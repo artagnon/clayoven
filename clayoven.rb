@@ -45,7 +45,7 @@ class ContentPage < Page
     @filename = filename
     @topic, @permalink = @filename.split(":", 2)
     @target = "#{@permalink}.html"
-    @template = IO.read("design/template.index.html")
+    @template = IO.read("design/template.html")
   end
 end
 
