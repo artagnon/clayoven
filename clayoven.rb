@@ -23,7 +23,7 @@ class Page
 end
 
 class IndexPage < Page
-  attr_accessor :index_fill
+  attr_accessor :indexfill
 
   def initialize(filename)
     @filename = filename
