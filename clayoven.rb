@@ -3,6 +3,8 @@ class Page
 end
 
 class IndexPage < Page
+  attr_accessor :index_fill
+
   def initialize(filename)
     @filename = filename
     if @filename == "index"
@@ -94,6 +96,9 @@ def main
 
   # Compute the indexfill for indexes
   flist = content_files.select { |file| file.start_with? "#{permalink}:" }
+  topics.each { |topic|
+    topic_index = index_pages.select { |page| page.topic == topic }[0] # there is only one
+    topic_index.indexfill = content_pages.select { |page| page.topic == topic }
   indexfill = flist.map { |file| file.split("#{permalink}:")[1] }.map {
     |link| "<li><a href=\"#{link}\">#{link}</a></li>" }.join("\n") if flist
 
