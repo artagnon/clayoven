@@ -1,3 +1,38 @@
+class Page
+  attr_accessor :filename, :permalink, :title, :body, :footer, :target
+end
+
+class IndexPage < Page
+  def IndexPage(filename)
+    @filename = filename
+    if @filename == "index"
+      @permalink = @filename
+    else
+      @permalink = filename.split(".index")[0]
+    end
+    @target = "#{@permalink}.html"
+  end
+  def template
+    IO.read("design/template.index.html")
+  end
+end
+
+class ContentPage < Page
+  attr_accessor :topic, :pub_date
+
+  def ContentPage(filename)
+    @filename = filename
+    @permalink = @filename.split(":", 2)[1]
+    @target = "#{@permalink}.html"
+  end
+  def template
+    IO.read("design/template.html")
+  end
+end
+
+# Topic classes will be dynamically created
+# So, we will have a LogContentPage class, for example
+
 def escape_htmlspecialchars(content)
   # see: http://php.net/htmlspecialchars
   replaces = {
@@ -32,51 +67,50 @@ def main
     end
   }
 
-  # Next, look for stray files
   index_files = ["index"] + all_files.select { |file| /\.index$/ =~ file }
-  topics = index_files.map { |file| file.split(".index")[0] }
   content_files = all_files - index_files
+  index_pages = index_files.map { |file| IndexPage.new(file) }
+  content_pages = []
+
+  # Generate topic classes on-the-fly, and fill up content_pages
+  topics = index_files.map { |file| file.split(".index")[0] }
+  topics.each { |topic|
+    klass = Object.const_set("#{topic.capitalize}ContentPage",
+                             Class.new ContentPage)
+    content_pages.select { |filename| filename.split(":", 2)[0] == topic }.each {
+      |filename| content_pages.push klass.new(filename) }
+  }
+
+  # Next, look for stray files
   (content_files.reject { |file| topics.include? (file.split(":", 2)[0]) })
     .each { |stray_file|
-    content_files = content_files - [stray_file]
     puts "warning: #{stray_file} is a stray file; ignored"
   }
 
-  # Generate all the pages
-  (index_files + content_files).each { |file|
-    if file == "index"
-      target = "index.html"
-      permalink = file
-      template = IO.read("design/template.index.html")
-    elsif index_files.include? file
-      target = file.sub(".index", ".html")
-      permalink = file.split(".index")[0]
-      template = IO.read("design/template.index.html")
-
-      # Compute the indexfill
-      flist = content_files.select { |file| file.start_with? "#{permalink}:" }
-      indexfill = flist.map { |file| file.split("#{permalink}:")[1] }.map {
-        |link| "<li><a href=\"#{link}\">#{link}</a></li>" }.join("\n") if flist
-    else
-      target = "#{file.split(':', 2)[1]}.html"
-      permalink = file.split(":", 2)[0]
-      template = IO.read("design/template.html")
-    end
-    content = escape_htmlspecialchars(IO.read file)
-    title, rest = content.split("\n\n", 2)
+  # First, fill in all the page attributes
+  (index_pages + content_pages).each { |page|
+    page.content = escape_htmlspecialchars(IO.read file)
+    page.title, rest = content.split("\n\n", 2)
     begin
       # Optional footer
-      body, partial_footer = rest.split("\n\n[1]: ", 2)
-      footer = "\n\n[1]: #{partial_footer}" if partial_footer
+      page.body, partial_footer = rest.split("\n\n[1]: ", 2)
+      page.footer = "\n\n[1]: #{partial_footer}" if partial_footer
     rescue
     end
-    anchor_footerlinks footer if footer
+    anchor_footerlinks page.footer if page.footer
     sidebar = topics.map { |topic|
       "<li><a href=\"#{topic}\">#{topic}/</a></li>" }.join("\n")
+  }
 
+  # Compute the indexfill for indexes
+  flist = content_files.select { |file| file.start_with? "#{permalink}:" }
+  indexfill = flist.map { |file| file.split("#{permalink}:")[1] }.map {
+    |link| "<li><a href=\"#{link}\">#{link}</a></li>" }.join("\n") if flist
+
+  (index_pages + content_pages.each { |page|
     template_vars = ["permalink", "title", "body", "sidebar"]
     ["footer", "indexfill"].each { |optional_field|
-      if eval(optional_field)
+      if eval(page.optional_field)
         template_vars = template_vars + [optional_field]
       else
         template.gsub!("\{% #{optional_field} %\}", "")
