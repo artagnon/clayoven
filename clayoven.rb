@@ -1,5 +1,5 @@
 class Page
-  attr_accessor :filename, :permalink, :title, :body, :footer, :target
+  attr_accessor :filename, :permalink, :title, :body, :target
 end
 
 class IndexPage < Page
