@@ -1,22 +1,13 @@
+require 'slim'
+
 class Page
-  attr_accessor :filename, :permalink, :title, :topic, :body, :template, :target
+  attr_accessor :filename, :permalink, :title, :topic, :body, :template, :target, :topics
 
-  def render(sidebar)
-    template_vars = ["permalink", "title", "body"]
-    if self.is_a? IndexPage
-      if @indexfill
-        template_vars = template_vars + ["indexfill"]
-      else
-        @template.gsub!("\{% indexfill %\}", "")
-      end
-    end
-
-    @template.gsub!("\{% sidebar %\}", sidebar)
-    template_vars.each { |template_var|
-      @template.gsub!("\{% #{template_var} %\}", eval("self.#{template_var}"))
-    }
+  def render(topics)
+    self.topics = topics
+    rendered = Slim::Template.new { @template }.render(self)
     File.open(@target, mode="w") { |targetio|
-      nbytes = targetio.write(@template)
+      nbytes = targetio.write(rendered)
       puts "[GEN] #{@target} (#{nbytes} bytes out)"
     }
   end
@@ -34,7 +25,7 @@ class IndexPage < Page
     end
     @topic = @permalink
     @target = "#{@permalink}.html"
-    @template = IO.read("design/template.index.html")
+    @template = IO.read("design/template.index.slim")
   end
 end
 
@@ -45,21 +36,8 @@ class ContentPage < Page
     @filename = filename
     @topic, @permalink = @filename.split(":", 2)
     @target = "#{@permalink}.html"
-    @template = IO.read("design/template.html")
+    @template = IO.read("design/template.slim")
   end
-end
-
-def escape_htmlspecialchars(content)
-  # see: http://php.net/htmlspecialchars
-  replaces = {
-    "&" => "&amp;",
-    "\"" => "&quot;",
-    "'" => "&apos;",
-    "<" => "&lt;",
-    ">" => "&gt;"
-  }
-  replaces.each { |key, value| content.gsub!(key, value) }
-  content
 end
 
 def anchor_footerlinks(footer)
@@ -77,7 +55,7 @@ def main
     exit 1
   end
 
-  ["template.index.html", "template.html"].each { |file|
+  ["template.index.slim", "template.slim"].each { |file|
     if not Dir.entries("design").include? file
       puts "error: design/#{file} file not found; aborting"
       exit 1
@@ -88,7 +66,7 @@ def main
   content_files = all_files - index_files
   index_pages = index_files.map { |filename| IndexPage.new(filename) }
   content_pages = content_files.map { |filename| ContentPage.new(filename) }
-  topics = index_files.map { |file| file.split(".index")[0] }
+  topics = index_files.map { |file| file.split(".index")[0] }.uniq
 
   # Next, look for stray files
   (content_files.reject { |file| topics.include? (file.split(":", 2)[0]) })
@@ -98,24 +76,17 @@ def main
 
   # First, fill in all the page attributes
   (index_pages + content_pages).each { |page|
-    content = escape_htmlspecialchars(IO.read page.filename)
-    page.title, page.body = content.split("\n\n", 2)
+    page.title, page.body = (IO.read page.filename).split("\n\n", 2)
     anchor_footerlinks page.body
   }
 
   # Compute the indexfill for indexes
   topics.each { |topic|
     topic_index = index_pages.select { |page| page.topic == topic }[0] # there is only one
-    these_pages = content_pages.select { |page| page.topic == topic }
-    topic_index.indexfill = these_pages.map { |page|
-      "<li><a href=\"#{page.permalink}\">#{page.title}</a></li>" }.join("\n")
+    topic_index.indexfill = content_pages.select { |page| page.topic == topic }
   }
 
-  # Compute sidebar
-  sidebar = topics.map { |topic|
-    "<li><a href=\"#{topic}\">#{topic}/</a></li>" }.join("\n")
-
-  (index_pages + content_pages).each { |page| page.render sidebar }
+  (index_pages + content_pages).each { |page| page.render topics }
 end
 
 main

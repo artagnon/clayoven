@@ -1,9 +1,20 @@
 # clayoven
 
 An extremely simple website generator that operates on a very specific
-kind of repository.  It has no dependencies, and hand-parses
-everything using regular expressions.  Posts can optionally posted via
-email.
+kind of repository.  It only depends on slim (for rendering).  Posts
+can optionally posted via email.
+
+## Usage
+
+First, get slim
+
+    gem install slim
+
+Then, simply run:
+
+    ruby clayoven.rb
+
+in your repository.
 
 ## Repository format
 
