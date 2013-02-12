@@ -68,7 +68,8 @@ end
 
 def main
   # First, make sure that the required files are present
-  all_files = (Dir.entries(".") - [".", "..", "design", ".git"]).reject { |file|
+  all_files = (Dir.entries(".") - [".", "..", "design", ".git",
+                                   ".gitignore"]).reject { |file|
     /\.html$/ =~ file
   }
   if not all_files.include? "index"
