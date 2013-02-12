@@ -62,11 +62,20 @@ def main
     begin
       # Optional footer
       body, partial_footer = rest.split("\n\n[1]: ", 2)
-      footer = "\n\n[1]: #{partial_footer}"
+      footer = "\n\n[1]: #{partial_footer}" if partial_footer
     rescue
     end
     anchor_footerlinks footer if footer
-    ["permalink", "title", "body", "footer"].each { |template_var|
+    sidebar = topics.map { |topic|
+      "<li><a href=\"#{topic}\">#{topic}/</a></li>" }.join("\n")
+
+    template_vars = ["permalink", "title", "body", "sidebar"]
+    if footer
+      template_vars = template_vars + ["footer"]
+    else
+      template.gsub!("\{% footer %\}", "")
+    end
+    template_vars.each { |template_var|
       template.gsub!("\{% #{template_var} %\}", eval(template_var))
     }
     File.open(target, mode="w") { |targetio|
