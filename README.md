@@ -4,17 +4,30 @@ An extremely simple website generator that operates on a very specific
 kind of repository.  It only depends on slim (for rendering).  Posts
 can optionally posted via email.
 
-## Usage
+## Configuration
 
-First, get slim
+clayoven depends on slim:
 
     gem install slim
 
-Then, simply run:
+clayoven generates links with the assumption that the .html part is
+implicit and unnecessary.  Use the following .htaccess file in your
+repository root:
 
-    ruby clayoven.rb
-
-in your repository.
+    Options +FollowSymLinks -MultiViews
+    DirectorySlash Off
+    
+    RewriteEngine On
+    
+    RewriteCond %{SCRIPT_FILENAME}/ -d
+    RewriteCond %{SCRIPT_FILENAME}.html !-f
+    RewriteRule [^/]$ %{REQUEST_URI}/ [R=301,L]
+    
+    RewriteCond %{ENV:REDIRECT_STATUS} ^$
+    RewriteRule ^(.+)\.html$ /$1 [R=301,L]
+    
+    RewriteCond %{SCRIPT_FILENAME}.html -f
+    RewriteRule [^/]$ %{REQUEST_URI}.html [QSA,L]
 
 ## Repository format
 
