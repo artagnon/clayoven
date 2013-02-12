@@ -77,7 +77,7 @@ def main
 
   # First, fill in all the page attributes
   (index_pages + content_pages).each { |page|
-    page.content = escape_htmlspecialchars(IO.read file)
+    content = escape_htmlspecialchars(IO.read page.filename)
     page.title, page.body = content.split("\n\n", 2)
     anchor_footerlinks page.body
   }
