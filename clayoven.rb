@@ -82,16 +82,8 @@ def main
   # First, fill in all the page attributes
   (index_pages + content_pages).each { |page|
     page.content = escape_htmlspecialchars(IO.read file)
-    page.title, rest = content.split("\n\n", 2)
-    begin
-      # Optional footer
-      page.body, partial_footer = rest.split("\n\n[1]: ", 2)
-      page.footer = "\n\n[1]: #{partial_footer}" if partial_footer
-    rescue
-    end
-    anchor_footerlinks page.footer if page.footer
-    sidebar = topics.map { |topic|
-      "<li><a href=\"#{topic}\">#{topic}/</a></li>" }.join("\n")
+    page.title, page.body = content.split("\n\n", 2)
+    anchor_footerlinks page.body
   }
 
   # Compute the indexfill for indexes
@@ -104,7 +96,7 @@ def main
 
   (index_pages + content_pages.each { |page|
     template_vars = ["permalink", "title", "body", "sidebar"]
-    ["footer", "indexfill"].each { |optional_field|
+    ["indexfill"].each { |optional_field|
       if eval(page.optional_field)
         template_vars = template_vars + [optional_field]
       else
