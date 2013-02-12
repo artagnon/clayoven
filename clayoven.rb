@@ -1,5 +1,5 @@
 class Page
-  attr_accessor :filename, :permalink, :title, :body, :target
+  attr_accessor :filename, :permalink, :title, :topic, :body, :target
 end
 
 class IndexPage < Page
@@ -10,6 +10,7 @@ class IndexPage < Page
     else
       @permalink = filename.split(".index")[0]
     end
+    @topic = @permalink
     @target = "#{@permalink}.html"
   end
   def template
@@ -18,20 +19,17 @@ class IndexPage < Page
 end
 
 class ContentPage < Page
-  attr_accessor :topic, :pub_date
+  attr_accessor :pub_date
 
   def initialize(filename)
     @filename = filename
-    @permalink = @filename.split(":", 2)[1]
+    @topic, @permalink = @filename.split(":", 2)
     @target = "#{@permalink}.html"
   end
   def template
     IO.read("design/template.html")
   end
 end
-
-# Topic classes will be dynamically created
-# So, we will have a LogContentPage class, for example
 
 def escape_htmlspecialchars(content)
   # see: http://php.net/htmlspecialchars
@@ -70,16 +68,8 @@ def main
   index_files = ["index"] + all_files.select { |file| /\.index$/ =~ file }
   content_files = all_files - index_files
   index_pages = index_files.map { |file| IndexPage.new(file) }
-  content_pages = []
-
-  # Generate topic classes on-the-fly, and fill up content_pages
+  content_pages = content_files.map { |file| ContentPage.new(file) }
   topics = index_files.map { |file| file.split(".index")[0] }
-  topics.each { |topic|
-    klass = Object.const_set("#{topic.capitalize}ContentPage",
-                             Class.new ContentPage)
-    content_pages.select { |filename| filename.split(":", 2)[0] == topic }.each {
-      |filename| content_pages.push klass.new(filename) }
-  }
 
   # Next, look for stray files
   (content_files.reject { |file| topics.include? (file.split(":", 2)[0]) })
