@@ -1,5 +1,5 @@
 class Page
-  attr_accessor :filename, :permalink, :title, :topic, :body, :target
+  attr_accessor :filename, :permalink, :title, :topic, :body, :template, :target
 end
 
 class IndexPage < Page
@@ -14,9 +14,7 @@ class IndexPage < Page
     end
     @topic = @permalink
     @target = "#{@permalink}.html"
-  end
-  def template
-    IO.read("design/template.index.html")
+    @template = IO.read("design/template.index.html")
   end
 end
 
@@ -27,9 +25,7 @@ class ContentPage < Page
     @filename = filename
     @topic, @permalink = @filename.split(":", 2)
     @target = "#{@permalink}.html"
-  end
-  def template
-    IO.read("design/template.html")
+    @template = IO.read("design/template.index.html")
   end
 end
 
