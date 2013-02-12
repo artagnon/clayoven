@@ -91,12 +91,12 @@ def main
     "<li><a href=\"#{topic}\">#{topic}/</a></li>" }.join("\n")
 
   # Compute the indexfill for indexes
-  flist = content_files.select { |file| file.start_with? "#{permalink}:" }
   topics.each { |topic|
     topic_index = index_pages.select { |page| page.topic == topic }[0] # there is only one
-    topic_index.indexfill = content_pages.select { |page| page.topic == topic }
-  indexfill = flist.map { |file| file.split("#{permalink}:")[1] }.map {
-    |link| "<li><a href=\"#{link}\">#{link}</a></li>" }.join("\n") if flist
+    these_pages = content_pages.select { |page| page.topic == topic }
+    topic_index.indexfill = these_pages.map { |page|
+      "<li><a href=\"#{page.permalink}\">#{page.title}</a></li>" }.join("\n")
+  }
 
   (index_pages + content_pages.each { |page|
     template_vars = ["permalink", "title", "body", "sidebar"]
