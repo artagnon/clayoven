@@ -33,7 +33,7 @@ def main
   }
 
   # Next, look for stray files
-  index_files = ["index"] + all_files.select { |file| /\.index/ =~ file }
+  index_files = ["index"] + all_files.select { |file| /\.index$/ =~ file }
   topics = index_files.map { |file| file.split(".index")[0] }
   content_files = all_files - index_files
   (content_files.reject { |file| topics.include? (file.split(":", 2)[0]) })
