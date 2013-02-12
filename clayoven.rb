@@ -86,8 +86,8 @@ def main
 
   index_files = ["index"] + all_files.select { |file| /\.index$/ =~ file }
   content_files = all_files - index_files
-  index_pages = index_files.map { |file| IndexPage.new(file) }
-  content_pages = content_files.map { |file| ContentPage.new(file) }
+  index_pages = index_files.map { |filename| IndexPage.new(filename) }
+  content_pages = content_files.map { |filename| ContentPage.new(filename) }
   topics = index_files.map { |file| file.split(".index")[0] }
 
   # Next, look for stray files
