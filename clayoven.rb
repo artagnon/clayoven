@@ -86,6 +86,10 @@ def main
     anchor_footerlinks page.body
   }
 
+  # Compute sidebar
+  sidebar = topics.map { |topic|
+    "<li><a href=\"#{topic}\">#{topic}/</a></li>" }.join("\n")
+
   # Compute the indexfill for indexes
   flist = content_files.select { |file| file.start_with? "#{permalink}:" }
   topics.each { |topic|
