@@ -52,6 +52,11 @@ def main
       target = file.sub(".index", ".html")
       permalink = file.split(".index")[0]
       template = IO.read("design/template.index.html")
+
+      # Compute the indexfill
+      flist = content_files.select { |file| file.start_with? "#{permalink}:" }
+      indexfill = flist.map { |file| file.split("#{permalink}:")[1] }.map {
+        |link| "<li><a href=\"#{link}\">#{link}</a></li>" }.join("\n") if flist
     else
       target = "#{file.split(':', 2)[1]}.html"
       permalink = file.split(":", 2)[0]
@@ -70,11 +75,13 @@ def main
       "<li><a href=\"#{topic}\">#{topic}/</a></li>" }.join("\n")
 
     template_vars = ["permalink", "title", "body", "sidebar"]
-    if footer
-      template_vars = template_vars + ["footer"]
-    else
-      template.gsub!("\{% footer %\}", "")
-    end
+    ["footer", "indexfill"].each { |optional_field|
+      if eval(optional_field)
+        template_vars = template_vars + [optional_field]
+      else
+        template.gsub!("\{% #{optional_field} %\}", "")
+      end
+    }
     template_vars.each { |template_var|
       template.gsub!("\{% #{template_var} %\}", eval(template_var))
     }
