@@ -1,11 +1,16 @@
 require 'slim'
 
+def anchor_footerlinks!(page)
+  page.gsub!(/^(\[\d+\]:) (.*)/, '\1 <a href="\2">\2</a>')
+end
+
 class Page
   attr_accessor :filename, :permalink, :title, :topic, :body, :template, :target, :topics
 
   def render(topics)
     self.topics = topics
     rendered = Slim::Template.new { @template }.render(self)
+    anchor_footerlinks! rendered
     File.open(@target, mode="w") { |targetio|
       nbytes = targetio.write(rendered)
       puts "[GEN] #{@target} (#{nbytes} bytes out)"
@@ -38,10 +43,6 @@ class ContentPage < Page
     @target = "#{@permalink}.html"
     @template = IO.read("design/template.slim")
   end
-end
-
-def anchor_footerlinks(footer)
-  footer.gsub!(/^(\[\d+\]:) (.*)/, '\1 <a href="\2">\2</a>')
 end
 
 def main
@@ -77,7 +78,6 @@ def main
   # First, fill in all the page attributes
   (index_pages + content_pages).each { |page|
     page.title, page.body = (IO.read page.filename).split("\n\n", 2)
-    anchor_footerlinks page.body
   }
 
   # Compute the indexfill for indexes
