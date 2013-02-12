@@ -1,5 +1,25 @@
 class Page
   attr_accessor :filename, :permalink, :title, :topic, :body, :template, :target
+
+  def render(sidebar)
+    template_vars = ["permalink", "title", "body"]
+    if self.is_a? IndexPage
+      if @indexfill
+        template_vars = template_vars + ["indexfill"]
+      else
+        @template.gsub!("\{% indexfill %\}", "")
+      end
+    end
+
+    @template.gsub!("\{% sidebar %\}", sidebar)
+    template_vars.each { |template_var|
+      @template.gsub!("\{% #{template_var} %\}", eval("self.#{template_var}"))
+    }
+    File.open(@target, mode="w") { |targetio|
+      nbytes = targetio.write(@template)
+      puts "[GEN] #{@target} (#{nbytes} bytes out)"
+    }
+  end
 end
 
 class IndexPage < Page
@@ -94,23 +114,6 @@ def main
       "<li><a href=\"#{page.permalink}\">#{page.title}</a></li>" }.join("\n")
   }
 
-  (index_pages + content_pages.each { |page|
-    template_vars = ["permalink", "title", "body", "sidebar"]
-    ["indexfill"].each { |optional_field|
-      if eval(page.optional_field)
-        template_vars = template_vars + [optional_field]
-      else
-        template.gsub!("\{% #{optional_field} %\}", "")
-      end
-    }
-    template_vars.each { |template_var|
-      template.gsub!("\{% #{template_var} %\}", eval(template_var))
-    }
-    File.open(target, mode="w") { |targetio|
-      nbytes = targetio.write(template)
-      puts "[GEN] #{target} (#{nbytes} bytes out)"
-    }
-  }
 end
 
 main
