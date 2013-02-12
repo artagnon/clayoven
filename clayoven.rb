@@ -103,10 +103,6 @@ def main
     anchor_footerlinks page.body
   }
 
-  # Compute sidebar
-  sidebar = topics.map { |topic|
-    "<li><a href=\"#{topic}\">#{topic}/</a></li>" }.join("\n")
-
   # Compute the indexfill for indexes
   topics.each { |topic|
     topic_index = index_pages.select { |page| page.topic == topic }[0] # there is only one
@@ -115,6 +111,11 @@ def main
       "<li><a href=\"#{page.permalink}\">#{page.title}</a></li>" }.join("\n")
   }
 
+  # Compute sidebar
+  sidebar = topics.map { |topic|
+    "<li><a href=\"#{topic}\">#{topic}/</a></li>" }.join("\n")
+
+  (index_pages + content_pages).each { |page| page.render sidebar }
 end
 
 main
