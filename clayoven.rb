@@ -3,7 +3,7 @@ class Page
 end
 
 class IndexPage < Page
-  def IndexPage(filename)
+  def initialize(filename)
     @filename = filename
     if @filename == "index"
       @permalink = @filename
@@ -20,7 +20,7 @@ end
 class ContentPage < Page
   attr_accessor :topic, :pub_date
 
-  def ContentPage(filename)
+  def initialize(filename)
     @filename = filename
     @permalink = @filename.split(":", 2)[1]
     @target = "#{@permalink}.html"
