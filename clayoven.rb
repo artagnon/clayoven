@@ -1,4 +1,5 @@
 require 'slim'
+require_relative 'httpd'
 
 def anchor_footerlinks!(page)
   page.gsub!(/^(\[\d+\]:) (.*)/, '\1 <a href="\2">\2</a>')
@@ -97,4 +98,9 @@ def main
   (index_pages + content_pages).each { |page| page.render topics }
 end
 
-main
+case ARGV[0]
+when "server"
+  Httpd.start
+else
+  main
+end
