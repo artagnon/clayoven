@@ -20,6 +20,7 @@ class Page
 
   def render(topics)
     self.topics = topics
+    Slim::Engine.set_default_options pretty: true, sort_attrs: false
     rendered = Slim::Template.new { IO.read("design/template.slim") }.render(self)
     anchor_footerlinks! rendered
     File.open(@target, mode="w") { |targetio|
