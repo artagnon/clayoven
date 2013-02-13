@@ -1,3 +1,4 @@
+require 'optparse'
 require 'slim'
 
 def anchor_footerlinks!(page)
@@ -28,7 +29,7 @@ class Page
 end
 
 class IndexPage < Page
-  def initialize(filename)
+  def initialize(filename, output_directory)
     @filename = filename
     if @filename == "index"
       @permalink = @filename
@@ -36,7 +37,7 @@ class IndexPage < Page
       @permalink = filename.split(".index")[0]
     end
     @topic = @permalink
-    @target = "#{@permalink}.html"
+    @target = File.join(output_directory, "#{@permalink}.html")
     @timestamp = when_introduced @filename
   end
 end
@@ -44,16 +45,50 @@ end
 class ContentPage < Page
   attr_accessor :pub_date
 
-  def initialize(filename)
+  def initialize(filename, output_directory)
     @filename = filename
     @topic, @permalink = @filename.split(":", 2)
-    @target = "#{@permalink}.html"
+    @target = File.join(output_directory, "#{@permalink}.html")
     @indexfill = nil
     @timestamp = when_introduced @filename
   end
 end
 
+def parse_options
+  # Fill in the default values first.
+  options = {:output_directory => "."}
+
+  parser = OptionParser.new do |opts|
+    opts.banner = "Usage: clayoven.rb [options]"
+    
+    opts.on("-o", "--output-directory DIRECTORY",
+            "Output html files to DIRECTORY") do |dir_name|
+      options[:output_directory] = dir_name
+    end
+
+    opts.on("-h", "--help", "Show this message") do
+      puts opts
+      return nil
+    end
+  end
+
+  begin
+    parser.parse!
+  rescue OptionParser::ParseError
+    puts parser
+    return nil
+  end
+
+  return options
+end
+
 def main
+  options = parse_options
+  if options.nil?
+    exit
+  end
+  output_directory = options[:output_directory]
+
   # First, make sure that the required files are present
   all_files = (Dir.entries(".") - [".", "..", "design"]).reject { |file|
     /\.html$/ =~ file or /^\..*/ =~ file or /.*~$/ =~ file
@@ -79,8 +114,10 @@ def main
     puts "warning: #{stray_file} is a stray file; ignored"
   }
 
-  index_pages = index_files.map { |filename| IndexPage.new(filename) }
-  content_pages = content_files.map { |filename| ContentPage.new(filename) }
+  index_pages = index_files.map { |filename| 
+    IndexPage.new(filename, output_directory) }
+  content_pages = content_files.map { |filename| 
+    ContentPage.new(filename, output_directory) }
 
   # First, fill in all the page attributes
   (index_pages + content_pages).each { |page|
