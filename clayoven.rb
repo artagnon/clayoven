@@ -6,10 +6,11 @@ def anchor_footerlinks!(page)
 end
 
 def when_introduced(filename)
-  if system("git log #{filename} 2>&1 >/dev/null")
-    Time.at(`git log --reverse --pretty="%at" -1 #{filename}`.to_i)
-  else
+  timestamp = `git log --reverse --pretty="%at" -1 #{filename} >/dev/null`.strip
+  if timestamp == ""
     Time.now
+  else
+    Time.at(timestamp.to_i)
   end
 end
 
@@ -92,7 +93,7 @@ def main
   topics.each { |topic|
     topic_index = index_pages.select { |page| page.topic == topic }[0]
     topic_index.indexfill = content_pages.select { |page|
-      page.topic == topic }.sort { |a, b| b.timestamp <=> a.timestamp }
+      page.topic == topic }.sort { |a, b| a.timestamp <=> b.timestamp }
   }
 
   (index_pages + content_pages).each { |page| page.render topics }
