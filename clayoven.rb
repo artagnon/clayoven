@@ -5,11 +5,12 @@ def anchor_footerlinks!(page)
 end
 
 class Page
-  attr_accessor :filename, :permalink, :title, :topic, :body, :template, :target, :topics
+  attr_accessor :filename, :permalink, :title, :topic, :body,
+  :target, :indexfill, :topics
 
   def render(topics)
     self.topics = topics
-    rendered = Slim::Template.new { @template }.render(self)
+    rendered = Slim::Template.new { IO.read("design/template.slim") }.render(self)
     anchor_footerlinks! rendered
     File.open(@target, mode="w") { |targetio|
       nbytes = targetio.write(rendered)
@@ -19,8 +20,6 @@ class Page
 end
 
 class IndexPage < Page
-  attr_accessor :indexfill
-
   def initialize(filename)
     @filename = filename
     if @filename == "index"
@@ -30,7 +29,6 @@ class IndexPage < Page
     end
     @topic = @permalink
     @target = "#{@permalink}.html"
-    @template = IO.read("design/template.index.slim")
   end
 end
 
@@ -41,7 +39,7 @@ class ContentPage < Page
     @filename = filename
     @topic, @permalink = @filename.split(":", 2)
     @target = "#{@permalink}.html"
-    @template = IO.read("design/template.slim")
+    @indexfill = nil
   end
 end
 
@@ -56,12 +54,10 @@ def main
     exit 1
   end
 
-  ["template.index.slim", "template.slim"].each { |file|
-    if not Dir.entries("design").include? file
-      puts "error: design/#{file} file not found; aborting"
-      exit 1
-    end
-  }
+  if not Dir.entries("design").include? "template.slim"
+    puts "error: design/template.slim file not found; aborting"
+    exit 1
+  end
 
   index_files = ["index"] + all_files.select { |file| /\.index$/ =~ file }
   content_files = all_files - index_files
