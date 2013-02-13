@@ -1,8 +1,8 @@
 # clayoven
 
-An extremely simple website generator that operates on a very specific
-kind of repository.  It only depends on slim (for rendering).  Posts
-can optionally posted via email.
+Extremely simple website generator. Generates html files from a git
+repository, where files use a special markup.  Pages can optionally be
+posted via email.
 
 ## Configuration
 
