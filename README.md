@@ -38,8 +38,7 @@ repository root:
   `<topic>:<permalink>`.
 
 * To generate HTML from the index and content files, the repository
-  should contain `design/template.index.html` (for index pages) and
-  `design/template.html` (for content pages).
+  should contain `design/template.slim`.
 
 * Both index and content pages conform to the same format.  The first
   line of file contains the title, followed by the body which is
