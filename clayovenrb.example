@@ -1,4 +1,5 @@
+---
 username: publish@artagnon.com
-password: 
+password: yourpass
 server: imap.gmail.com
 port: 993

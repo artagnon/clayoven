@@ -50,9 +50,9 @@ repository root:
 ## Posting via email
 
 clayoven includes clayovend, a daemon which constantly polls an IMAP
-server for new emails.  Copy `imap-settings.template` to
-`imap-settings.private` and configure.  The subject of the email
-should be suffixed with "# \<permalink\>".
+server for new emails.  Copy `clayovenrb.template` to `~/.clayovenrc`
+and configure.  The subject of the email should be suffixed with "#
+\<permalink\>".
 
 ## Contributing
 
