@@ -60,15 +60,17 @@ def main
 
   index_files = ["index"] + all_files.select { |file| /\.index$/ =~ file }
   content_files = all_files - index_files
-  index_pages = index_files.map { |filename| IndexPage.new(filename) }
-  content_pages = content_files.map { |filename| ContentPage.new(filename) }
   topics = index_files.map { |file| file.split(".index")[0] }.uniq
 
   # Next, look for stray files
   (content_files.reject { |file| topics.include? (file.split(":", 2)[0]) })
     .each { |stray_file|
+    content_files = content_files - [stray_file]
     puts "warning: #{stray_file} is a stray file; ignored"
   }
+
+  index_pages = index_files.map { |filename| IndexPage.new(filename) }
+  content_pages = content_files.map { |filename| ContentPage.new(filename) }
 
   # First, fill in all the page attributes
   (index_pages + content_pages).each { |page|
