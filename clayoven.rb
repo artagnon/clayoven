@@ -45,9 +45,8 @@ end
 
 def main
   # First, make sure that the required files are present
-  all_files = (Dir.entries(".") - [".", "..", "design", ".git",
-                                   ".gitignore"]).reject { |file|
-    /\.html$/ =~ file
+  all_files = (Dir.entries(".") - [".", "..", "design"]).reject { |file|
+    /\.html$/ =~ file or /^\..*/ =~ file or /.*~$/ =~ file
   }
   if not all_files.include? "index"
     puts "error: index file not found; aborting"
