@@ -4,8 +4,16 @@ def anchor_footerlinks!(page)
   page.gsub!(/^(\[\d+\]:) (.*)/, '\1 <a href="\2">\2</a>')
 end
 
+def when_introduced(filename)
+  if system("git log #{filename} 2>&1 >/dev/null")
+    Time.at(`git log --reverse --pretty="%at" -1 #{filename}`.to_i)
+  else
+    Time.now
+  end
+end
+
 class Page
-  attr_accessor :filename, :permalink, :title, :topic, :body,
+  attr_accessor :filename, :permalink, :timestamp, :title, :topic, :body,
   :target, :indexfill, :topics
 
   def render(topics)
@@ -29,6 +37,7 @@ class IndexPage < Page
     end
     @topic = @permalink
     @target = "#{@permalink}.html"
+    @timestamp = when_introduced @filename
   end
 end
 
@@ -40,6 +49,7 @@ class ContentPage < Page
     @topic, @permalink = @filename.split(":", 2)
     @target = "#{@permalink}.html"
     @indexfill = nil
+    @timestamp = when_introduced @filename
   end
 end
 
@@ -80,7 +90,8 @@ def main
   # Compute the indexfill for indexes
   topics.each { |topic|
     topic_index = index_pages.select { |page| page.topic == topic }[0]
-    topic_index.indexfill = content_pages.select { |page| page.topic == topic }
+    topic_index.indexfill = content_pages.select { |page|
+      page.topic == topic }.sort { |a, b| b.timestamp <=> a.timestamp }
   }
 
   (index_pages + content_pages).each { |page| page.render topics }
