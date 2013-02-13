@@ -79,7 +79,7 @@ def main
 
   # Compute the indexfill for indexes
   topics.each { |topic|
-    topic_index = index_pages.select { |page| page.topic == topic }[0] # there is only one
+    topic_index = index_pages.select { |page| page.topic == topic }[0]
     topic_index.indexfill = content_pages.select { |page| page.topic == topic }
   }
 
