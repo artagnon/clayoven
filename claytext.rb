@@ -1,27 +1,25 @@
 class Paragraph
-  attr_accessor :content, :exclude
+  attr_accessor :content
 
   def initialize(content)
     @content = content
-    @exclude = false
   end
 end
 
 class ClayText
-  def self.mark_emailquote!(content)
-    content = "<span class=\"emailquote\">#{content}</span>"
+  def self.mark_emailquote(content)
+    "<span class=\"emailquote\">#{content}</span>"
   end
 
-  def self.mark_codeblock!(content)
-    content = "<span class=\"codeblock\">#{content}</span>"
+  def self.mark_codeblock(content)
+    "<span class=\"codeblock\">#{content}</span>"
   end
 
-  def self.anchor_footerlinks!(footer)
-    footer.gsub!(%r{^(\[\d+\]:) (.*://(.*))}, '\1 <a href="\2">\3</a>')
+  def self.anchor_footerlinks(footer)
+    footer.gsub(%r{^(\[\d+\]:) (.*://(.*))}, '\1 <a href="\2">\3</a>')
   end
 
   def self.process(body)
-    puts "DBG: body"
     htmlescape_rules = {
       "&" => "&amp;",
       "\"" => "&quot;",
@@ -31,13 +29,9 @@ class ClayText
     }.freeze
 
     paragraph_rules = {
-      Proc.new { |line| line.start_with? "> " } => method(:mark_emailquote!),
-      Proc.new { |line| line.start_with? "    " } => method(:mark_codeblock!),
-      Proc.new { |line| /^\[\d+\]: / =~ line } => method(:anchor_footerlinks!)
-    }.freeze
-
-    body_rules = {
-      /(\[\d+\])/ => '<span class="linkref">\1</span>'
+      Proc.new { |line| line.start_with? "&gt; " } => method(:mark_emailquote),
+      Proc.new { |line| line.start_with? "    " } => method(:mark_codeblock),
+      Proc.new { |line| /^\[\d+\]: / =~ line } => method(:anchor_footerlinks)
     }.freeze
 
     # First, htmlescape the body text
@@ -51,23 +45,10 @@ class ClayText
     paragraphs.each { |paragraph|
       paragraph_rules.each { |proc_match, callback|
         if paragraph.content.lines.all? &proc_match
-          callback.call paragraph.content
-          paragraph.exclude = true
+          paragraph.content = callback.call paragraph.content
         end
       }
     }
-
-    # Body-level processing
-    paragraphs.select(&:exclude).each { |paragraph|
-      paragraph.content.gsub! /[(\[\d+\])]/, body_rules
-    }
-
-    puts "<pre>#{paragraphs.map(&:content).join("\n\n")}</pre>"
+    "\n<pre>#{paragraphs.map(&:content).join("\n\n")}</pre>\n"
   end
 end
-
-def main
-  ClayText.process(IO.read("colophon:claytext"))
-end
-
-main

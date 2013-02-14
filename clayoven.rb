@@ -1,9 +1,6 @@
 require 'slim'
 require_relative 'httpd'
-
-def anchor_footerlinks!(page)
-  page.gsub!(/^(\[\d+\]:) (.*)/, '\1 <a href="\2">\2</a>')
-end
+require_relative 'claytext'
 
 def when_introduced(filename)
   timestamp = `git log --reverse --pretty="%at" #{filename} 2>/dev/null | head -n 1`.strip
@@ -19,10 +16,10 @@ class Page
   :target, :indexfill, :topics
 
   def render(topics)
-    self.topics = topics
+    @topics = topics
+    @body = ClayText.process @body
     Slim::Engine.set_default_options pretty: true, sort_attrs: false
     rendered = Slim::Template.new { IO.read("design/template.slim") }.render(self)
-    anchor_footerlinks! rendered
     File.open(@target, mode="w") { |targetio|
       nbytes = targetio.write(rendered)
       puts "[GEN] #{@target} (#{nbytes} bytes out)"
