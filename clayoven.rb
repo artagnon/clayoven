@@ -74,9 +74,9 @@ def main
 
   # Next, look for stray files
   (content_files.reject { |file| topics.include? (file.split(":", 2)[0]) })
-    .each { |stray_file|
-    content_files = content_files - [stray_file]
-    puts "warning: #{stray_file} is a stray file; ignored"
+    .each { |stray_entry|
+    content_files = content_files - [stray_entry]
+    puts "warning: #{stray_entry} is a stray file or directory; ignored"
   }
 
   index_pages = index_files.map { |filename| IndexPage.new(filename) }
