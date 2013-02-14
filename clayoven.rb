@@ -1,4 +1,5 @@
 require 'slim'
+require 'yaml'
 require_relative 'httpd'
 require_relative 'claytext'
 
@@ -8,6 +9,38 @@ def when_introduced(filename)
     Time.now
   else
     Time.at(timestamp.to_i)
+  end
+end
+
+class ConfigData
+  attr_accessor :rootpath, :rcpath, :ignorepath, :rc, :ignore
+
+  def initialize
+    @rootpath = ".clayoven"
+    @rcpath = "#{rootpath}/rc"
+    @ignorepath = "#{rootpath}/ignore"
+    @ignore = ["\\.html$"]
+    @rc = {"claytext" => {"reflow" => "false"},
+           "imap" => {"server" => "imap.gmail.com"}}
+
+    if not File.exists? @ignorepath and not File.exists? @rcpath
+      puts "[NOTE] Populating .clayoven/ with sane defaults"
+    end
+
+    Dir.mkdir @rootpath if not Dir.exists? @rootpath
+    if File.exists? @ignorepath
+      @ignore = IO.read(@ignorepath).split("\n")
+    else
+      File.open(@ignorepath, "w") { |ignoreio|
+        ignoreio.write @ignore.join("\n") }
+    end
+
+    if File.exists? @rcpath
+      @rc = YAML.load_file @rcpath
+    else
+      File.open(@rcpath, "w") { |rcio|
+        rcio.write YAML.dump(@rc) }
+    end
   end
 end
 
@@ -54,14 +87,15 @@ class ContentPage < Page
 end
 
 def main
-  # First, make sure that the required files are present
-  all_files = (Dir.entries(".") - [".", "..", "design"]).reject { |file|
-    /\.html$/ =~ file or /^\..*/ =~ file or /.*~$/ =~ file
-  }
-  if not all_files.include? "index"
+  if not File.exists? "index"
     puts "error: index file not found; aborting"
     exit 1
   end
+
+  config = ConfigData.new
+  all_files = (Dir.entries(".") - [".", ".."]).reject { |entry|
+    config.ignore.any? { |regex| %r{regex} =~ entry }
+  }
 
   if not Dir.entries("design").include? "template.slim"
     puts "error: design/template.slim file not found; aborting"
