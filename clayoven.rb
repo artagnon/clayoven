@@ -19,7 +19,8 @@ class ConfigData
     @rootpath = ".clayoven"
     @rcpath = "#{rootpath}/rc"
     @ignorepath = "#{rootpath}/ignore"
-    @ignore = ["\\.html$", "~$", ".git", ".gitignore", ".htaccess"]
+    @ignore = ["\\.html$", "~$", "^.\#", "^\#.*\#$",
+               "^\\.git$", "^\\.gitignore$", "^\\.htaccess$"]
     @rc = nil
 
     Dir.mkdir @rootpath if not Dir.exists? @rootpath
