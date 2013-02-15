@@ -19,13 +19,8 @@ class ConfigData
     @rootpath = ".clayoven"
     @rcpath = "#{rootpath}/rc"
     @ignorepath = "#{rootpath}/ignore"
-    @ignore = ["\\.html$"]
-    @rc = {"claytext" => {"reflow" => "false"},
-           "imap" => {"server" => "imap.gmail.com"}}
-
-    if not File.exists? @ignorepath and not File.exists? @rcpath
-      puts "[NOTE] Populating .clayoven/ with sane defaults"
-    end
+    @ignore = ["\\.html$", "~$", ".git", ".gitignore", ".htaccess"]
+    @rc = nil
 
     Dir.mkdir @rootpath if not Dir.exists? @rootpath
     if File.exists? @ignorepath
@@ -33,13 +28,7 @@ class ConfigData
     else
       File.open(@ignorepath, "w") { |ignoreio|
         ignoreio.write @ignore.join("\n") }
-    end
-
-    if File.exists? @rcpath
-      @rc = YAML.load_file @rcpath
-    else
-      File.open(@rcpath, "w") { |rcio|
-        rcio.write YAML.dump(@rc) }
+      puts "[NOTE] #{@ignorepath} populated with sane defaults"
     end
   end
 end
@@ -93,8 +82,9 @@ def main
   end
 
   config = ConfigData.new
-  all_files = (Dir.entries(".") - [".", ".."]).reject { |entry|
-    config.ignore.any? { |regex| %r{regex} =~ entry }
+  all_files = (Dir.entries(".") -
+               [".", "..", ".clayoven", "design"]).reject { |entry|
+    config.ignore.any? { |pattern| %r{#{pattern}} =~ entry }
   }
 
   if not Dir.entries("design").include? "template.slim"
