@@ -46,11 +46,11 @@ end
 
 class Page
   attr_accessor :filename, :permalink, :timestamp, :title, :topic, :body,
-  :target, :indexfill, :topics
+  :paragraphs, :target, :indexfill, :topics
 
   def render(topics)
     @topics = topics
-    @body = ClayText.process @body
+    @paragraphs = ClayText.process! @body
     Slim::Engine.set_default_options pretty: true, sort_attrs: false
     rendered = Slim::Template.new { IO.read("design/template.slim") }.render(self)
     File.open(@target, mode="w") { |targetio|
