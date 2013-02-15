@@ -22,7 +22,9 @@ class ClayText
   end
 
   def self.anchor_footerlinks!(paragraph)
-    paragraph.content.gsub!(%r{^(\[\d+\]:) (.*://(.*))}, '\1 <a href="\2">\3</a>')
+    paragraph.content.gsub!(%r{^(\[\d+\]:) (.*://(.*))}) {
+      "#{$1} <a href=\"#{$2}\">#{$3[0, 64]}#{%{...} if $3.length > 67}</a>"
+    }
     paragraph.type = :footer
   end
 
