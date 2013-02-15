@@ -23,7 +23,7 @@ class ClayText
     htmlescape_rules = {
       "&" => "&amp;",
       "\"" => "&quot;",
-      "'" => "&apos;",
+      "'" => "&#39;",
       "<" => "&lt;",
       ">" => "&gt;"
     }.freeze
