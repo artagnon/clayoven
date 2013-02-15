@@ -37,7 +37,7 @@ class ClayText
       ">" => "&gt;"
     }.freeze
 
-    paragraph_types = [:plain, :emailquote, :codeblock, :footer]
+    paragraph_types = [:plain, :emailquote, :codeblock, :header, :footer]
     paragraph_rules = {
       Proc.new { |line| line.start_with? "&gt; " } => method(:mark_emailquote!),
       Proc.new { |line| line.start_with? "    " } => method(:mark_codeblock!),
@@ -47,12 +47,18 @@ class ClayText
     # First, htmlescape the body text
     body.gsub!(/[&"'<>]/, htmlescape_rules)
 
-    # Paragraph-level processing
     paragraphs = []
     body.split("\n\n").each { |content|
       paragraphs << Paragraph.new(content)
     }
+
     paragraphs[0].first = true
+    if paragraphs[0].content.start_with? "(" and
+        paragraphs[0].content.end_with? ")"
+      paragraphs[0].type = :header
+    end
+
+    # Paragraph-level processing
     paragraphs.each { |paragraph|
       paragraph_rules.each { |proc_match, callback|
         if paragraph.content.lines.all? &proc_match
