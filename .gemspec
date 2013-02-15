@@ -1,8 +1,8 @@
 Gem::Specification.new do |s|
   s.name                 = "clayoven"
   s.version              = "0.1"
-  s.summary              = "Extremely simple website generator"
-  s.description          = "Generates html files from a git repository, where files use a special markup.  Email posting supported."
+  s.summary              = "Modern website generator with a traditional design"
+  s.description          = ""
   s.author               = "Ramkumar Ramachandra"
   s.email                = "artagnon@gmail.com"
   s.files                = ["clayoven.rb", "httpd.rb", "imapd.rb"]

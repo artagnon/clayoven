@@ -123,7 +123,7 @@ def main
 end
 
 case ARGV[0]
-when "server"
+when "httpd"
   Httpd.start
 else
   main
