@@ -1,7 +1,8 @@
 require 'slim'
-require 'yaml'
-require_relative 'httpd'
+require_relative 'config'
 require_relative 'claytext'
+require_relative 'httpd'
+require_relative 'imapd'
 
 def when_introduced(filename)
   timestamp = `git log --reverse --pretty="%at" #{filename} 2>/dev/null | head -n 1`.strip
@@ -9,28 +10,6 @@ def when_introduced(filename)
     Time.now
   else
     Time.at(timestamp.to_i)
-  end
-end
-
-class ConfigData
-  attr_accessor :rootpath, :rcpath, :ignorepath, :rc, :ignore
-
-  def initialize
-    @rootpath = ".clayoven"
-    @rcpath = "#{rootpath}/rc"
-    @ignorepath = "#{rootpath}/ignore"
-    @ignore = ["\\.html$", "~$", "^.\#", "^\#.*\#$",
-               "^\\.git$", "^\\.gitignore$", "^\\.htaccess$"]
-    @rc = nil
-
-    Dir.mkdir @rootpath if not Dir.exists? @rootpath
-    if File.exists? @ignorepath
-      @ignore = IO.read(@ignorepath).split("\n")
-    else
-      File.open(@ignorepath, "w") { |ignoreio|
-        ignoreio.write @ignore.join("\n") }
-      puts "[NOTE] #{@ignorepath} populated with sane defaults"
-    end
   end
 end
 
@@ -125,6 +104,18 @@ end
 case ARGV[0]
 when "httpd"
   Httpd.start
+when "imapd"
+  while 1
+    mails = Imapd.poll
+    if not mails.empty?
+      main
+      mails.each { |mail|
+        `git add .`
+        puts `git commit -a -m "#{mail.filename}: new post\n\n#{mail.date}\n#{mail.msgid}"`
+      }
+      sleep 1800
+    end
+  end
 else
   main
 end

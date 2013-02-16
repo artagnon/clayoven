@@ -18,7 +18,7 @@ class Httpd
 
     puts "clayoven serving at: http://localhost:#{port}"
 
-    trap(:INT){ server.shutdown }
+    trap(:INT) { server.shutdown }
     server.start
   end
 end
