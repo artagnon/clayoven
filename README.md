@@ -10,25 +10,6 @@ clayoven depends on Git, Ruby 1.9.3 and [Slim](http://slim-lang.com).
 
     gem install slim
 
-It generates links with the assumption that the .html part is implicit
-and unnecessary.  Use the following `.htaccess` file in your
-repository root:
-
-    Options +FollowSymLinks -MultiViews
-    DirectorySlash Off
-    
-    RewriteEngine On
-    
-    RewriteCond %{SCRIPT_FILENAME}/ -d
-    RewriteCond %{SCRIPT_FILENAME}.html !-f
-    RewriteRule [^/]$ %{REQUEST_URI}/ [R=301,L]
-    
-    RewriteCond %{ENV:REDIRECT_STATUS} ^$
-    RewriteRule ^(.+)\.html$ /$1 [R=301,L]
-    
-    RewriteCond %{SCRIPT_FILENAME}.html -f
-    RewriteRule [^/]$ %{REQUEST_URI}.html [QSA,L]
-
 ## Usage
 
 Simply run `clayoven` on your website's repository.  A small HTTP
