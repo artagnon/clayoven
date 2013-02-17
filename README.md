@@ -1,4 +1,5 @@
 # clayoven
+[![Code Climate](https://codeclimate.com/github/artagnon/clayoven.png)](https://codeclimate.com/github/artagnon/clayoven)
 
 Modern website generator with a traditional design. Generates html
 files from a git repository; files are written in claytext.  Pages can
