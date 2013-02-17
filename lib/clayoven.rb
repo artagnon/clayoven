@@ -15,7 +15,7 @@ def when_introduced(filename)
   end
 end
 
-module Core
+module Clayoven
   class Page
     attr_accessor :filename, :permalink, :timestamp, :title, :topic, :body,
     :paragraphs, :target, :indexfill, :topics

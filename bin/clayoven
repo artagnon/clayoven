@@ -11,7 +11,7 @@ when "imapd"
   while 1
     mails = Clayoven::Imapd.poll
     if not mails.empty?
-      Core.main
+      Clayoven.main
       mails.each { |mail|
         `git add .`
         puts `git commit -a -m "#{mail.filename}: new post\n\n#{mail.date}\n#{mail.msgid}"`
@@ -20,5 +20,5 @@ when "imapd"
     sleep 1800
   end
 else
-  Core.main
+  Clayoven.main
 end
