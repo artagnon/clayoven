@@ -14,9 +14,9 @@ module Imapd
     server.examine "INBOX"
     server.search(["ALL"]).each { |id|
       message = server.fetch(id, ["ENVELOPE", "RFC822.TEXT"])[0]
-      if message.attr["ENVELOPE"].sender[0].mailbox == "artagnon" and
-          message.attr["ENVELOPE"].sender[0].host == "gmail.com" and
-          message.attr["ENVELOPE"].sender[0].name == "Ramkumar Ramachandra"
+      trustmailbox, trusthost = config.rc["trustfrom"].split("@")
+      if message.attr["ENVELOPE"].sender[0].mailbox == trustmailbox and
+          message.attr["ENVELOPE"].sender[0].host == trusthost
         date = message.attr["ENVELOPE"].date
         msgid = message.attr["ENVELOPE"].message_id
         title, filename = message.attr["ENVELOPE"].subject.split(" # ")

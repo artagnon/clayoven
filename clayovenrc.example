@@ -4,3 +4,4 @@ port: 993
 ssl: true
 username: publish@yourdomain.com
 password: yourpass
+trustfrom: username@gmail.com
