@@ -8,6 +8,9 @@ module Clayoven
       @rootpath = ".clayoven"
       @rcpath = File.expand_path "~/.clayovenrc"
       @ignorepath = "#{rootpath}/ignore"
+
+      # Most common patterns that should sit in .clayoven/ignore.
+      # Written to the file when it doesn't exist.
       @ignore = ["\\.html$", "~$", "^.\#", "^\#.*\#$",
                  "^\\.git$", "^\\.gitignore$", "^\\.htaccess$"]
       @rc = nil

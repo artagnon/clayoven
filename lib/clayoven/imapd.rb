@@ -2,7 +2,13 @@ require 'net/imap'
 require_relative 'config'
 
 module Clayoven
+  # `clayoven impad` essentially calls Imapd.poll
+  # (but also calls Clayoven.main)
   module Imapd
+    # Initialites a connection to the IMAP server, and fetches new
+    # messages.
+    #
+    # Returns an unnamed Struct with :filename, :date, :msgid fields
     def self.poll
       config = Clayoven::ConfigData.new
       abort "error: #{config.rcpath} not found; aborting" if not config.rc
@@ -15,6 +21,9 @@ module Clayoven
       server.examine "INBOX"
       server.search(["ALL"]).each do |id|
         message = server.fetch(id, ["ENVELOPE", "RFC822.TEXT"])[0]
+
+        # This block is only run if we receive email from the trusted
+        # sender (a configuration variable).
         trustmailbox, trusthost = config.rc["trustfrom"].split("@")
         if message.attr["ENVELOPE"].sender[0].mailbox == trustmailbox and
             message.attr["ENVELOPE"].sender[0].host == trusthost
