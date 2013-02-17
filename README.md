@@ -4,17 +4,19 @@ Modern website generator with a traditional design. Generates html
 files from a git repository; files are written in claytext.  Pages can
 optionally be posted via email.
 
-## Configuration
+## Installation
+
+Get the gem
+
+    gem install clayoven
 
 clayoven depends on Git, Ruby 1.9.3 and [Slim](http://slim-lang.com).
 
-    gem install slim
-
 ## Usage
 
-Simply run `clayoven` on your website's repository.  A small HTTP
-server is also included for previewing your website locally; start
-with `clayoven httpd`.
+* Run `clayoven` on your website's repository to generate HTML files.
+* Run `clayoven httpd` to preview your website locally.
+* Run `clayoven imapd` to start a daemon which will poll for emails.
 
 ## Repository format
 
@@ -58,11 +60,6 @@ However, this does not make use of the structured information that
 claytext offers.  For a full example, look at the
 [template](https://github.com/artagnon/artagnon.com/blob/master/design/template.slim)
 that artagnon.com uses.
-
-## Posting via email
-
-clayoven includes imapd, a daemon which constantly polls an IMAP
-server for new emails.  This is currently incomplete.
 
 ## Contributing
 
