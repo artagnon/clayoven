@@ -16,8 +16,9 @@ module Clayoven
       if File.exists? @ignorepath
         @ignore = IO.read(@ignorepath).split("\n")
       else
-        File.open(@ignorepath, "w") { |ignoreio|
-          ignoreio.write @ignore.join("\n") }
+        File.open(@ignorepath, "w") do |ignoreio|
+          ignoreio.write @ignore.join("\n")
+        end
         puts "[NOTE] #{@ignorepath} populated with sane defaults"
       end
       @rc = YAML.load_file @rcpath if File.exists? @rcpath

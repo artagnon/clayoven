@@ -4,14 +4,14 @@ module Clayoven
   module Httpd
     def self.start
       port = 8000
-      callback = Proc.new { |req, res|
+      callback = Proc.new do |req, res|
         if %r{^/$} =~ req.path_info
           res.set_redirect WEBrick::HTTPStatus::Found, "index.html"
         end
         if %r{^/([^.]*)$} =~ req.path_info
           res.set_redirect WEBrick::HTTPStatus::Found, "#{$1}.html"
         end
-      }
+      end
 
       server = WEBrick::HTTPServer.new(:Port            => port,
                                        :RequestCallback => callback,

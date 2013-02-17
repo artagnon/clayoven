@@ -25,10 +25,10 @@ module Clayoven
       @paragraphs = ClayText.process! @body
       Slim::Engine.set_default_options pretty: true, sort_attrs: false
       rendered = Slim::Template.new { IO.read("design/template.slim") }.render(self)
-      File.open(@target, mode="w") { |targetio|
+      File.open(@target, mode="w") do |targetio|
         nbytes = targetio.write(rendered)
         puts "[GEN] #{@target} (#{nbytes} bytes out)"
-      }
+      end
     end
   end
 
@@ -63,9 +63,9 @@ module Clayoven
 
     config = Clayoven::ConfigData.new
     all_files = (Dir.entries(".") -
-                 [".", "..", ".clayoven", "design"]).reject { |entry|
+                 [".", "..", ".clayoven", "design"]).reject do |entry|
       config.ignore.any? { |pattern| %r{#{pattern}} =~ entry }
-    }
+    end
 
     abort "error: design/template.slim file not found; aborting" if not
       Dir.entries("design").include? "template.slim"
@@ -76,25 +76,25 @@ module Clayoven
 
     # Next, look for stray files
     (content_files.reject { |file| topics.include? (file.split(":", 2)[0]) })
-      .each { |stray_entry|
+      .each do |stray_entry|
       content_files = content_files - [stray_entry]
       puts "warning: #{stray_entry} is a stray file or directory; ignored"
-    }
+    end
 
     index_pages = index_files.map { |filename| IndexPage.new(filename) }
     content_pages = content_files.map { |filename| ContentPage.new(filename) }
 
     # First, fill in all the page attributes
-    (index_pages + content_pages).each { |page|
+    (index_pages + content_pages).each do |page|
       page.title, page.body = (IO.read page.filename).split("\n\n", 2)
-    }
+    end
 
     # Compute the indexfill for indexes
-    topics.each { |topic|
+    topics.each do |topic|
       topic_index = index_pages.select { |page| page.topic == topic }[0]
       topic_index.indexfill = content_pages.select { |page|
         page.topic == topic }.sort { |a, b| b.timestamp <=> a.timestamp }
-    }
+    end
 
     (index_pages + content_pages).each { |page| page.render topics }
   end

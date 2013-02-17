@@ -28,21 +28,21 @@ module ClayText
         paragraph.type = :emailquote },
       Proc.new { |line| line.start_with? "    " } => lambda { |paragraph|
         paragraph.type = :codeblock },
-      Proc.new { |line| /^\[\d+\]: / =~ line } => lambda { |paragraph|
-        paragraph.content.gsub!(%r{^(\[\d+\]:) (.*://(.*))}) {
+      Proc.new { |line| /^\[\d+\]: / =~ line } => lambda do |paragraph|
+        paragraph.content.gsub!(%r{^(\[\d+\]:) (.*://(.*))}) do
           "#{$1} <a href=\"#{$2}\">#{$3[0, 64]}#{%{...} if $3.length > 67}</a>"
-        }
+        end
         paragraph.type = :footer
-      }
+      end
     }.freeze
 
     # First, htmlescape the body text
     body.gsub!(/[&"'<>]/, htmlescape_rules)
 
     paragraphs = []
-    body.split("\n\n").each { |content|
+    body.split("\n\n").each do |content|
       paragraphs << Paragraph.new(content)
-    }
+    end
 
     paragraphs[0].first = true
     if paragraphs[0].content.start_with? "(" and
@@ -51,20 +51,20 @@ module ClayText
     end
 
     # Paragraph-level processing
-    paragraphs.each { |paragraph|
-      paragraph_rules.each { |proc_match, lambda_cb|
+    paragraphs.each do |paragraph|
+      paragraph_rules.each do |proc_match, lambda_cb|
         if paragraph.content.lines.all? &proc_match
           lambda_cb.call paragraph
         end
-      }
-    }
+      end
+    end
 
     # Generate is_*? methods for Paragraph
-    Paragraph.class_eval {
-      paragraph_types.each { |type|
+    Paragraph.class_eval do
+      paragraph_types.each do |type|
         define_method("is_#{type.to_s}?") { @type == type }
-      }
-    }
+      end
+    end
 
     body = paragraphs.map(&:content).join("\n\n")
     paragraphs
