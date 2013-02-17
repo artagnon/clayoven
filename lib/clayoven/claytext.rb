@@ -13,21 +13,6 @@ class Paragraph
 end
 
 module ClayText
-  def self.mark_emailquote!(paragraph)
-    paragraph.type = :emailquote
-  end
-
-  def self.mark_codeblock!(paragraph)
-    paragraph.type = :codeblock
-  end
-
-  def self.anchor_footerlinks!(paragraph)
-    paragraph.content.gsub!(%r{^(\[\d+\]:) (.*://(.*))}) {
-      "#{$1} <a href=\"#{$2}\">#{$3[0, 64]}#{%{...} if $3.length > 67}</a>"
-    }
-    paragraph.type = :footer
-  end
-
   def self.process!(body)
     htmlescape_rules = {
       "&" => "&amp;",
@@ -39,9 +24,16 @@ module ClayText
 
     paragraph_types = [:plain, :emailquote, :codeblock, :header, :footer]
     paragraph_rules = {
-      Proc.new { |line| line.start_with? "&gt; " } => method(:mark_emailquote!),
-      Proc.new { |line| line.start_with? "    " } => method(:mark_codeblock!),
-      Proc.new { |line| /^\[\d+\]: / =~ line } => method(:anchor_footerlinks!)
+      Proc.new { |line| line.start_with? "&gt; " } => lambda { |paragraph|
+        paragraph.type = :emailquote },
+      Proc.new { |line| line.start_with? "    " } => lambda { |paragraph|
+        paragraph.type = :codeblock },
+      Proc.new { |line| /^\[\d+\]: / =~ line } => lambda { |paragraph|
+        paragraph.content.gsub!(%r{^(\[\d+\]:) (.*://(.*))}) {
+          "#{$1} <a href=\"#{$2}\">#{$3[0, 64]}#{%{...} if $3.length > 67}</a>"
+        }
+        paragraph.type = :footer
+      }
     }.freeze
 
     # First, htmlescape the body text
@@ -60,9 +52,9 @@ module ClayText
 
     # Paragraph-level processing
     paragraphs.each { |paragraph|
-      paragraph_rules.each { |proc_match, callback|
+      paragraph_rules.each { |proc_match, lambda_cb|
         if paragraph.content.lines.all? &proc_match
-          callback.call paragraph
+          lambda_cb.call paragraph
         end
       }
     }
