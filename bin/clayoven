@@ -1,0 +1,24 @@
+#!/usr/bin/env ruby
+
+$:.unshift File.join(File.dirname(__FILE__), *%w{ .. lib })
+
+require 'clayoven'
+
+case ARGV[0]
+when "httpd"
+  Httpd.start
+when "imapd"
+  while 1
+    mails = Imapd.poll
+    if not mails.empty?
+      Core.main
+      mails.each { |mail|
+        `git add .`
+        puts `git commit -a -m "#{mail.filename}: new post\n\n#{mail.date}\n#{mail.msgid}"`
+      }
+      sleep 1800
+    end
+  end
+else
+  Core.main
+end
