@@ -59,10 +59,7 @@ module Core
   end
 
   def self.main
-    if not File.exists? "index"
-      puts "error: index file not found; aborting"
-      exit 1
-    end
+    abort "error: index file not found; aborting" if not File.exists? "index"
 
     config = ConfigData.new
     all_files = (Dir.entries(".") -
@@ -70,10 +67,8 @@ module Core
       config.ignore.any? { |pattern| %r{#{pattern}} =~ entry }
     }
 
-    if not Dir.entries("design").include? "template.slim"
-      puts "error: design/template.slim file not found; aborting"
-      exit 1
-    end
+    abort "error: design/template.slim file not found; aborting" if not
+      Dir.entries("design").include? "template.slim"
 
     index_files = ["index"] + all_files.select { |file| /\.index$/ =~ file }
     content_files = all_files - index_files

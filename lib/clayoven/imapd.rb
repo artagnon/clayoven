@@ -14,10 +14,7 @@ end
 module Imapd
   def self.poll
     config = ConfigData.new
-    if not config.rc
-      puts "error: #{config.rcpath} not found; aborting"
-      exit 1
-    end
+    abort "error: #{config.rcpath} not found; aborting" if not config.rc
     mails = []
     server = Net::IMAP.new(config.rc["server"],
                            {:port => config.rc["port"], :ssl => config.rc["ssl"]})
