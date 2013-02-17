@@ -1,16 +1,6 @@
 require 'net/imap'
 require_relative 'config'
 
-class Mail
-  attr_accessor :filename, :date, :msgid
-
-  def initialize(filename, date, msgid)
-    @filename = filename
-    @date = date
-    @msgid = msgid
-  end
-end
-
 module Imapd
   def self.poll
     config = ConfigData.new
@@ -34,7 +24,7 @@ module Imapd
         File.open(filename, "w") { |targetio|
           targetio.write([title, message.attr["RFC822.TEXT"].delete("\r")].join "\n\n")
         }
-        mails << Mail.new(filename, date, msgid)
+        mails << Struct.new(:filename, :date, :msgid).new(filename, date, msgid)
       end
     }
     server.disconnect
