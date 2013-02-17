@@ -1,18 +1,18 @@
-class Paragraph
-  attr_accessor :content, :first, :type
-
-  def initialize(content)
-    @content = content
-    @first = false
-    @type = :plain
-  end
-
-  def is_first?
-    @first
-  end
-end
-
 module ClayText
+  class Paragraph
+    attr_accessor :content, :first, :type
+
+    def initialize(content)
+      @content = content
+      @first = false
+      @type = :plain
+    end
+
+    def is_first?
+      @first
+    end
+  end
+
   def self.process!(body)
     htmlescape_rules = {
       "&" => "&amp;",
