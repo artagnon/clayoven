@@ -1,6 +1,6 @@
 require 'webrick'
 
-class Httpd
+module Httpd
   def self.start
     port = 8000
     callback = Proc.new { |req, res|

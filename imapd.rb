@@ -11,7 +11,7 @@ class Mail
   end
 end
 
-class Imapd
+module Imapd
   def self.poll
     config = ConfigData.new
     if not config.rc

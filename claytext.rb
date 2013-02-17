@@ -12,7 +12,7 @@ class Paragraph
   end
 end
 
-class ClayText
+module ClayText
   def self.mark_emailquote!(paragraph)
     paragraph.type = :emailquote
   end
