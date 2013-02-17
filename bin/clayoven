@@ -16,8 +16,8 @@ when "imapd"
         `git add .`
         puts `git commit -a -m "#{mail.filename}: new post\n\n#{mail.date}\n#{mail.msgid}"`
       }
-      sleep 1800
     end
+    sleep 1800
   end
 else
   Core.main
