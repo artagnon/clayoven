@@ -6,10 +6,10 @@ require 'clayoven'
 
 case ARGV[0]
 when "httpd"
-  Httpd.start
+  Clayoven::Httpd.start
 when "imapd"
   while 1
-    mails = Imapd.poll
+    mails = Clayoven::Imapd.poll
     if not mails.empty?
       Core.main
       mails.each { |mail|

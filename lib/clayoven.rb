@@ -61,7 +61,7 @@ module Core
   def self.main
     abort "error: index file not found; aborting" if not File.exists? "index"
 
-    config = ConfigData.new
+    config = Clayoven::ConfigData.new
     all_files = (Dir.entries(".") -
                  [".", "..", ".clayoven", "design"]).reject { |entry|
       config.ignore.any? { |pattern| %r{#{pattern}} =~ entry }
