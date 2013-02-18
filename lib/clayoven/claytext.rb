@@ -1,10 +1,22 @@
 module ClayText
-  
+
+  # These are the values that Paragraph.type can take
+  PARAGRAPH_TYPES = [:plain, :emailquote, :codeblock, :header, :footer]
+
+  # see: http://php.net/manual/en/function.htmlspecialchars.php
+  HTMLESCAPE_RULES = {
+    "&" => "&amp;",
+    "\"" => "&quot;",
+    "'" => "&#39;",
+    "<" => "&lt;",
+    ">" => "&gt;"
+  }
+
   # A paragraph of text
   #
   # :content contains its content
   # :fist asserts whether it's the first paragraph in the body
-  # :type can be one of paragraph_types (defined later)
+  # :type can be one of PARAGRAPH_TYPES (defined later)
   class Paragraph
     attr_accessor :content, :first, :type
 
@@ -21,26 +33,14 @@ module ClayText
   # Returns a list of Paragraphs
   def self.process!(body)
 
-    # see: http://php.net/manual/en/function.htmlspecialchars.php
-    htmlescape_rules = {
-      "&" => "&amp;",
-      "\"" => "&quot;",
-      "'" => "&#39;",
-      "<" => "&lt;",
-      ">" => "&gt;"
-    }.freeze
-
     # First, htmlescape the body text
-    body.gsub!(/[&"'<>]/, htmlescape_rules)
+    body.gsub!(/[&"'<>]/, ClayText::HTMLESCAPE_RULES)
 
     # Split the body into Paragraphs
     paragraphs = []
     body.split("\n\n").each do |content|
       paragraphs << Paragraph.new(content)
     end
-
-    # These are the values that Paragraph.type can take
-    paragraph_types = [:plain, :emailquote, :codeblock, :header, :footer]
 
     # Special matching for the first paragraph.  This paragraph will
     # be marked header:
@@ -90,7 +90,7 @@ module ClayText
 
     # Generate is_*? methods for Paragraph
     Paragraph.class_eval do
-      (paragraph_types + [:first]).each do |type|
+      (ClayText::PARAGRAPH_TYPES + [:first]).each do |type|
         define_method("is_#{type.to_s}?") { @type == type }
       end
     end
