@@ -50,6 +50,13 @@ module ClayText
       @content = content
       @first = false
       @type = :plain
+
+      # Generate is_*? methods for PARAGRAPH_TYPES
+      Paragraph.class_eval do
+        ClayText::PARAGRAPH_TYPES.each do |type|
+          define_method("is_#{type.to_s}?") { @type == type }
+        end
+      end
     end
 
     def is_first?
@@ -89,13 +96,6 @@ module ClayText
         if paragraph.content.lines.all? &proc_match
           lambda_cb.call paragraph
         end
-      end
-    end
-
-    # Generate is_*? methods for Paragraph
-    Paragraph.class_eval do
-      ClayText::PARAGRAPH_TYPES.each do |type|
-        define_method("is_#{type.to_s}?") { @type == type }
       end
     end
 
