@@ -42,7 +42,7 @@ module ClayText
   #
   # :content contains its content
   # :fist asserts whether it's the first paragraph in the body
-  # :type can be one of PARAGRAPH_TYPES (defined later)
+  # :type can be one of PARAGRAPH_TYPES
   class Paragraph
     attr_accessor :content, :first, :type
 
@@ -82,7 +82,7 @@ module ClayText
     # Special matching for the first paragraph.  This paragraph will
     # be marked header:
     #
-    # (This is a really long first paragraph
+    # (This is a really long first paragraph blah-blah-blah-blah-blah
     # that spans to two lines)
     paragraphs[0].first = true
     if paragraphs[0].content.start_with? "(" and
@@ -99,7 +99,7 @@ module ClayText
       end
     end
 
-    # body is the useless version.  If someone is too lazy to xuse all
+    # body is the useless version.  If someone is too lazy to use all
     # the paragraphs individually in their template, they can just use
     # this.
     body = paragraphs.map(&:content).join("\n\n")
