@@ -12,6 +12,32 @@ module ClayText
     ">" => "&gt;"
   }
 
+  # Key is used to match a paragraph, and value is the lambda
+  # that'll act on it.
+  PARAGRAPH_RULES = {
+
+    # If all the lines in a paragraph, begin with "> ", the
+    # paragraph is marked as an :emailquote.
+    Proc.new { |line| line.start_with? "&gt; " } => lambda { |paragraph|
+      paragraph.type = :emailquote },
+
+    # If all the lines in a paragraph, begin with "   ", the paragraph is
+    # marked as an :coeblock
+    Proc.new { |line| line.start_with? "    " } => lambda { |paragraph|
+      paragraph.type = :codeblock },
+
+    # If all the lines in a paragraph, begin with " ", the paragraph
+    # is marked as :footer.  Also, a regex substitution runs on each
+    # line turning every link like http://a-url-over-67-characters
+    # to <a href="http://google.com">64-characters-of-the-li...</a>
+    Proc.new { |line| /^\[\d+\]: / =~ line } => lambda do |paragraph|
+      paragraph.type = :footer
+      paragraph.content.gsub!(%r{^(\[\d+\]:) (.*://(.*))}) do
+        "#{$1} <a href=\"#{$2}\">#{$3[0, 64]}#{%{...} if $3.length > 67}</a>"
+      end
+    end
+  }
+
   # A paragraph of text
   #
   # :content contains its content
@@ -57,35 +83,9 @@ module ClayText
       paragraphs[0].type = :header
     end
 
-    # Key is used to match a paragraph, and value is the lambda
-    # that'll act on it.
-    paragraph_rules = {
-
-      # If all the lines in a paragraph, begin with "> ", the
-      # paragraph is marked as an :emailquote
-      Proc.new { |line| line.start_with? "&gt; " } => lambda { |paragraph|
-        paragraph.type = :emailquote },
-
-      # If all the lines in a paragraph, begin with "   ", the paragraph is
-      # marked as an :coeblock
-      Proc.new { |line| line.start_with? "    " } => lambda { |paragraph|
-        paragraph.type = :codeblock },
-
-      # If all the lines in a paragraph, begin with " ", the paragraph
-      # is marked as :footer.  Also, a regex subsittuion runs on each
-      # line turning every link like http://a-url-over-67-characters
-      # to <a href="http://google.com">64-characters-of-the-li...</a>
-      Proc.new { |line| /^\[\d+\]: / =~ line } => lambda do |paragraph|
-        paragraph.type = :footer
-        paragraph.content.gsub!(%r{^(\[\d+\]:) (.*://(.*))}) do
-          "#{$1} <a href=\"#{$2}\">#{$3[0, 64]}#{%{...} if $3.length > 67}</a>"
-        end
-      end
-    }.freeze
-
-    # Apply the paragraph_rules on all the paragraphs
+    # Apply the PARAGRAPH_RULES on all the paragraphs
     paragraphs.each do |paragraph|
-      paragraph_rules.each do |proc_match, lambda_cb|
+      ClayText::PARAGRAPH_RULES.each do |proc_match, lambda_cb|
         if paragraph.content.lines.all? &proc_match
           lambda_cb.call paragraph
         end
