@@ -6,16 +6,20 @@ module Clayoven
 
     def initialize
       @rootpath = ".clayoven"
-      @rcpath = File.expand_path "~/.clayovenrc"
+      Dir.mkdir @rootpath if not Dir.exists? @rootpath
+
+      initialize_ignore
+      initialize_rc
+    end
+
+    def initialize_ignore
       @ignorepath = "#{rootpath}/ignore"
 
       # Most common patterns that should sit in .clayoven/ignore.
       # Written to the file when it doesn't exist.
       @ignore = ["\\.html$", "~$", "^.\#", "^\#.*\#$",
                  "^\\.git$", "^\\.gitignore$", "^\\.htaccess$"]
-      @rc = nil
 
-      Dir.mkdir @rootpath if not Dir.exists? @rootpath
       if File.exists? @ignorepath
         @ignore = IO.read(@ignorepath).split("\n")
       else
@@ -24,6 +28,11 @@ module Clayoven
         end
         puts "[NOTE] #{@ignorepath} populated with sane defaults"
       end
+    end
+
+    def initialize_rc
+      @rcpath = File.expand_path "~/.clayovenrc"
+      @rc = nil
       @rc = YAML.load_file @rcpath if File.exists? @rcpath
     end
   end
