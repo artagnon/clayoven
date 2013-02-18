@@ -25,6 +25,10 @@ module ClayText
       @first = false
       @type = :plain
     end
+
+    def is_first?
+      @first
+    end
   end
 
   # Takes a body of claytext, breaks it up into paragraphs, and
@@ -90,7 +94,7 @@ module ClayText
 
     # Generate is_*? methods for Paragraph
     Paragraph.class_eval do
-      (ClayText::PARAGRAPH_TYPES + [:first]).each do |type|
+      ClayText::PARAGRAPH_TYPES.each do |type|
         define_method("is_#{type.to_s}?") { @type == type }
       end
     end
