@@ -1,5 +1,4 @@
 module ClayText
-
   # These are the values that Paragraph.type can take
   PARAGRAPH_TYPES = [:plain, :emailquote, :codeblock, :header, :footer]
 
@@ -15,14 +14,13 @@ module ClayText
   # Key is used to match a paragraph, and value is the lambda
   # that'll act on it.
   PARAGRAPH_RULES = {
-
     # If all the lines in a paragraph, begin with "> " (or with more
     # arrows like ">>> "), the paragraph is marked as an :emailquote.
     Proc.new { |line| /^(&gt;)+ / =~ line } => lambda { |paragraph|
       paragraph.type = :emailquote },
 
     # If all the lines in a paragraph, begin with "   ", the paragraph is
-    # marked as an :coeblock
+    # marked as an :codeblock
     Proc.new { |line| line.start_with? "    " } => lambda { |paragraph|
       paragraph.type = :codeblock },
 
@@ -69,7 +67,6 @@ module ClayText
   #
   # Returns a list of Paragraphs
   def self.process!(body)
-
     # First, htmlescape the body text
     body.gsub!(/[&"'<>]/, ClayText::HTMLESCAPE_RULES)
 
