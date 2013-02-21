@@ -11,13 +11,15 @@ module ClayText
     ">" => "&gt;"
   }
 
-  # Key is used to match a paragraph, and value is the lambda
-  # that'll act on it.
+  # Key is used to match a paragraph, and value is the lambda that'll
+  # act on it.
   PARAGRAPH_RULES = {
     # If all the lines in a paragraph, begin with "> " (or with more
-    # arrows like ">>> "), the paragraph is marked as an :emailquote.
-    Proc.new { |line| /^(&gt;)+ / =~ line } => lambda { |paragraph|
-      paragraph.type = :emailquote },
+    # arrows like ">>> "), the paragraph is marked as an :emailquote,
+    # with Paragraph#level set to the number of arrows.
+    Proc.new { |line| /^((&gt;)+) / =~ line } => lambda { |paragraph|
+      paragraph.type = :emailquote
+      paragraph.level = $1.length / 4 },
 
     # If all the lines in a paragraph, begin with "   ", the paragraph is
     # marked as an :codeblock
@@ -41,8 +43,9 @@ module ClayText
   # :content contains its content
   # :fist asserts whether it's the first paragraph in the body
   # :type can be one of PARAGRAPH_TYPES
+  # :level is an integer which has a type-specific meaning
   class Paragraph
-    attr_accessor :content, :first, :type
+    attr_accessor :content, :first, :type, :level
 
     def initialize(content)
       @content = content
