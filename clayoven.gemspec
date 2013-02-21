@@ -1,6 +1,6 @@
 Gem::Specification.new do |s|
   s.name                  = "clayoven"
-  s.version               = "0.1"
+  s.version               = "0.2"
   s.license               = "MIT"
   s.date                  = '2013-02-17'
   s.rubyforge_project     = 'clayoven'
