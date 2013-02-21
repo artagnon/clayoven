@@ -16,9 +16,9 @@ module ClayText
   # that'll act on it.
   PARAGRAPH_RULES = {
 
-    # If all the lines in a paragraph, begin with "> ", the
-    # paragraph is marked as an :emailquote.
-    Proc.new { |line| line.start_with? "&gt; " } => lambda { |paragraph|
+    # If all the lines in a paragraph, begin with "> " (or with more
+    # arrows like ">>> "), the paragraph is marked as an :emailquote.
+    Proc.new { |line| /^(&gt;)+ / =~ line } => lambda { |paragraph|
       paragraph.type = :emailquote },
 
     # If all the lines in a paragraph, begin with "   ", the paragraph is
