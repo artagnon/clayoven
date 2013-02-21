@@ -1,6 +1,7 @@
 module ClayText
   # These are the values that Paragraph.type can take
-  PARAGRAPH_TYPES = [:plain, :emailquote, :codeblock, :header, :footer]
+  PARAGRAPH_TYPES = [:plain, :emailquote, :codeblock, :subheading,
+                     :header, :footer]
 
   # see: http://php.net/manual/en/function.htmlspecialchars.php
   HTMLESCAPE_RULES = {
@@ -90,12 +91,21 @@ module ClayText
       paragraphs[0].type = :header
     end
 
-    # Apply the PARAGRAPH_RULES on all the paragraphs
     paragraphs.each do |paragraph|
+      # Apply the PARAGRAPH_RULES on all the paragraphs
       ClayText::PARAGRAPH_RULES.each do |proc_match, lambda_cb|
         if paragraph.content.lines.all? &proc_match
           lambda_cb.call paragraph
         end
+      end
+
+      # If the paragraph contains only one line which begins with "# "
+      # (or with more hashes like "### "), the paragraph is marked as
+      # an :subheading, with Paragraph#level set to the number of
+      # hashes.
+      if not paragraph.content.index "\n" and /^(\#+) / =~ paragraph.content
+        paragraph.type = :subheading
+        paragraph.level = $1.length
       end
     end
 
