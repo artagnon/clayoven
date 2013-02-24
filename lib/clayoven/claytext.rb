@@ -42,15 +42,13 @@ module ClayText
   # A paragraph of text
   #
   # :content contains its content
-  # :fist asserts whether it's the first paragraph in the body
   # :type can be one of PARAGRAPH_TYPES
   # :level is an integer which has a type-specific meaning
   class Paragraph
-    attr_accessor :content, :first, :type, :level
+    attr_accessor :content, :type, :level
 
     def initialize(content)
       @content = content
-      @first = false
       @type = :plain
 
       # Generate is_*? methods for PARAGRAPH_TYPES
@@ -59,10 +57,6 @@ module ClayText
           define_method("is_#{type.to_s}?") { @type == type }
         end
       end
-    end
-
-    def is_first?
-      @first
     end
   end
 
@@ -85,7 +79,6 @@ module ClayText
     #
     # (This is a really long first paragraph blah-blah-blah-blah-blah
     # that spans to two lines)
-    paragraphs[0].first = true
     if paragraphs[0].content.start_with? "(" and
         paragraphs[0].content.end_with? ")"
       paragraphs[0].type = :header
