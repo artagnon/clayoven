@@ -1,4 +1,4 @@
-$:.unshift File.dirname(__FILE__)
+$:.unshift __dir__
 
 require 'slim'
 require 'clayoven/config'
