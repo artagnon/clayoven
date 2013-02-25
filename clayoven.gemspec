@@ -22,6 +22,7 @@ Gem::Specification.new do |s|
                              lib/clayoven/claytext.rb
                              lib/clayoven/httpd.rb
                              lib/clayoven/imapd.rb]
+  s.extra_rdoc_files      = %w[README.md LICENSE]
   s.post_install_message  = "clayoven installed!  Run `clayoven` or `clayoven (httpd|imapd)`"
   s.required_ruby_version = '>= 2.0.0'
 
