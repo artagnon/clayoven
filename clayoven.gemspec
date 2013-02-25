@@ -13,11 +13,15 @@ Gem::Specification.new do |s|
   s.homepage              = "https://github.com/artagnon/clayoven"
 
   s.executables           = ["clayoven"]
-  s.files                 = ["lib/clayoven.rb",
-                             "lib/clayoven/config.rb",
-                             "lib/clayoven/claytext.rb",
-                             "lib/clayoven/httpd.rb",
-                             "lib/clayoven/imapd.rb"]
+  s.files                 = %w[README.md
+                             LICENSE
+                             clayoven.gemspec
+                             bin/clayoven
+                             lib/clayoven.rb
+                             lib/clayoven/config.rb
+                             lib/clayoven/claytext.rb
+                             lib/clayoven/httpd.rb
+                             lib/clayoven/imapd.rb]
   s.post_install_message  = "clayoven installed!  Run `clayoven` or `clayoven (httpd|imapd)`"
   s.required_ruby_version = '>= 2.0.0'
 
