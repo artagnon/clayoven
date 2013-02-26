@@ -21,9 +21,11 @@ module ClayText
       paragraph.type = :emailquote
       paragraph.level = $1.length / 4 },
 
-    # If all the lines in a paragraph, begin with "   ", the paragraph is
-    # marked as an :codeblock
+    # If all the lines in a paragraph, begin with "    ", those four
+    # characters are stripped from the content, and the paragraph is
+    # marked as an :codeblock,
     Proc.new { |line| line.start_with? "    " } => lambda { |paragraph|
+      paragraph.content = paragraph.content.lines.map { |l| l[4..-1] }.join
       paragraph.type = :codeblock },
 
     # If all the lines in a paragraph, begin with " ", the paragraph
