@@ -84,7 +84,7 @@ module Clayoven
     # topics is the list of topics.  We need it for the sidebar
     index_files = ["index"] + all_files.select { |file| /\.index$/ =~ file }
     content_files = all_files - index_files
-    topics = index_files.map { |file| file.split(".index")[0] }
+    topics = index_files.map { |file| file.split(".index")[0] } + ["hidden"]
 
     # Look for stray files.  All content_files that don't have a valid
     # topic before ":" (or don't have ";" in their filename at all)
@@ -104,12 +104,12 @@ module Clayoven
     end
 
     # Compute the indexfill for indexes
-    topics.each do |topic|
+    (topics - ["hidden"]).each do |topic|
       topic_index = index_pages.select { |page| page.topic == topic }[0]
       topic_index.indexfill = content_pages.select { |page|
         page.topic == topic }.sort { |a, b| b.timestamp <=> a.timestamp }
     end
 
-    (index_pages + content_pages).each { |page| page.render topics }
+    (index_pages + content_pages).each { |page| page.render (topics - ["hidden"]) }
   end
 end
