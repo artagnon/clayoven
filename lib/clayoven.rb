@@ -98,18 +98,23 @@ module Clayoven
     index_pages = index_files.map { |filename| IndexPage.new(filename) }
     content_pages = content_files.map { |filename| ContentPage.new(filename) }
 
+    # Update topics to be a sorted Array extracted from index_pages.
+    # It'll automatically exclude "hidden".
+    topics = index_pages.sort { |a, b| a.timestamp <=> b.timestamp }
+      .map { |page| page.topic }
+
     # Fill in page.title and page.body by reading the file
     (index_pages + content_pages).each do |page|
       page.title, page.body = (IO.read page.filename).split("\n\n", 2)
     end
 
     # Compute the indexfill for indexes
-    (topics - ["hidden"]).each do |topic|
+    topics.each do |topic|
       topic_index = index_pages.select { |page| page.topic == topic }[0]
       topic_index.indexfill = content_pages.select { |page|
         page.topic == topic }.sort { |a, b| b.timestamp <=> a.timestamp }
     end
 
-    (index_pages + content_pages).each { |page| page.render (topics - ["hidden"]) }
+    (index_pages + content_pages).each { |page| page.render topics }
   end
 end
