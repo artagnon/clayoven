@@ -112,6 +112,21 @@ module ClayText
         end
       end
     end
+
+    def format_markdown!
+      content.gsub!(/(([^\\]|^))`((.|\n)*?)([^\\])`/, "\\1<code>\\3\\5</code>")
+      content.gsub!(/(([^\\]|^))_((.|\n)*?)([^\\])_/, "\\1<em>\\3\\5</em>")
+      content.gsub!(/(([^\\]|^))\*((.|\n)*?)([^\\])\*/,
+                    "\\1<strong>\\3\\5</strong>")
+      content.gsub!('--', '—')
+      content.gsub!(/\\`/, "`")
+      content.gsub!(/\\_/, "_")
+      content.gsub!(/\\\*/, "*")
+    end
+
+    def is_first?
+      @first
+    end
   end
 
   # Takes a body of claytext, breaks it up into paragraphs, and
@@ -150,6 +165,17 @@ module ClayText
         lambda_cb.call paragraph
       end
     end
+
+    paragraphs.each do |paragraph|
+      if paragraph.is_plain?
+        paragraph.format_markdown!
+      end
+    end
+
+    # body is the useless version.  If someone is too lazy to use all
+    # the paragraphs individually in their template, they can just use
+    # this.
+    body = paragraphs.map(&:content).join("\n\n")
 
     paragraphs
   end
