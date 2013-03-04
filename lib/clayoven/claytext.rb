@@ -14,10 +14,10 @@ module ClayText
   # Key is used to match a paragraph, and value is the lambda that'll
   # act on it.
   PARAGRAPH_RULES = {
-    # If all the lines in a paragraph begin with "> " (or with more
-    # arrows like ">>> "), the paragraph is marked as an :emailquote,
-    # with Paragraph#level set to the number of arrows.
-    Proc.new { |line| /^((&gt;)+) / =~ line } => lambda { |paragraph|
+    # If all the lines in a paragraph begin with "> " or ">> ", the
+    # paragraph is marked as an :emailquote, with Paragraph#level set
+    # to the number of arrows.
+    Proc.new { |line| /^(&gt;|&gt;&gt;) / =~ line } => lambda { |paragraph|
       paragraph.type = :emailquote
       paragraph.level = $1.length / 4 },
 
@@ -94,10 +94,9 @@ module ClayText
       end
 
       # If the paragraph contains only one line which begins with "# "
-      # (or with more hashes like "### "), the paragraph is marked as
-      # an :subheading, with Paragraph#level set to the number of
-      # hashes.
-      if not paragraph.content.index "\n" and /^(\#+) / =~ paragraph.content
+      # or "## ", the paragraph is marked as a :subheading, with
+      # Paragraph#level set to the number of hashes.
+      if not paragraph.content.index "\n" and /^(\#|\#\#) / =~ paragraph.content
         paragraph.type = :subheading
         paragraph.level = $1.length
       end
