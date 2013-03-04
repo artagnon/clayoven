@@ -100,6 +100,10 @@ module ClayText
         paragraph.type = :subheading
         paragraph.level = $1.length
       end
+
+      # Two trailing whitespaces (/  $/) indicates that a line break
+      # should be inserted.
+      paragraph.content.gsub!(/  $/, "<br>")
     end
 
     # body is the useless version.  If someone is too lazy to use all
