@@ -35,10 +35,10 @@ module ClayText
       paragraph.content = paragraph.content.lines.map { |l| l[2..-1] }.join
       paragraph.type = :listitem },
 
-    # If all the lines in a paragraph begin with " ", the paragraph
-    # is marked as :footer.  Also, a regex substitution runs on each
-    # line turning every link like http://a-url-over-67-characters
-    # to <a href="http://google.com">64-characters-of-the-li...</a>
+    # If all the lines in a paragraph begin with "[\d+]: ", the
+    # paragraph is marked as :footer.  Also, a regex substitution runs
+    # on each line turning every link like http://url-over-67-chars to
+    # <a href="http://google.com">64-characters-of-the-li...</a>
     Proc.new { |line| /^\[\d+\]: / =~ line } => lambda do |paragraph|
       paragraph.type = :footer
       paragraph.content.gsub!(%r{^(\[\d+\]:) (.*://(.*))}) do
