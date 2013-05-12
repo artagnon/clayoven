@@ -18,7 +18,8 @@ module Clayoven
       # Most common patterns that should sit in .clayoven/ignore.
       # Written to the file when it doesn't exist.
       @ignore = ['\\.html$', '~$', '^.\#', '^\#.*\#$',
-                 '^\\.git$', '^\\.gitignore$', '^\\.htaccess$']
+                 '^\\.git$', '^\\.gitignore$', '^\\.htaccess$',
+                 '^\\.rss']
 
       if File.exists? @ignorepath
         @ignore = IO.read(@ignorepath).split("\n")

@@ -1,0 +1,12 @@
+---
+server: imap.gmail.com
+port: 993
+ssl: true
+username: publish@yourdomain.com
+password: yourpass
+trustfrom: username@gmail.com
+rss-author: Sanjoy Das
+rss-about-page: http://playingwithpointers.com/
+rss-title: Playing With Pointers
+rss-filename: feed
+rss-blog-root: http://playingwithpointers.com
