@@ -11,9 +11,9 @@ module ClayText
     ">" => "&gt;"
   }
 
-  # Key is used to match a paragraph, and value is the lambda that'll
-  # act on it.
-  PARAGRAPH_RULES = {
+  # Key is used to match each line in a paragraph, and value is the
+  # lambda that'll act on the matched paragraph.
+  PARAGRAPH_LINE_FILTERS = {
     # If all the lines in a paragraph begin with "> " or ">> ", the
     # paragraph is marked as an :emailquote, with Paragraph#level set
     # to the number of arrows.
@@ -93,8 +93,8 @@ module ClayText
     end
 
     paragraphs.each do |paragraph|
-      # Apply the PARAGRAPH_RULES on all the paragraphs
-      ClayText::PARAGRAPH_RULES.each do |proc_match, lambda_cb|
+      # Apply the PARAGRAPH_LINE_FILTERS on all the paragraphs
+      ClayText::PARAGRAPH_LINE_FILTERS.each do |proc_match, lambda_cb|
         if paragraph.content.lines.all? &proc_match
           lambda_cb.call paragraph
         end
