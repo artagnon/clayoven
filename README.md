@@ -62,5 +62,7 @@ that artagnon.com uses.
 
 ## Contributing
 
-Open issues and send pull requests on GitHub.  You can optionally
-email the author your patches, if you prefer that.
+Fork and customize as you please.  You may optionally contribute back
+changes if you think I will find it useful.
+
+Either use pull requests, or email me your patches.
