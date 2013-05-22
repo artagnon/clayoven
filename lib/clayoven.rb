@@ -4,7 +4,6 @@ require 'slim'
 require 'clayoven/config'
 require 'clayoven/claytext'
 require 'clayoven/httpd'
-require 'clayoven/imapd'
 
 # Figures out the timestamp of the commit that introduced a specific
 # file.  If the file hasn't been checked into git yet, return the

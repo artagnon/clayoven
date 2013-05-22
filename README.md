@@ -2,8 +2,7 @@
 [![Code Climate](https://codeclimate.com/github/artagnon/clayoven.png)](https://codeclimate.com/github/artagnon/clayoven)
 
 Modern website generator with a traditional design. Generates html
-files from a git repository; files are written in claytext.  Pages can
-optionally be posted via email.
+files from a git repository; files are written in claytext.
 
 ## Installation
 
@@ -17,7 +16,6 @@ clayoven depends on Git, Ruby 1.9.3 and [Slim](http://slim-lang.com).
 
 * Run `clayoven` on your website's repository to generate HTML files.
 * Run `clayoven httpd` to preview your website locally.
-* Run `clayoven imapd` to start a daemon which will poll for emails.
 
 ## Repository format
 

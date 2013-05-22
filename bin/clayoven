@@ -7,18 +7,6 @@ require 'clayoven'
 case ARGV[0]
 when "httpd"
   Clayoven::Httpd.start
-when "imapd"
-  while 1
-    mails = Clayoven::Imapd.poll
-    if not mails.empty?
-      Clayoven.main
-      mails.each { |mail|
-        `git add .`
-        puts `git commit -a -m "#{mail.filename}: new post\n\n#{mail.date}\n#{mail.msgid}"`
-      }
-    end
-    sleep 1800
-  end
 else
   Clayoven.main
 end
