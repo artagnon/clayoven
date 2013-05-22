@@ -62,6 +62,8 @@ List item: Indent the whole paragraph by two spaces.
 Email quote: Begin each line in the paragraph with either a '>' (for
 one-level) or '>>' (for two-level).
 
+Forced line break: End the paragraph with one trailing whitespace.
+
 The simplest possible slim template that will work with clayoven is:
 
     doctype html
