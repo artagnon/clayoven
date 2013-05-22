@@ -2,7 +2,9 @@
 [![Code Climate](https://codeclimate.com/github/artagnon/clayoven.png)](https://codeclimate.com/github/artagnon/clayoven)
 
 Modern website generator with a traditional design. Generates html
-files from a git repository; files are written in claytext.
+that faithfully represents the textual input, provided the input is
+like an email I write to the git list.  In other words, it is
+specifically tailored to my writing style (referred to as claytext).
 
 ## Installation
 
@@ -26,24 +28,39 @@ which "topic" (or index), content page filenames must look like
 `<topic>:<permalink>`.  Topic page filenames must look like
 `<topic>.index`.  A special index page called `index` will serve as
 the homepage.  Additionally, the repository should contain a
-`design/template.slim`.
+`design/template.slim`. `hidden` is a special topic that can be used
+to publish a content page that are not listed in any index; example:
+404 page.
 
 Content pages are sorted based on the timestamp of the commit that
 first introduced the file, reverse-chronologically.  This means that
 updating a page (and checking in the changes) will not break the sort
-order.
+order.  Index pages are sorted chronologically.
 
 ## Using slim and claytext
 
 claytext is the markup engine that processes all your files, and
 passes structured information to the slim template.  However, no
-special effort is required to mark up the text that you write.  The
-first line of file should contain the title, followed by the body
-peppered with [\d+] markers referring to links in the footer.  The
-footer should contain "[\d+]: \<link\>" lines, which will be turned
-into clickable links.  For a full example, see
-[artagnon.com/claytext](http://artagnon.com/claytext).
+special effort is required to mark up.
 
+Paragraphs: Just write plain text paragraphs and wrap to 80-columns as
+usual in Emacs.
+
+Links: The first line of file should contain the title, followed by
+the body peppered with [\d+] markers referring to links in the footer.
+The footer should contain "[\d+]: \<link\>" lines, which will be
+turned into clickable links.
+
+Header: Enclose the first paragraph in '(' and ')' to make it a
+header.
+
+Codeblocks (verbatim blocks): Indent the whole paragraph by four
+spaces.
+
+List item: Indent the whole paragraph by two spaces.
+
+Email quote: Begin each line in the paragraph with either a '>' (for
+one-level) or '>>' (for two-level).
 
 The simplest possible slim template that will work with clayoven is:
 
