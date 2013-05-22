@@ -100,14 +100,6 @@ module ClayText
         end
       end
 
-      # If the paragraph contains only one line which begins with "# "
-      # or "## ", the paragraph is marked as a :subheading, with
-      # Paragraph#level set to the number of hashes.
-      if not paragraph.content.index "\n" and /^(\#|\#\#) / =~ paragraph.content
-        paragraph.type = :subheading
-        paragraph.level = $1.length
-      end
-
       # One trailing whitespace (/ $/) indicates that a line break
       # should be inserted.
       paragraph.content.gsub!(/ $/, "<br>")
