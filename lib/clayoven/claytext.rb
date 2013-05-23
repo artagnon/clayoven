@@ -1,6 +1,6 @@
 module ClayText
   # These are the values that Paragraph.type can take
-  PARAGRAPH_TYPES = %i[plain emailquote codeblock listitem subheading header footer]
+  PARAGRAPH_TYPES = %i[plain emailquote codeblock ulitem olitem subheading header footer]
 
   # see: http://php.net/manual/en/function.htmlspecialchars.php
   HTMLESCAPE_RULES = {
@@ -30,10 +30,10 @@ module ClayText
 
     # If all the lines in a paragraph begin with "  ", those two
     # characters are stripped from the content, and the paragraph is
-    # marked as an :listitem,
+    # marked as an :ulitem,
     Proc.new { |line| line.start_with? "  " } => lambda { |paragraph|
       paragraph.content = paragraph.content.lines.map { |l| l[2..-1] }.join
-      paragraph.type = :listitem },
+      paragraph.type = :ulitem },
 
     # If all the lines in a paragraph begin with "[\d+]: ", the
     # paragraph is marked as :footer.  Also, a regex substitution runs
@@ -43,6 +43,22 @@ module ClayText
       paragraph.type = :footer
       paragraph.content.gsub!(%r{^(\[\d+\]:) (.*://(.*))}) do
         "#{$1} <a href=\"#{$2}\">#{$3[0, 64]}#{%{...} if $3.length > 67}</a>"
+      end
+    end
+  }
+
+  # Key is just a name given to the lambda that acts on the paragraph
+  PARAGRAPH_BLOCK_FILTERS = {
+    # Numbered list.  Use paragraph level to convey the li value
+    # information.
+    :olitem => lambda do |paragraph|
+      first, rest = paragraph.content.split("\n", 2)
+      rest = [rest] if rest and not rest.is_a? Enumerable
+      if /^(\d+)\. / =~ first
+        return if rest and not rest.each { |l| l.start_with? "   " }
+        paragraph.content = paragraph.content.lines.map { |l| l[3..-1] }.join
+        paragraph.type = :olitem
+        paragraph.level = $1
       end
     end
   }
@@ -98,6 +114,9 @@ module ClayText
         if paragraph.content.lines.all? &proc_match
           lambda_cb.call paragraph
         end
+      end
+      ClayText::PARAGRAPH_BLOCK_FILTERS.each do |_, lambda_cb|
+        lambda_cb.call paragraph
       end
 
       # One trailing whitespace (/ $/) indicates that a line break
