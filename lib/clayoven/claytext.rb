@@ -37,12 +37,12 @@ module ClayText
 
     # If all the lines in a paragraph begin with "[\d+]: ", the
     # paragraph is marked as :footer.  Also, a regex substitution runs
-    # on each line turning every link like http://url-over-67-chars to
-    # <a href="http://google.com">64-characters-of-the-li...</a>
+    # on each line turning every link like http://url-over-36-chars to
+    # <a href="http://google.com">33-characters-of-the-li...</a>
     Proc.new { |line| /^\[\d+\]: / =~ line } => lambda do |paragraph|
       paragraph.type = :footer
       paragraph.content.gsub!(%r{^(\[\d+\]:) (.*://(.*))}) do
-        "#{$1} <a href=\"#{$2}\">#{$3[0, 64]}#{%{...} if $3.length > 67}</a>"
+        "#{$1} <a href=\"#{$2}\">#{$3[0, 33]}#{%{...} if $3.length > 36}</a>"
       end
     end
   }
