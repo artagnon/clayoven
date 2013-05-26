@@ -52,6 +52,13 @@ commit that first introduced the file, reverse-chronologically.  Index
 pages are sorted chronologically.  Just don't check in multiple files
 simultaneously.
 
+## Configuration
+
+On the first run, clayoven will create a `.clayoven/ignore` file in
+your repository.  This is a gitignore-like file (but uses full regular
+expressions) specifying which files clayoven should ignore.  Useful
+for your site's `README.md` and drafts.
+
 ## Slim template
 
 The simplest possible slim template that will work with clayoven is:
