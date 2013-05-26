@@ -33,10 +33,9 @@ the homepage.  Additionally, the repository should contain a
 to publish a content page that are not listed in any index; example:
 404 page.
 
-Content pages are sorted based on the timestamp of the commit that
-first introduced the file, reverse-chronologically.  This means that
-updating a page (and checking in the changes) will not break the sort
-order.  Index pages are sorted chronologically.
+Content pages are sorted based on the committer-timestamp of the
+commit that first introduced the file, reverse-chronologically.  Index
+pages are sorted chronologically.
 
 ## Slim template
 
