@@ -59,7 +59,7 @@ module ClayText
   PARAGRAPH_BLOCK_FILTERS = {
     # Numbered list.  Use paragraph level to convey the li value
     # information.
-    :olitem => lambda do |paragraph|
+    :olitem => lambda { |paragraph|
       first, rest = paragraph.content.split "\n", 2
       rest = [rest] if rest and not rest.is_a? Enumerable
       if /^(\d+)\. / =~ first
@@ -68,7 +68,12 @@ module ClayText
         paragraph.type = :olitem
         paragraph.level = $1
       end
-    end
+    },
+    # One trailing whitespace (/ $/) indicates that a line break
+    # should be inserted.
+    :hardbr => lambda { |paragraph|
+      paragraph.content.gsub!(/ $/, "<br>")
+    }
   }
 
   # A paragraph of text
@@ -126,10 +131,6 @@ module ClayText
       ClayText::PARAGRAPH_BLOCK_FILTERS.each do |_, lambda_cb|
         lambda_cb.call paragraph
       end
-
-      # One trailing whitespace (/ $/) indicates that a line break
-      # should be inserted.
-      paragraph.content.gsub!(/ $/, "<br>")
     end
 
     paragraphs
