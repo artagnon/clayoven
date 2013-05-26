@@ -5,16 +5,11 @@ require 'clayoven/config'
 require 'clayoven/claytext'
 require 'clayoven/httpd'
 
-# Figures out the timestamp of the commit that introduced a specific
-# file.  If the file hasn't been checked into git yet, return the
-# current time.
-def when_introduced(filename)
-  timestamp = `git log --reverse --pretty="%at" #{filename} 2>/dev/null | head -n 1`.strip
-  if timestamp == ""
-    Time.now
-  else
-    Time.at(timestamp.to_i)
-  end
+# Sorts a list of filenames by first-committed time.
+def git_sort files, reverse_p
+  reverse = ""
+  reverse = "--reverse" if reverse_p
+  `git log #{reverse} --format=%H --name-status --diff-filter=A -- #{files.join(" ")} | grep ^A | cut -f2`.split("\n")
 end
 
 module Clayoven
@@ -47,7 +42,6 @@ module Clayoven
       end
       @topic = @permalink
       @target = "#{@permalink}.html"
-      @timestamp = when_introduced @filename
     end
   end
 
@@ -59,7 +53,6 @@ module Clayoven
       @topic, @permalink = @filename.split(":", 2)
       @target = "#{@permalink}.html"
       @indexfill = nil
-      @timestamp = when_introduced @filename
     end
   end
 
@@ -94,13 +87,12 @@ module Clayoven
     end
 
     # Turn index_files and content_files into objects
-    index_pages = index_files.map { |filename| IndexPage.new(filename) }
-    content_pages = content_files.map { |filename| ContentPage.new(filename) }
+    index_pages = (git_sort index_files, true).map { |filename| IndexPage.new(filename) }
+    content_pages = (git_sort content_files, false).map { |filename| ContentPage.new(filename) }
 
     # Update topics to be a sorted Array extracted from index_pages.
     # It'll automatically exclude "hidden".
-    topics = index_pages.sort { |a, b| a.timestamp <=> b.timestamp }
-      .map { |page| page.topic }
+    topics = index_pages.map { |page| page.topic }
 
     # Fill in page.title and page.body by reading the file
     (index_pages + content_pages).each do |page|
@@ -110,8 +102,7 @@ module Clayoven
     # Compute the indexfill for indexes
     topics.each do |topic|
       topic_index = index_pages.select { |page| page.topic == topic }[0]
-      topic_index.indexfill = content_pages.select { |page|
-        page.topic == topic }.sort { |a, b| b.timestamp <=> a.timestamp }
+      topic_index.indexfill = content_pages.select { |page| page.topic == topic }
     end
 
     (index_pages + content_pages).each { |page| page.render topics }
