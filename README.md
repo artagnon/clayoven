@@ -3,8 +3,9 @@
 
 Modern website generator with a traditional design. Generates html
 that faithfully represents the textual input, provided the input is
-like an email I write to the git list.  In other words, it is
-specifically tailored to my writing style (referred to as claytext).
+like an email I write to the git list.  This
+[input](http://artagnon.com/hidden:claytext) produces this
+[output](http://artagnon.com/claytext).
 
 ## Installation
 
@@ -37,32 +38,7 @@ first introduced the file, reverse-chronologically.  This means that
 updating a page (and checking in the changes) will not break the sort
 order.  Index pages are sorted chronologically.
 
-## Using slim and claytext
-
-claytext is the markup engine that processes all your files, and
-passes structured information to the slim template.  However, no
-special effort is required to mark up.
-
-Paragraphs: Just write plain text paragraphs and wrap to 80-columns as
-usual in Emacs.
-
-Links: The first line of file should contain the title, followed by
-the body peppered with [\d+] markers referring to links in the footer.
-The footer should contain "[\d+]: \<link\>" lines, which will be
-turned into clickable links.
-
-Header: Enclose the first paragraph in '(' and ')' to make it a
-header.
-
-Codeblocks (verbatim blocks): Indent the whole paragraph by four
-spaces.
-
-List item: Indent the whole paragraph by two spaces.
-
-Email quote: Begin each line in the paragraph with either a '>' (for
-one-level) or '>>' (for two-level).
-
-Forced line break: End the paragraph with one trailing whitespace.
+## Slim template
 
 The simplest possible slim template that will work with clayoven is:
 
@@ -75,7 +51,7 @@ The simplest possible slim template that will work with clayoven is:
 	pre #{body}
 
 However, this does not make use of the structured information that
-claytext offers.  For a full example, look at the
+clayoven offers.  For a full example, look at the
 [template](https://github.com/artagnon/artagnon.com/blob/master/design/template.slim)
 that artagnon.com uses.
 
