@@ -67,7 +67,7 @@ that artagnon.com uses.
 ## Hacking
 
 Fork and customize as you please.  To avoid regressions, just check
-[this file](https://github.com/artagnon/artagnon.com/blob/hidden:claytext)
+[this file](https://github.com/artagnon/artagnon.com/blob/master/hidden:claytext)
 into your website repository (and update it as you add new features):
 your testsuite is a clean `git diff`.
 
