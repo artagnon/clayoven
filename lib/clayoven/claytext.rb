@@ -52,7 +52,7 @@ module ClayText
     # Numbered list.  Use paragraph level to convey the li value
     # information.
     :olitem => lambda do |paragraph|
-      first, rest = paragraph.content.split("\n", 2)
+      first, rest = paragraph.content.split "\n", 2
       rest = [rest] if rest and not rest.is_a? Enumerable
       if /^(\d+)\. / =~ first
         return if rest and not rest.each { |l| l.start_with? "   " }
@@ -71,7 +71,7 @@ module ClayText
   class Paragraph
     attr_accessor :content, :type, :level
 
-    def initialize(content)
+    def initialize content
       @content = content
       @type = :plain
 
@@ -90,7 +90,7 @@ module ClayText
   # Returns a list of Paragraphs
   def self.process body
     # First, htmlescape the body text
-    body.gsub!(/[&"'<>]/, ClayText::HTMLESCAPE_RULES)
+    body.gsub! /[&"'<>]/, ClayText::HTMLESCAPE_RULES
 
     # Split the body into Paragraphs
     paragraphs = []

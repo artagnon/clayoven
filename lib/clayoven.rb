@@ -9,7 +9,7 @@ require 'clayoven/httpd'
 def git_sort files, reverse_p
   reverse = ""
   reverse = "--reverse" if reverse_p
-  `git log #{reverse} --format=%H --name-status --diff-filter=A -- #{files.join(" ")} | grep ^A | cut -f2`.split("\n")
+  `git log #{reverse} --format=%H --name-status --diff-filter=A -- #{files.join " "} | grep ^A | cut -f2`.split "\n"
 end
 
 module Clayoven
@@ -20,20 +20,20 @@ module Clayoven
     # Writes out HTML pages.  Takes a list of topics to render
     #
     # Prints a "[GEN]" line for every file it writes out.
-    def render(topics)
+    def render topics
       @topics = topics
       @paragraphs = ClayText.process @body
       Slim::Engine.set_default_options pretty: true, sort_attrs: false
-      rendered = Slim::Template.new { IO.read("design/template.slim") }.render(self)
+      rendered = Slim::Template.new { IO.read "design/template.slim" }.render self
       File.open(@target, mode="w") do |targetio|
-        nbytes = targetio.write(rendered)
+        nbytes = targetio.write rendered
         puts "[GEN] #{@target} (#{nbytes} bytes out)"
       end
     end
   end
 
   class IndexPage < Page
-    def initialize(filename)
+    def initialize filename
       @filename = filename
       if @filename == "index"
         @permalink = @filename
@@ -48,9 +48,9 @@ module Clayoven
   class ContentPage < Page
     attr_accessor :pub_date
 
-    def initialize(filename)
+    def initialize filename
       @filename = filename
-      @topic, @permalink = @filename.split(":", 2)
+      @topic, @permalink = @filename.split ":", 2
       @target = "#{@permalink}.html"
       @indexfill = nil
     end
@@ -80,15 +80,15 @@ module Clayoven
 
     # Look for stray files.  All content_files that don't have a valid
     # topic before ":" (or don't have ";" in their filename at all)
-    (content_files.reject { |file| topics.include? (file.split(":", 2)[0]) })
+    (content_files.reject { |file| topics.include? file.split(":", 2)[0] })
       .each do |stray_entry|
       content_files = content_files - [stray_entry]
       puts "warning: #{stray_entry} is a stray file or directory; ignored"
     end
 
     # Turn index_files and content_files into objects
-    index_pages = (git_sort index_files, true).map { |filename| IndexPage.new(filename) }
-    content_pages = (git_sort content_files, false).map { |filename| ContentPage.new(filename) }
+    index_pages = (git_sort index_files, true).map { |filename| IndexPage.new filename }
+    content_pages = (git_sort content_files, false).map { |filename| ContentPage.new filename }
 
     # Update topics to be a sorted Array extracted from index_pages.
     # It'll automatically exclude "hidden".
@@ -96,7 +96,7 @@ module Clayoven
 
     # Fill in page.title and page.body by reading the file
     (index_pages + content_pages).each do |page|
-      page.title, page.body = (IO.read page.filename).split("\n\n", 2)
+      page.title, page.body = (IO.read page.filename).split "\n\n", 2
     end
 
     # Compute the indexfill for indexes
