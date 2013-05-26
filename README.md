@@ -64,9 +64,12 @@ Look at the
 [template](https://github.com/artagnon/artagnon.com/blob/master/design/template.slim)
 that artagnon.com uses.
 
-## Contributing
+## Hacking
 
-Fork and customize as you please.  You may optionally contribute back
-changes if you think I will find it useful.
+Fork and customize as you please.  To avoid regressions, just check
+[this file](https://github.com/artagnon/artagnon.com/blob/hidden:claytext)
+into your website repository (and update it as you add new features):
+your testsuite is a clean `git diff`.
 
-Either use pull requests, or email me your patches.
+You may optionally contribute back changes if you think I will find it
+useful.  Either use pull requests, or email me your patches.
