@@ -61,18 +61,7 @@ for your site's `README.md` and drafts.
 
 ## Slim template
 
-The simplest possible slim template that will work with clayoven is:
-
-    doctype html
-    html
-      head
-        title #{permalink}
-      body
-        h1 #{title}
-	pre #{body}
-
-However, this does not make use of the structured information that
-clayoven offers.  For a full example, look at the
+Look at the
 [template](https://github.com/artagnon/artagnon.com/blob/master/design/template.slim)
 that artagnon.com uses.
 
