@@ -9,11 +9,10 @@ like an email I write to the git list.  This
 
 ## Installation
 
-Get the gem
+The whole point of using clayoven is so you can hack on it: don't use
+gems. Just clone, and put `bin/clayoven` in `$PATH`.
 
-    gem install clayoven
-
-clayoven depends on Git, Ruby 1.9.3 and [Slim](http://slim-lang.com).
+Depends on ruby 2.0+, git, and [slim](http://slim-lang.com).
 
 ## Usage
 
