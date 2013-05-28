@@ -14,9 +14,11 @@ module ClayText
   # Key is used to match each line in a paragraph, and value is the
   # lambda that'll act on the matched paragraph.
   PARAGRAPH_LINE_FILTERS = {
-    # If all the lines in a paragraph begin with "> ", the paragraph
-    # is marked as an :emailquote
+    # If all the lines in a paragraph begin with "> ", those five
+    # characters ("&gt; ") are stripped from the content, and the
+    # paragraph is marked as an :emailquote.
     Proc.new { |line| /^&gt; / =~ line } => lambda { |paragraph|
+      paragraph.content = paragraph.content.lines.map { |l| l[5..-1] }.join
       paragraph.type = :emailquote },
 
     # If all the lines in a paragraph begin with "    ", those four
