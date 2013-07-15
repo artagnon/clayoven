@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 module ClayText
   # These are the values that Paragraph.type can take
   PARAGRAPH_TYPES = %i[plain emailquote codeblock indentp ulitem olitem
@@ -168,7 +169,7 @@ module ClayText
     end
 
     paragraphs.each do |paragraph|
-      if paragraph.is_plain?
+      if paragraph.is_plain? || paragraph.is_olitem? || paragraph.is_ulitem?
         paragraph.format_markdown!
       end
     end
