@@ -1,6 +1,6 @@
 module ClayText
   # These are the values that Paragraph.type can take
-  PARAGRAPH_TYPES = %i[plain emailquote codeblock ulitem olitem subheading header footer]
+  PARAGRAPH_TYPES = %i[plain emailquote codeblock indentp ulitem olitem subheading header footer]
 
   # see: http://php.net/manual/en/function.htmlspecialchars.php
   HTMLESCAPE_RULES = {
@@ -30,10 +30,10 @@ module ClayText
 
     # If all the lines in a paragraph begin with "  ", those two
     # characters are stripped from the content, and the paragraph is
-    # marked as an :ulitem,
+    # marked as an :indentp,
     Proc.new { |line| line.start_with? "  " } => lambda { |paragraph|
       paragraph.content = paragraph.content.lines.map { |l| l[2..-1] }.join
-      paragraph.type = :ulitem },
+      paragraph.type = :indentp },
 
     # If all the lines in a paragraph begin with "[\d+]: ", the
     # paragraph is marked as :footer.  Also, a regex substitution runs
