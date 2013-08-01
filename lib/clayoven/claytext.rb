@@ -57,8 +57,9 @@ module ClayText
 
   # Key is just a name given to the lambda that acts on the paragraph
   PARAGRAPH_BLOCK_FILTERS = {
-    # Numbered list.  Use paragraph level to convey the li value
-    # information.
+    # Numbered list; first line starts with "\d+. ", and the other
+    # lines start with "   ", maintaining indent.  Use paragraph
+    # level to convey the li value information.
     :olitem => lambda { |paragraph|
       first, rest = paragraph.content.split "\n", 2
       rest = [rest] if rest and not rest.is_a? Enumerable
