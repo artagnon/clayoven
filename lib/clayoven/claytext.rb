@@ -70,6 +70,19 @@ module ClayText
         paragraph.level = $1
       end
     },
+
+    # Bulleted list; first line starts with "- ", and the other lines
+    # start with "  ", maintaining indent.
+    :ulitem => lambda { |paragraph|
+      first, rest = paragraph.content.split "\n", 2
+      rest = [rest] if rest and not rest.is_a? Enumerable
+      if first.start_with? "- "
+        return if rest and not rest.each { |l| l.start_with? "  " }
+        paragraph.content = paragraph.content.lines.map { |l| l[2..-1] }.join
+        paragraph.type = :ulitem
+      end
+    },
+
     # One trailing whitespace (/ $/) indicates that a line break
     # should be inserted.
     :hardbr => lambda { |paragraph|
