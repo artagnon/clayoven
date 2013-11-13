@@ -57,7 +57,7 @@ module Clayoven
   end
 
   def self.main
-    abort 'error: index file not found; aborting' if not File.exists? 'index'
+    abort 'error: index file not found; aborting' unless File.exists? 'index'
 
     config = Clayoven::ConfigData.new
     all_files = (Dir.entries('.') -
@@ -67,7 +67,7 @@ module Clayoven
 
     # We must have a 'design' directory.  I don't plan on making this
     # a configuration variable.
-    if not Dir.entries('design').include? 'template.slim'
+    unless Dir.entries('design').include? 'template.slim'
       abort 'error: design/template.slim file not found; aborting'
     end
 
