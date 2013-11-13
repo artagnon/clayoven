@@ -17,21 +17,21 @@ module ClayText
     # If all the lines in a paragraph begin with "> ", those five
     # characters ("&gt; ") are stripped from the content, and the
     # paragraph is marked as an :emailquote.
-    Proc.new { |line| /^&gt; / =~ line } => lambda { |paragraph|
+    proc { |line| /^&gt; / =~ line } => lambda { |paragraph|
       paragraph.content = paragraph.content.lines.map { |l| l[5..-1] }.join
       paragraph.type = :emailquote },
 
     # If all the lines in a paragraph begin with "    ", those four
     # characters are stripped from the content, and the paragraph is
     # marked as an :codeblock,
-    Proc.new { |line| line.start_with? "    " } => lambda { |paragraph|
+    proc { |line| line.start_with? "    " } => lambda { |paragraph|
       paragraph.content = paragraph.content.lines.map { |l| l[4..-1] }.join
       paragraph.type = :codeblock },
 
     # If all the lines in a paragraph begin with "  ", those two
     # characters are stripped from the content, and the paragraph is
     # marked as an :indentp,
-    Proc.new { |line| line.start_with? "  " } => lambda { |paragraph|
+    proc { |line| line.start_with? "  " } => lambda { |paragraph|
       paragraph.content = paragraph.content.lines.map { |l| l[2..-1] }.join
       paragraph.type = :indentp },
 
@@ -40,7 +40,7 @@ module ClayText
     # on each line turning every link like http://url-over-33-chars to
     # <a href="http://google.com">30-characters-of-the-li...</a>
     # Also, special case github.com links.
-    Proc.new { |line| /^\[\d+\]: / =~ line } => lambda do |paragraph|
+    proc { |line| /^\[\d+\]: / =~ line } => lambda do |paragraph|
       paragraph.type = :footer
       paragraph.content.gsub!(%r{^(\[\d+\]:) (.*://(.*))}) do
         if $3.start_with? "github.com"
