@@ -4,7 +4,7 @@ module Clayoven
   module Httpd
     def self.start
       port = 8000
-      callback = Proc.new do |req, res|
+      callback = proc do |req, res|
 
         # A couple of URL rewriting rules.  Not real URL rewriting
         # like .htaccess; just a HTTP redirect. / is rewritten to
