@@ -60,7 +60,7 @@ module ClayText
     # Numbered list; first line starts with "\d+. ", and the other
     # lines start with "   ", maintaining indent.  Use paragraph
     # level to convey the li value information.
-    :olitem => lambda { |paragraph|
+    olitem: lambda { |paragraph|
       first, rest = paragraph.content.split "\n", 2
       rest = [rest] if rest and not rest.is_a? Enumerable
       if /^(\d+)\. / =~ first
@@ -73,7 +73,7 @@ module ClayText
 
     # Bulleted list; first line starts with "- ", and the other lines
     # start with "  ", maintaining indent.
-    :ulitem => lambda { |paragraph|
+    ulitem: lambda { |paragraph|
       first, rest = paragraph.content.split "\n", 2
       rest = [rest] if rest and not rest.is_a? Enumerable
       if first.start_with? "- "
@@ -85,7 +85,7 @@ module ClayText
 
     # One trailing whitespace (/ $/) indicates that a line break
     # should be inserted.
-    :hardbr => lambda { |paragraph|
+    hardbr: lambda { |paragraph|
       paragraph.content.gsub!(/ $/, "<br>")
     }
   }
