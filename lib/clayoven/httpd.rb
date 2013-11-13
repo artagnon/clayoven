@@ -17,9 +17,9 @@ module Clayoven
         end
       end
 
-      server = WEBrick::HTTPServer.new(:Port            => port,
-                                       :RequestCallback => callback,
-                                       :DocumentRoot    => Dir.pwd)
+      server = WEBrick::HTTPServer.new(Port: port,
+                                       RequestCallback: callback,
+                                       DocumentRoot: Dir.pwd)
 
       puts "clayoven serving at: http://localhost:#{port}"
 
