@@ -6,7 +6,7 @@ module Clayoven
 
     def initialize
       @rootpath = ".clayoven"
-      Dir.mkdir @rootpath if not Dir.exists? @rootpath
+      Dir.mkdir @rootpath unless Dir.exists? @rootpath
 
       initialize_ignore
       initialize_rc
