@@ -4,11 +4,11 @@ module ClayText
 
   # see: http://php.net/manual/en/function.htmlspecialchars.php
   HTMLESCAPE_RULES = {
-    "&" => "&amp;",
-    "\"" => "&quot;",
-    "'" => "&#39;",
-    "<" => "&lt;",
-    ">" => "&gt;"
+    '&' => '&amp;',
+    '"' => '&quot;',
+    "'" => '&#39;',
+    '<' => '&lt;',
+    '>' => '&gt;'
   }
 
   # Key is used to match each line in a paragraph, and value is the
@@ -38,7 +38,7 @@ module ClayText
       paragraph.type = :indentp
     end,
 
-    # If all the lines in a paragraph begin with "[\d+]: ", the
+    # If all the lines in a paragraph begin with '[\d+]: ', the
     # paragraph is marked as :footer.  Also, a regex substitution runs
     # on each line turning every link like http://url-over-33-chars to
     # <a href="http://google.com">30-characters-of-the-li...</a>
@@ -46,8 +46,8 @@ module ClayText
     proc { |line| /^\[\d+\]: / =~ line } => lambda do |paragraph|
       paragraph.type = :footer
       paragraph.content.gsub!(%r{^(\[\d+\]:) (.*://(.*))}) do
-        if $3.start_with? "github.com"
-          text = "gh:" + $3[11, 30]
+        if $3.start_with? 'github.com'
+          text = 'gh:' + $3[11, 30]
           trunc_len = 44 # 33 + 11
         else
           text = $3[0, 30]
@@ -60,27 +60,27 @@ module ClayText
 
   # Key is just a name given to the lambda that acts on the paragraph
   PARAGRAPH_BLOCK_FILTERS = {
-    # Numbered list; first line starts with "\d+. ", and the other
-    # lines start with "   ", maintaining indent.  Use paragraph
+    # Numbered list; first line starts with '\d+. ', and the other
+    # lines start with '   ', maintaining indent.  Use paragraph
     # level to convey the li value information.
     olitem: lambda do |paragraph|
       first, rest = paragraph.content.split "\n", 2
       rest = [rest] if rest and not rest.is_a? Enumerable
       if /^(\d+)\. / =~ first
-        return if rest and not rest.each { |l| l.start_with? "   " }
+        return if rest and not rest.each { |l| l.start_with? '   ' }
         paragraph.content = paragraph.content.lines.map { |l| l[3..-1] }.join
         paragraph.type = :olitem
         paragraph.level = $1
       end
     end,
 
-    # Bulleted list; first line starts with "- ", and the other lines
-    # start with "  ", maintaining indent.
+    # Bulleted list; first line starts with '- ', and the other lines
+    # start with '  ', maintaining indent.
     ulitem: lambda do |paragraph|
       first, rest = paragraph.content.split "\n", 2
       rest = [rest] if rest and not rest.is_a? Enumerable
-      if first.start_with? "- "
-        return if rest and not rest.each { |l| l.start_with? "  " }
+      if first.start_with? '- '
+        return if rest and not rest.each { |l| l.start_with? '  ' }
         paragraph.content = paragraph.content.lines.map { |l| l[2..-1] }.join
         paragraph.type = :ulitem
       end
@@ -89,7 +89,7 @@ module ClayText
     # One trailing whitespace (/ $/) indicates that a line break
     # should be inserted.
     hardbr: lambda { |paragraph|
-      paragraph.content.gsub!(/ $/, "<br>")
+      paragraph.content.gsub!(/ $/, '<br>')
     }
   }
 
@@ -133,8 +133,8 @@ module ClayText
     #
     # (This is a really long first paragraph blah-blah-blah-blah-blah
     # that spans to two lines)
-    if paragraphs[0].content.start_with? "(" and
-        paragraphs[0].content.end_with? ")"
+    if paragraphs[0].content.start_with? '(' and
+        paragraphs[0].content.end_with? ')'
       paragraphs[0].type = :header
     end
 

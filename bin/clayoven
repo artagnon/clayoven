@@ -5,7 +5,7 @@ $:.unshift File.join(__dir__, *%w{ .. lib })
 require 'clayoven'
 
 case ARGV[0]
-when "httpd"
+when 'httpd'
   Clayoven::Httpd.start
 else
   Clayoven.main

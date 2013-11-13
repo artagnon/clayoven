@@ -7,9 +7,9 @@ require 'clayoven/httpd'
 
 # Sorts a list of filenames by first-committed time.
 def git_sort files, reverse_p
-  reverse = ""
-  reverse = "--reverse" if reverse_p
-  `git log #{reverse} --format=%H --name-status --diff-filter=A -- #{files.join " "} | grep ^A | cut -f2`.split "\n"
+  reverse = ''
+  reverse = '--reverse' if reverse_p
+  `git log #{reverse} --format=%H --name-status --diff-filter=A -- #{files.join ' '} | grep ^A | cut -f2`.split "\n"
 end
 
 module Clayoven
@@ -19,13 +19,13 @@ module Clayoven
 
     # Writes out HTML pages.  Takes a list of topics to render
     #
-    # Prints a "[GEN]" line for every file it writes out.
+    # Prints a '[GEN]' line for every file it writes out.
     def render topics
       @topics = topics
       @paragraphs = ClayText.process @body
       Slim::Engine.set_default_options pretty: true, sort_attrs: false
-      rendered = Slim::Template.new { IO.read "design/template.slim" }.render self
-      File.open(@target, mode="w") do |targetio|
+      rendered = Slim::Template.new { IO.read 'design/template.slim' }.render self
+      File.open(@target, mode = 'w') do |targetio|
         nbytes = targetio.write rendered
         puts "[GEN] #{@target} (#{nbytes} bytes out)"
       end
@@ -35,10 +35,10 @@ module Clayoven
   class IndexPage < Page
     def initialize filename
       @filename = filename
-      if @filename == "index"
+      if @filename == 'index'
         @permalink = @filename
       else
-        @permalink = filename.split(".index")[0]
+        @permalink = filename.split('.index')[0]
       end
       @topic = @permalink
       @target = "#{@permalink}.html"
@@ -50,37 +50,37 @@ module Clayoven
 
     def initialize filename
       @filename = filename
-      @topic, @permalink = @filename.split ":", 2
+      @topic, @permalink = @filename.split ':', 2
       @target = "#{@permalink}.html"
       @indexfill = nil
     end
   end
 
   def self.main
-    abort "error: index file not found; aborting" if not File.exists? "index"
+    abort 'error: index file not found; aborting' if not File.exists? 'index'
 
     config = Clayoven::ConfigData.new
-    all_files = (Dir.entries(".") -
-                 [".", "..", ".clayoven", "design"]).reject do |entry|
+    all_files = (Dir.entries('.') -
+                 ['.', '..', '.clayoven', 'design']).reject do |entry|
       config.ignore.any? { |pattern| %r{#{pattern}} =~ entry }
     end
 
-    # We must have a "design" directory.  I don't plan on making this
+    # We must have a 'design' directory.  I don't plan on making this
     # a configuration variable.
-    if not Dir.entries("design").include? "template.slim"
-      abort "error: design/template.slim file not found; aborting"
+    if not Dir.entries('design').include? 'template.slim'
+      abort 'error: design/template.slim file not found; aborting'
     end
 
-    # index_files are files ending in ".index" and "index"
+    # index_files are files ending in '.index' and 'index'
     # content_files are all other files (we've already applied ignore)
     # topics is the list of topics.  We need it for the sidebar
-    index_files = ["index"] + all_files.select { |file| /\.index$/ =~ file }
+    index_files = ['index'] + all_files.select { |file| /\.index$/ =~ file }
     content_files = all_files - index_files
-    topics = index_files.map { |file| file.split(".index")[0] } + ["hidden"]
+    topics = index_files.map { |file| file.split('.index')[0] } + ['hidden']
 
     # Look for stray files.  All content_files that don't have a valid
     # topic before ":" (or don't have ";" in their filename at all)
-    (content_files.reject { |file| topics.include? file.split(":", 2)[0] })
+    (content_files.reject { |file| topics.include? file.split(':', 2)[0] })
       .each do |stray_entry|
       content_files = content_files - [stray_entry]
       puts "warning: #{stray_entry} is a stray file or directory; ignored"

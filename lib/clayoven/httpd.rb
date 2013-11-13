@@ -11,7 +11,7 @@ module Clayoven
         # index.html, and anything-that-doesn't-end-in-.html/css/js is
         # rewritten to that-thing.html.
         if %r{^/$} =~ req.path_info
-          res.set_redirect WEBrick::HTTPStatus::Found, "index.html"
+          res.set_redirect WEBrick::HTTPStatus::Found, 'index.html'
         elsif %r{^/((?:(?!\.html|\.css|\.js).)+)$} =~ req.path_info
           res.set_redirect WEBrick::HTTPStatus::Found, "#{$1}.html"
         end
