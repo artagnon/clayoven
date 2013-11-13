@@ -17,23 +17,26 @@ module ClayText
     # If all the lines in a paragraph begin with "> ", those five
     # characters ("&gt; ") are stripped from the content, and the
     # paragraph is marked as an :emailquote.
-    proc { |line| /^&gt; / =~ line } => lambda { |paragraph|
+    proc { |line| /^&gt; / =~ line } => lambda do |paragraph|
       paragraph.content = paragraph.content.lines.map { |l| l[5..-1] }.join
-      paragraph.type = :emailquote },
+      paragraph.type = :emailquote
+    end,
 
     # If all the lines in a paragraph begin with "    ", those four
     # characters are stripped from the content, and the paragraph is
     # marked as an :codeblock,
-    proc { |line| line.start_with? "    " } => lambda { |paragraph|
+    proc { |line| line.start_with? "    " } => lambda do |paragraph|
       paragraph.content = paragraph.content.lines.map { |l| l[4..-1] }.join
-      paragraph.type = :codeblock },
+      paragraph.type = :codeblock
+    end,
 
     # If all the lines in a paragraph begin with "  ", those two
     # characters are stripped from the content, and the paragraph is
     # marked as an :indentp,
-    proc { |line| line.start_with? "  " } => lambda { |paragraph|
+    proc { |line| line.start_with? "  " } => lambda do |paragraph|
       paragraph.content = paragraph.content.lines.map { |l| l[2..-1] }.join
-      paragraph.type = :indentp },
+      paragraph.type = :indentp
+    end,
 
     # If all the lines in a paragraph begin with "[\d+]: ", the
     # paragraph is marked as :footer.  Also, a regex substitution runs
@@ -60,7 +63,7 @@ module ClayText
     # Numbered list; first line starts with "\d+. ", and the other
     # lines start with "   ", maintaining indent.  Use paragraph
     # level to convey the li value information.
-    olitem: lambda { |paragraph|
+    olitem: lambda do |paragraph|
       first, rest = paragraph.content.split "\n", 2
       rest = [rest] if rest and not rest.is_a? Enumerable
       if /^(\d+)\. / =~ first
@@ -69,11 +72,11 @@ module ClayText
         paragraph.type = :olitem
         paragraph.level = $1
       end
-    },
+    end,
 
     # Bulleted list; first line starts with "- ", and the other lines
     # start with "  ", maintaining indent.
-    ulitem: lambda { |paragraph|
+    ulitem: lambda do |paragraph|
       first, rest = paragraph.content.split "\n", 2
       rest = [rest] if rest and not rest.is_a? Enumerable
       if first.start_with? "- "
@@ -81,7 +84,7 @@ module ClayText
         paragraph.content = paragraph.content.lines.map { |l| l[2..-1] }.join
         paragraph.type = :ulitem
       end
-    },
+    end,
 
     # One trailing whitespace (/ $/) indicates that a line break
     # should be inserted.
