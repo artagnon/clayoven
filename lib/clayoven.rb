@@ -15,7 +15,7 @@ end
 module Clayoven
   class Page
     attr_accessor :filename, :permalink, :timestamp, :title, :topic, :body,
-    :paragraphs, :target, :indexfill, :topics
+    :pubdate, :paragraphs, :target, :indexfill, :topics
 
     # Writes out HTML pages.  Takes a list of topics to render
     #
@@ -97,6 +97,11 @@ module Clayoven
     # Fill in page.title and page.body by reading the file
     (index_pages + content_pages).each do |page|
       page.title, page.body = (IO.read page.filename).split "\n\n", 2
+    end
+
+    # Fill in page.pubdate by asking git
+    content_pages.each do |page|
+      page.pubdate = `git log --reverse --format="%aD" #{page.filename} | head -n 1`.split(' ')[0..3].join(' ')
     end
 
     # Compute the indexfill for indexes
