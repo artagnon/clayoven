@@ -125,6 +125,7 @@ module ClayText
     # Split the body into Paragraphs
     paragraphs = []
     body.split("\n\n").each do |content|
+      content.rstrip!
       paragraphs << Paragraph.new(content)
     end
 
