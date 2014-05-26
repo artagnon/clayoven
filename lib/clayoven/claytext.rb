@@ -120,6 +120,7 @@ module ClayText
       content.gsub!(/(([^\\]|^))_((.|\n)*?)([^\\])_/, "\\1<em>\\3\\5</em>")
       content.gsub!(/(([^\\]|^))\*((.|\n)*?)([^\\])\*/,
                     "\\1<strong>\\3\\5</strong>")
+      content.gsub!(/\[\[(.*?)\]\]/, "<img src=\"\\1\"/>")
       content.gsub!('--', '—')
       content.gsub!(/\\`/, "`")
       content.gsub!(/\\_/, "_")
