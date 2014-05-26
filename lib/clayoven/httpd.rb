@@ -12,7 +12,7 @@ module Clayoven
         # rewritten to that-thing.html.
         if %r{^/$} =~ req.path_info
           res.set_redirect WEBrick::HTTPStatus::Found, 'index.html'
-        elsif %r{^/((?:(?!\.html|\.css|\.js).)+)$} =~ req.path_info
+        elsif %r{^/((?:(?!\.html|\.css|\.js|\.png).)+)$} =~ req.path_info
           res.set_redirect WEBrick::HTTPStatus::Found, "#{$1}.html"
         end
       end
