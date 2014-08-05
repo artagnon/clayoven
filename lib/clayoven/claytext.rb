@@ -128,10 +128,6 @@ module ClayText
       content.gsub!(/\\_/, "_")
       content.gsub!(/\\\*/, "*")
     end
-
-    def is_first?
-      @first
-    end
   end
 
   # Takes a body of claytext, breaks it up into paragraphs, and
