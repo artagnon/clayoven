@@ -172,11 +172,6 @@ module ClayText
       end
     end
 
-    # body is the useless version.  If someone is too lazy to use all
-    # the paragraphs individually in their template, they can just use
-    # this.
-    body = paragraphs.map(&:content).join("\n\n")
-
     paragraphs
   end
 end
