@@ -1,6 +1,7 @@
 module ClayText
   # These are the values that Paragraph.type can take
-  PARAGRAPH_TYPES = %i[plain emailquote codeblock indentp ulitem olitem subheading header footer]
+  PARAGRAPH_TYPES = %i[plain emailquote codeblock indentp ulitem olitem
+                       subheading header footer]
 
   # see: http://php.net/manual/en/function.htmlspecialchars.php
   HTMLESCAPE_RULES = {
