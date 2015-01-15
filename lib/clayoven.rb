@@ -1,10 +1,8 @@
-$:.unshift __dir__
-
 require 'slim'
-require 'clayoven/config'
-require 'clayoven/clayfeed'
-require 'clayoven/claytext'
-require 'clayoven/httpd'
+require_relative 'clayoven/config'
+require_relative 'clayoven/clayfeed'
+require_relative 'clayoven/claytext'
+require_relative 'clayoven/httpd'
 
 # Sorts a list of filenames by first-committed time.
 def git_sort files, reverse_p
@@ -105,13 +103,8 @@ module Clayoven
       page.pubdate = `git log --reverse --format="%aD" #{page.filename} | head -n 1`.split(' ')[0..3].join(' ')
     end
 
-    # Compute the indexfill for indexes
-    topics.each do |topic|
-      topic_index = index_pages.select { |page| page.topic == topic }[0]
-      topic_index.indexfill = content_pages.select { |page| page.topic == topic }
-    end
-
-    (index_pages + content_pages).each { |page| page.render topics }
-    ClayFeed.render!(content_pages)
+    (index_pages + content_pages).each { |page| page.render (if topics.length == 1
+                                                            then nil else topics end) }
+    # ClayFeed.render! content_pages
   end
 end
