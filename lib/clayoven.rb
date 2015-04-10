@@ -22,7 +22,7 @@ module Clayoven
     def render topics
       @topics = topics
       @paragraphs = ClayText.process @body
-      Slim::Engine.set_default_options pretty: true, sort_attrs: false
+      Slim::Engine.set_options pretty: true, sort_attrs: false
       rendered = Slim::Template.new { IO.read 'design/template.slim' }.render self
       File.open(@target, mode = 'w') do |targetio|
         nbytes = targetio.write rendered
