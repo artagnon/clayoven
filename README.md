@@ -4,7 +4,7 @@
 Modern website generator with a traditional design. Generates html that
 faithfully represents the textual input, provided the input is like an email I
 write to the git list.  This [input](examples/hidden:claytext) produces this
-[output](examples/claytext.html).
+[output](http://artagnon.github.io/clayoven).
 
 ## Installation
 
