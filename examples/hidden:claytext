@@ -1,0 +1,50 @@
+How to write content for clayoven
+
+(This is a header.  The first line enclosed in parentheses.)
+
+Welcome.  Let me describe how to write content for clayoven [1].  Care
+has been taken to ensure that the input [2] and output (i.e. this
+page) are as close to each other as possible.
+
+Paragraphs can be written as you would write them in emails, wrapped
+to 80 characters.  Hard line-breaks will be removed and the html page
+will wrap lines.
+
+Links are footnoted, and cannot be inlined: this is a feature.
+
+> This is a quote from an email.  I've chosen to display it in a color
+> that's reminiscent of the color used to display these quotes in
+> Gmail.
+
+Lists are automatic.
+
+1. I'll show some source code here, and then continue to the next
+   point as if nothing happened.
+
+    static int ce_compare_data(struct cache_entry *ce)
+    {
+    	int match = -1;
+    	int fd = open(".git/cache", O_RDONLY);
+    
+    	if (fd >= 0) {
+    		unsigned char sha1[20];
+    		if (!index_fd(sha1, fd, OBJ_BLOB))
+    			match = hashcmp(sha1, ce->sha1);
+    		/* index_fd() closed file descriptor */
+    	}
+    	return match;
+    }
+
+- This is an unordered list.
+
+4. Note that my numbering doesn't have to be consistent either.
+
+  This is a simple paragraph indent.
+
+If you do want hard-line breaks, you can get that. 
+Just put one trailing whitespace at the end of the line.
+
+That's about it.  I really don't need anything else.
+
+[1]: https://github.com/artagnon/clayoven
+[2]: http://artagnon.com/hidden:claytext

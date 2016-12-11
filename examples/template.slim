@@ -1,0 +1,66 @@
+doctype html
+html
+  head
+    title artagnon.com: #{permalink}
+    meta charset="UTF-8"
+    meta name="description" content="Ramkumar Ramachandra's site"
+    meta name="author" content="Ramkumar Ramachandra"
+    meta name="keywords" content="programming, linux, philosophy, git"
+    meta name="viewport" content="width=device-width, initial-scale=1.0"
+    link rel="stylesheet" href="/design/screen.css" media="screen"
+    link rel="stylesheet" href="/design/claytext.css" media="screen"
+    link rel="stylesheet" href="/design/mobile.css" media="only screen and (min-device-width: 320px) and (max-device-width: 600px)"
+    link rel="stylesheet" type="text/css" href="http://fonts.googleapis.com/css?family=Droid+Sans+Mono"
+    link rel="shortcut icon" href="/design/favicon.ico"
+    script type="text/javascript" src="/design/analyticstracking.js"
+    script type="text/javascript" src="http://use.typekit.net/ttq3jla.js"
+    script type="text/javascript" try{Typekit.load();}catch(e){}
+  body
+    div id="wrapper"
+      div id="main"
+        h1 #{title}
+        - if pubdate and not pubdate.empty?
+          span id="pubdate" #{pubdate}
+        - paragraphs.each do |paragraph|
+          - if paragraph.is_header?
+            p class="header"
+              == paragraph.content
+          - if paragraph.is_plain?
+            p
+              == paragraph.content
+          - elsif paragraph.is_emailquote?
+            blockquote class="emailquote"
+              == paragraph.content
+          - elsif paragraph.is_codeblock?
+            pre class="codeblock"
+              == paragraph.content
+          - elsif paragraph.is_indentp?
+            p class="indentp"
+              == paragraph.content
+          - elsif paragraph.is_olitem?
+            ol class="olitem"
+              li value="#{paragraph.level}"
+                == paragraph.content
+          - elsif paragraph.is_ulitem?
+            ul class="ulitem"
+              li
+                == paragraph.content
+          - elsif paragraph.is_subheading?
+            h2
+              == paragraph.content
+          - elsif paragraph.is_footer?
+            p class="footer"
+              == paragraph.content
+        - if indexfill and not indexfill.empty?
+          ul id="indexfill"
+            - indexfill.each do |page|
+              li
+                a href="/#{page.permalink}"
+                  = page.title
+      div id="sidebar"
+        ul
+          - if topics
+            - topics.each do |topic|
+              li
+                a href="/#{topic}"
+                  = topic

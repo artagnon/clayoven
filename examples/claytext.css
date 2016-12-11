@@ -1,0 +1,42 @@
+p.footer {
+	white-space: pre-line;
+}
+
+blockquote.emailquote {
+	font-family: 'PT Sans', sans-serif;
+	color: #500050;
+	border-left: 1px #ccc solid;
+	padding-left: 1ex;
+	margin-left: 0px;
+}
+
+h2 {
+	font-weight: 500;
+	font-size: 120%;
+}
+
+pre.codeblock {
+	font-family: 'Droid Sans Mono', monospace;
+	font-size: 80%;
+	margin: 0;
+	background-color: #eeeeee;
+	padding: 10px;
+	white-space: pre;
+	overflow-y: auto;
+	tab-size: 4;
+	-moz-tab-size: 4;
+	-o-tab-size: 4;
+}
+
+p.indentp {
+	margin-left: 2%;
+}
+
+ol.olitem, ul.ulitem {
+	list-style-position: outside;
+	padding-left: 1.4em;
+}
+
+p.header {
+	font-style: italic;
+}

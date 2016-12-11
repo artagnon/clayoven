@@ -1,0 +1,75 @@
+p, pre {
+	padding-top: 7px;
+	padding-bottom: 7px;
+}
+
+div#wrapper {
+	width: 100%;
+}
+
+div#sidebar {
+	height: 60px;
+	top: 0px;
+	left: 0px;
+	border-bottom: solid #000000;
+}
+
+div#sidebar ul {
+	height: inherit;
+	width: 15em;
+	margin-top: 0px;
+	margin-bottom: 0px;
+	margin-left: auto;
+	margin-right: auto;
+	padding-top: 15px;
+	padding-left: 0px;
+	padding-right: 0px;
+}
+
+div#sidebar li, ul#indexfill li {
+	list-style: none;
+}
+
+div#sidebar li {
+	float: left;
+	padding-right: 30px;
+}
+
+div#sidebar li:last-child {
+	padding-right: 0px;
+}
+
+ul#indexfill li {
+	float: none;
+	width: auto;
+	height: auto;
+	padding: 0;
+	font-size: 1em;
+	font-weight: 500;
+	text-align: left;
+
+	padding-top: 10px;
+	padding-bottom: 10px;
+}
+
+ul#indexfill li:before {
+	content: "\00BB \0020";
+	color: #888888;
+	margin-left: -10px;
+}
+
+div#main {
+	top: 80px;
+}
+
+div#sidebar, div#main {
+	float: none;
+	clear: both;
+	position: absolute;
+	padding-left: 20px;
+	padding-right: 20px;
+	width: 100%;
+	-webkit-box-sizing: border-box;
+	-moz-box-sizing: border-box;
+	box-sizing: border-box;
+}

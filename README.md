@@ -1,11 +1,10 @@
 # clayoven
 [![Code Climate](https://codeclimate.com/github/artagnon/clayoven.png)](https://codeclimate.com/github/artagnon/clayoven)
 
-Modern website generator with a traditional design. Generates html
-that faithfully represents the textual input, provided the input is
-like an email I write to the git list.  This
-[input](http://artagnon.com/hidden:claytext) produces this
-[output](http://artagnon.com/claytext).
+Modern website generator with a traditional design. Generates html that
+faithfully represents the textual input, provided the input is like an email I
+write to the git list.  This [input](examples/hidden:claytext) produces this
+[output](examples/claytext.html).
 
 ## Installation
 
@@ -60,16 +59,13 @@ for your site's `README.md` and drafts.
 
 ## Slim template
 
-Look at the
-[template](https://github.com/artagnon/artagnon.com/blob/master/design/template.slim)
-that artagnon.com uses.
+Look at the [template](examples/template.slim) that artagnon.com uses.
 
 ## Hacking
 
-Fork and customize as you please.  To avoid regressions, just check
-[this file](https://github.com/artagnon/artagnon.com/blob/master/hidden:claytext)
-into your website repository (and update it as you add new features):
-your testsuite is a clean `git diff`.
+Fork and customize as you please.  To avoid regressions, just check [this
+file](examples/hidden:claytext) into your website repository (and update it as
+you add new features): your testsuite is a clean `git diff`.
 
 You may optionally contribute back changes if you think I will find it
 useful.  Either use pull requests, or email me your patches.
