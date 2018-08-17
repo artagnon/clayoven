@@ -114,19 +114,6 @@ module ClayText
         end
       end
     end
-
-    def format_markdown!
-      content.gsub!(/(([^\\]|^))`((.|\n)*?)([^\\])`/, "\\1<code>\\3\\5</code>")
-      content.gsub!(/(([^\\]|^))_((.|\n)*?)([^\\])_/, "\\1<em>\\3\\5</em>")
-      content.gsub!(/^\*((.|\n)*?)([^\\])\*$/,
-                    "<div id=\"subheading\">\\1\\3</div>")
-      content.gsub!(/(([^\\]|^))\*((.|\n)*?)([^\\])\*/,
-                    "\\1<strong>\\3\\5</strong>")
-      content.gsub!(/\[\[(.*?)\]\]/, "<img src=\"\\1\"/>")
-      content.gsub!(/\\`/, "`")
-      content.gsub!(/\\_/, "_")
-      content.gsub!(/\\\*/, "*")
-    end
   end
 
   # Takes a body of claytext, breaks it up into paragraphs, and
@@ -163,12 +150,6 @@ module ClayText
       end
       ClayText::PARAGRAPH_BLOCK_FILTERS.each do |_, lambda_cb|
         lambda_cb.call paragraph
-      end
-    end
-
-    paragraphs.each do |paragraph|
-      if paragraph.is_plain? || paragraph.is_olitem? || paragraph.is_ulitem?
-        paragraph.format_markdown!
       end
     end
 
