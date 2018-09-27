@@ -9,7 +9,7 @@ module ClayText
     '"' => '&quot;',
     "'" => '&#39;',
     '<' => '&lt;',
-    '>' => '&gt;'
+    '>' => '&gt;',
   }
 
   # Key is used to match each line in a paragraph, and value is the
@@ -21,6 +21,13 @@ module ClayText
     proc { |line| /^\d+\. / =~ line } => lambda do |paragraph|
       paragraph.contents.map! { |k| k.gsub(/^\d+\. /, '') }
       paragraph.type = :olitems
+    end,
+
+    # The Roman-numeral version of ol
+    proc { |line| /^\([ivxIVX]+\)\. / =~ line } => lambda do |paragraph|
+      paragraph.contents.map! { |k| k.gsub(/^\([ivxIVX]+\)\. /, '') }
+      paragraph.type = :olitems
+      paragraph.prop = :roman
     end,
 
     # If all the lines in a paragraph begin with "- ", those
@@ -65,11 +72,12 @@ module ClayText
   # :type can be one of PARAGRAPH_TYPES
   # :level is an integer which has a type-specific meaning
   class Paragraph
-    attr_accessor :contents, :type
+    attr_accessor :contents, :type, :prop
 
     def initialize contents
       @contents = contents
       @type = :plain
+      @prop = :none
 
       # Generate is_*? methods for PARAGRAPH_TYPES
       Paragraph.class_eval do
