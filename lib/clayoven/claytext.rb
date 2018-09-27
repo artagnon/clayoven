@@ -18,16 +18,16 @@ module ClayText
     # If all the lines in a paragraph begin with "\d+\. ", those three
     # characters are stripped from the content, and the paragraph is
     # marked as an :olitem,
-    proc { |line| line.start_with? "\d+\. " } => lambda do |paragraph|
-      paragraph.contents.map! { |l| [3..-1].rstrip }
+    proc { |line| /^\d+\. / =~ line } => lambda do |paragraph|
+      paragraph.contents.map! { |k| k.gsub(/^\d+\. /, '') }
       paragraph.type = :olitem
     end,
 
     # If all the lines in a paragraph begin with "- ", those two
     # characters are stripped from the content, and the paragraph is
     # marked as an :ulitem.
-    proc { |line| line.start_with? "- " } => lambda do |paragraph|
-      paragraph.contents.map! { |l| l[2..-1].rstrip }
+    proc { |line| /^- / =~ line } => lambda do |paragraph|
+      paragraph.contents.map! { |k| k.gsub(/^- /, '') }
       paragraph.type = :ulitem
     end,
 
@@ -38,7 +38,7 @@ module ClayText
     # Also, special case github.com links.
     proc { |line| /^\[\d+\]: / =~ line } => lambda do |paragraph|
       paragraph.type = :footer
-      paragraph.contents.map { |k| k.gsub!(%r{^(\[\d+\]:) (.*://(.*))}) do
+      paragraph.contents.map! { |k| k.gsub(%r{^(\[\d+\]:) (.*://(.*))}) do
           if $3.start_with? 'github.com'
             text = 'gh:' + $3[11, 30]
             trunc_len = 44 # 33 + 11
