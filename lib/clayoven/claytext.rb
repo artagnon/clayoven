@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 module ClayText
   # These are the values that Paragraph.type can take
-  PARAGRAPH_TYPES = %i[plain ulitem olitem subheading header footer]
+  PARAGRAPH_TYPES = %i[plain ulitems olitems subheading header footer]
 
   # see: http://php.net/manual/en/function.htmlspecialchars.php
   HTMLESCAPE_RULES = {
@@ -15,20 +15,27 @@ module ClayText
   # Key is used to match each line in a paragraph, and value is the
   # lambda that'll act on the matched paragraph.
   PARAGRAPH_LINE_FILTERS = {
-    # If all the lines in a paragraph begin with "\d+\. ", those three
+    # If all the lines in a paragraph begin with "\d+\. ", those
     # characters are stripped from the content, and the paragraph is
-    # marked as an :olitem,
+    # marked as an :olitems,
     proc { |line| /^\d+\. / =~ line } => lambda do |paragraph|
       paragraph.contents.map! { |k| k.gsub(/^\d+\. /, '') }
-      paragraph.type = :olitem
+      paragraph.type = :olitems
     end,
 
-    # If all the lines in a paragraph begin with "- ", those two
+    # If all the lines in a paragraph begin with "- ", those
     # characters are stripped from the content, and the paragraph is
-    # marked as an :ulitem.
+    # marked as an :ulitems.
     proc { |line| /^- / =~ line } => lambda do |paragraph|
       paragraph.contents.map! { |k| k.gsub(/^- /, '') }
-      paragraph.type = :ulitem
+      paragraph.type = :ulitems
+    end,
+
+    # If the paragraph has exactly one line prefixed with a '# ',
+    # it is put into the :subheading type.
+    proc { |line| /^# / =~ line } => lambda do |paragraph|
+      paragraph.contents.map! { |k| k.gsub(/^# /, '') }
+      paragraph.type = :subheading
     end,
 
     # If all the lines in a paragraph begin with '[\d+]: ', the
@@ -79,7 +86,7 @@ module ClayText
   # Returns a list of Paragraphs
   def self.process body
     # First, htmlescape the body text
-    body.gsub! /[&"'<>]/, ClayText::HTMLESCAPE_RULES
+    body.gsub!(/[&"'<>]/, ClayText::HTMLESCAPE_RULES)
 
     # Split the body into Paragraphs
     paragraphs = []
@@ -101,7 +108,7 @@ module ClayText
     paragraphs.each do |paragraph|
       # Apply the PARAGRAPH_LINE_FILTERS on all the paragraphs
       ClayText::PARAGRAPH_LINE_FILTERS.each do |proc_match, lambda_cb|
-        if paragraph.contents.all? &proc_match
+        if paragraph.contents.all?(&proc_match)
           lambda_cb.call paragraph
         end
       end
