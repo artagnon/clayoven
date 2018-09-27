@@ -1,8 +1,7 @@
 # -*- coding: utf-8 -*-
 module ClayText
   # These are the values that Paragraph.type can take
-  PARAGRAPH_TYPES = %i[plain emailquote codeblock indentp ulitem olitem
-                       subheading header footer]
+  PARAGRAPH_TYPES = %i[plain ulitem olitem subheading header footer]
 
   # see: http://php.net/manual/en/function.htmlspecialchars.php
   HTMLESCAPE_RULES = {
@@ -16,28 +15,20 @@ module ClayText
   # Key is used to match each line in a paragraph, and value is the
   # lambda that'll act on the matched paragraph.
   PARAGRAPH_LINE_FILTERS = {
-    # If all the lines in a paragraph begin with "> ", those five
-    # characters ("&gt; ") are stripped from the content, and the
-    # paragraph is marked as an :emailquote.
-    proc { |line| /^&gt; / =~ line } => lambda do |paragraph|
-      paragraph.content = paragraph.content.lines.map { |l| l[5..-1] }.join
-      paragraph.type = :emailquote
+    # If all the lines in a paragraph begin with "\d+\. ", those three
+    # characters are stripped from the content, and the paragraph is
+    # marked as an :olitem,
+    proc { |line| line.start_with? "\d+\. " } => lambda do |paragraph|
+      paragraph.contents.map! { |l| [3..-1].rstrip }
+      paragraph.type = :olitem
     end,
 
-    # If all the lines in a paragraph begin with "    ", those four
+    # If all the lines in a paragraph begin with "- ", those two
     # characters are stripped from the content, and the paragraph is
-    # marked as an :codeblock,
-    proc { |line| line.start_with? "    " } => lambda do |paragraph|
-      paragraph.content = paragraph.content.lines.map { |l| l[4..-1] }.join
-      paragraph.type = :codeblock
-    end,
-
-    # If all the lines in a paragraph begin with "  ", those two
-    # characters are stripped from the content, and the paragraph is
-    # marked as an :indentp,
-    proc { |line| line.start_with? "  " } => lambda do |paragraph|
-      paragraph.content = paragraph.content.lines.map { |l| l[2..-1] }.join
-      paragraph.type = :indentp
+    # marked as an :ulitem.
+    proc { |line| line.start_with? "- " } => lambda do |paragraph|
+      paragraph.contents.map! { |l| l[2..-1].rstrip }
+      paragraph.type = :ulitem
     end,
 
     # If all the lines in a paragraph begin with '[\d+]: ', the
@@ -47,52 +38,18 @@ module ClayText
     # Also, special case github.com links.
     proc { |line| /^\[\d+\]: / =~ line } => lambda do |paragraph|
       paragraph.type = :footer
-      paragraph.content.gsub!(%r{^(\[\d+\]:) (.*://(.*))}) do
-        if $3.start_with? 'github.com'
-          text = 'gh:' + $3[11, 30]
-          trunc_len = 44 # 33 + 11
-        else
-          text = $3[0, 30]
-          trunc_len = 33 # 33 = 30 + "...".size
+      paragraph.contents.map { |k| k.gsub!(%r{^(\[\d+\]:) (.*://(.*))}) do
+          if $3.start_with? 'github.com'
+            text = 'gh:' + $3[11, 30]
+            trunc_len = 44 # 33 + 11
+          else
+            text = $3[0, 30]
+            trunc_len = 33 # 33 = 30 + "...".size
+          end
+          "#{$1} <a href=\"#{$2}\">#{text}#{%{...} if $3.length > trunc_len}</a>"
         end
-        "#{$1} <a href=\"#{$2}\">#{text}#{%{...} if $3.length > trunc_len}</a>"
-      end
+      }
     end
-  }
-
-  # Key is just a name given to the lambda that acts on the paragraph
-  PARAGRAPH_BLOCK_FILTERS = {
-    # Numbered list; first line starts with '\d+. ', and the other
-    # lines start with '   ', maintaining indent.  Use paragraph
-    # level to convey the li value information.
-    olitem: lambda do |paragraph|
-      first, rest = paragraph.content.split "\n", 2
-      rest = [rest] if rest and not rest.is_a? Enumerable
-      if /^(\d+)\. / =~ first
-        return if rest and not rest.each { |l| l.start_with? '   ' }
-        paragraph.content = paragraph.content.lines.map { |l| l[3..-1] }.join
-        paragraph.type = :olitem
-        paragraph.level = $1
-      end
-    end,
-
-    # Bulleted list; first line starts with '- ', and the other lines
-    # start with '  ', maintaining indent.
-    ulitem: lambda do |paragraph|
-      first, rest = paragraph.content.split "\n", 2
-      rest = [rest] if rest and not rest.is_a? Enumerable
-      if first.start_with? '- '
-        return if rest and not rest.each { |l| l.start_with? '  ' }
-        paragraph.content = paragraph.content.lines.map { |l| l[2..-1] }.join
-        paragraph.type = :ulitem
-      end
-    end,
-
-    # One trailing whitespace (/ $/) indicates that a line break
-    # should be inserted.
-    hardbr: lambda { |paragraph|
-      paragraph.content.gsub!(/ $/, '<br>')
-    }
   }
 
   # A paragraph of text
@@ -101,10 +58,10 @@ module ClayText
   # :type can be one of PARAGRAPH_TYPES
   # :level is an integer which has a type-specific meaning
   class Paragraph
-    attr_accessor :content, :type, :level
+    attr_accessor :contents, :type
 
-    def initialize content
-      @content = content
+    def initialize contents
+      @contents = contents
       @type = :plain
 
       # Generate is_*? methods for PARAGRAPH_TYPES
@@ -127,8 +84,7 @@ module ClayText
     # Split the body into Paragraphs
     paragraphs = []
     body.split("\n\n").each do |content|
-      content.rstrip!
-      paragraphs << Paragraph.new(content)
+      paragraphs << Paragraph.new(content.lines.map! { |l| l.strip })
     end
 
     # Special matching for the first paragraph.  This paragraph will
@@ -136,20 +92,18 @@ module ClayText
     #
     # (This is a really long first paragraph blah-blah-blah-blah-blah
     # that spans to two lines)
-    if paragraphs[0].content.start_with? '(' and
-        paragraphs[0].content.end_with? ')'
+    if paragraphs[0].contents.size == 1 and
+       paragraphs[0].contents[0].start_with? '(' and
+       paragraphs[0].contents[0].end_with? ')'
       paragraphs[0].type = :header
     end
 
     paragraphs.each do |paragraph|
       # Apply the PARAGRAPH_LINE_FILTERS on all the paragraphs
       ClayText::PARAGRAPH_LINE_FILTERS.each do |proc_match, lambda_cb|
-        if paragraph.content.lines.all? &proc_match
+        if paragraph.contents.all? &proc_match
           lambda_cb.call paragraph
         end
-      end
-      ClayText::PARAGRAPH_BLOCK_FILTERS.each do |_, lambda_cb|
-        lambda_cb.call paragraph
       end
     end
 
