@@ -24,7 +24,7 @@ module Clayoven
       @paragraphs = ClayText.process @body
       Slim::Engine.set_options pretty: true, sort_attrs: false
       rendered = Slim::Template.new { IO.read 'design/template.slim' }.render self
-      File.open(@target, mode = 'w') do |targetio|
+      File.open(@target, _ = 'w') do |targetio|
         nbytes = targetio.write rendered
         puts "[GEN] #{@target} (#{nbytes} bytes out)"
       end
@@ -99,8 +99,8 @@ module Clayoven
     end
 
     # Fill in page.pubdate by asking git
-    content_pages.each do |page|
-      page.pubdate = `git log --reverse --format="%aD" #{page.filename} | head -n 1`.split(' ')[0..3].join(' ')
+    (index_pages + content_pages).each do |page|
+      page.pubdate = `git log --format="%aD" #{page.filename} | head -n 1`.split(' ')[0..3].join(' ')
     end
 
     (index_pages + content_pages).each { |page| page.render (if topics.length == 1
