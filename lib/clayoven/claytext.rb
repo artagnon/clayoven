@@ -10,6 +10,7 @@ module ClayText
     "'" => '&#39;',
     '<' => '&lt;',
     '>' => '&gt;',
+    '...' => '&hellip;'
   }
 
   # Key is used to match each line in a paragraph, and value is the
@@ -93,9 +94,6 @@ module ClayText
   #
   # Returns a list of Paragraphs
   def self.process body
-    # First, htmlescape the body text
-    body.gsub!(/[&"'<>]/, ClayText::HTMLESCAPE_RULES)
-
     # Split the body into Paragraphs
     paragraphs = []
     body.split("\n\n").each do |content|
@@ -111,6 +109,13 @@ module ClayText
        paragraphs[0].contents[0].start_with? '(' and
        paragraphs[0].contents[0].end_with? ')'
       paragraphs[0].type = :header
+    end
+
+    paragraphs.each do |paragraph|
+      unless (paragraph.contents.size > 0 and paragraph.contents[0].start_with? '\[' and paragraph.contents[-1].end_with? '\]')
+        # First, htmlescape the body text
+        paragraph.contents.each { |l| l.gsub!(/[&"'<>]/, ClayText::HTMLESCAPE_RULES) }
+      end
     end
 
     paragraphs.each do |paragraph|
