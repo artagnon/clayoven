@@ -86,7 +86,7 @@ module Clayoven
     end
 
     # Turn index_files and content_files into objects
-    index_pages = (git_sort index_files, true).map { |filename| IndexPage.new filename }
+    index_pages = index_files.map { |filename| IndexPage.new filename }
     content_pages = (git_sort content_files, false).map { |filename| ContentPage.new filename }
 
     # Update topics to be a sorted Array extracted from index_pages.
@@ -103,8 +103,13 @@ module Clayoven
       page.pubdate = `git log --format="%aD" #{page.filename} | head -n 1`.split(' ')[0..3].join(' ')
     end
 
+    # Compute the indexfill for indexes
+    topics.each do |topic|
+      topic_index = index_pages.select { |page| page.topic == topic }[0]
+      topic_index.indexfill = content_pages.select { |page| page.topic == topic }
+    end
+
     (index_pages + content_pages).each { |page| page.render (if topics.length == 1
                                                             then nil else topics end) }
-    # ClayFeed.render! content_pages
   end
 end
