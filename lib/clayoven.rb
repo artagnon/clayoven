@@ -11,6 +11,11 @@ def git_sort files, reverse_p
   `git log #{reverse} --format=%H --name-status --diff-filter=A -- #{files.join ' '} | grep ^A | cut -f2`.split "\n"
 end
 
+# Sorts a list of filenames lexicographically, but for 'index', which is first
+def lex_sort files
+  ['index'] + (files.reject { |f| f == 'index'}).sort
+end
+
 module Clayoven
   class Page
     attr_accessor :filename, :permalink, :timestamp, :title, :topic, :body,
@@ -86,7 +91,7 @@ module Clayoven
     end
 
     # Turn index_files and content_files into objects
-    index_pages = index_files.map { |filename| IndexPage.new filename }
+    index_pages = lex_sort(index_files).map { |filename| IndexPage.new filename }
     content_pages = (git_sort content_files, false).map { |filename| ContentPage.new filename }
 
     # Update topics to be a sorted Array extracted from index_pages.
