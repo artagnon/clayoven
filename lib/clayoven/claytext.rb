@@ -13,6 +13,25 @@ module ClayText
     '...' => '&hellip;'
   }
 
+  ROMAN_NUMERALS = {
+    10 =>'x',
+    9 => 'ix',
+    5 => 'v',
+    4 => 'iv',
+    1 => 'i'
+  }
+
+  def self.to_arabic str
+    result = 0
+    ROMAN_NUMERALS.values.each do |roman|
+      while str.start_with?(roman)
+        result += ROMAN_NUMERALS.invert[roman]
+        str = str.slice(roman.length, str.length)
+      end
+    end
+    result
+  end
+
   # Key is used to match each line in a paragraph, and value is the
   # lambda that'll act on the matched paragraph.
   PARAGRAPH_LINE_FILTERS = {
@@ -25,10 +44,21 @@ module ClayText
     end,
 
     # The Roman-numeral version of ol
-    proc { |line| /^\([ivxIVX]+\)\. / =~ line } => lambda do |paragraph|
-      paragraph.contents.map! { |k| k.gsub(/^\([ivxIVX]+\)\. /, '') }
+    proc { |line| /^\([ivx]+\) / =~ line } => lambda do |paragraph|
+      match = paragraph.contents.first.match(/^\(([ivx]+)\)/) unless not paragraph.contents.first
+      paragraph.contents.map! { |k| k.gsub(/^\([ivx]+\) /, '') }
       paragraph.type = :olitems
-      paragraph.prop = :roman
+      paragraph.prop = :i
+      paragraph.start = to_arabic(match.captures.first) unless not match
+    end,
+
+    # The alphabetic version of ol
+    proc { |line| /^\([a-z]\) / =~ line } => lambda do |paragraph|
+      match = paragraph.contents.first.match(/^\(([a-z])\)/) unless not paragraph.contents.first
+      paragraph.contents.map! { |k| k.gsub(/^\([a-z]\) /, '') }
+      paragraph.type = :olitems
+      paragraph.prop = :a
+      paragraph.start = match.captures.first - 'a' + 1 unless not match
     end,
 
     # If all the lines in a paragraph begin with "- ", those
@@ -73,12 +103,13 @@ module ClayText
   # :type can be one of PARAGRAPH_TYPES
   # :level is an integer which has a type-specific meaning
   class Paragraph
-    attr_accessor :contents, :type, :prop
+    attr_accessor :contents, :type, :prop, :start
 
     def initialize contents
       @contents = contents
       @type = :plain
       @prop = :none
+      @start = :none
 
       # Generate is_*? methods for PARAGRAPH_TYPES
       Paragraph.class_eval do
