@@ -54,8 +54,9 @@ module Clayoven
 
     def initialize filename
       @filename = filename
-      @topic, @permalink = @filename.split ':', 2
-      @target = "#{@permalink}.html"
+      @topic, _ = @filename.split '/', 2
+      @target = "#{@filename}.html"
+      @permalink = @filename
       @indexfill = nil
     end
   end
@@ -64,7 +65,7 @@ module Clayoven
     abort 'error: index file not found; aborting' unless File.exists? 'index'
 
     config = Clayoven::ConfigData.new
-    all_files = (Dir.glob('**/*')).reject { |entry| File.directory? entry }
+    all_files = Dir.glob('**/*').reject { |entry| File.directory? entry }
     .reject { |entry| Regexp.union(/design\/.*/, /.clayoven\/.*/) =~ entry}.reject do |entry|
       config.ignore.any? { |pattern| %r{#{pattern}} =~ entry }
     end
@@ -80,14 +81,13 @@ module Clayoven
     # topics is the list of topics.  We need it for the sidebar
     index_files = ['index'] + all_files.select { |file| /\.index$/ =~ file }
     content_files = all_files - index_files
-    topics = index_files.map { |file| file.split('.index')[0] } + ['hidden']
+    topics = index_files.map { |file| file.split('.index')[0] }
 
-    # Look for stray files.  All content_files that don't have a valid
-    # topic before ":" (or don't have ";" in their filename at all)
-    (content_files.reject { |file| topics.include? file.split(':', 2)[0] })
+    # Look for stray files.  All content_files are nested within directories
+    (content_files.reject { |file| topics.include? file.split('/', 2)[0] })
       .each do |stray_entry|
       content_files = content_files - [stray_entry]
-      puts "warning: #{stray_entry} is a stray file or directory; ignored"
+      puts "[WARN] #{stray_entry} is a stray file or directory; ignored"
     end
 
     # Turn index_files and content_files into objects
@@ -95,7 +95,6 @@ module Clayoven
     content_pages = (git_sort content_files, false).map { |filename| ContentPage.new filename }
 
     # Update topics to be a sorted Array extracted from index_pages.
-    # It'll automatically exclude "hidden".
     topics = index_pages.map { |page| page.topic }
 
     # Fill in page.title and page.body by reading the file
