@@ -38,41 +38,43 @@ module ClayText
     # If all the lines in a paragraph begin with "\d+\. ", those
     # characters are stripped from the content, and the paragraph is
     # marked as an :olitems,
-    proc { |line| /^\d+\. / =~ line } => lambda do |paragraph|
-      paragraph.contents.map! { |k| k.gsub(/^\d+\. /, '') }
+    /^(\d+)\. / => lambda do |paragraph, lines, regex|
+      match = lines.first.match(regex)[1]
+      lines.map! { |k| k.gsub(regex, '') }
       paragraph.type = :olitems
+      paragraph.start = match if match
     end,
 
     # The Roman-numeral version of ol
-    proc { |line| /^\([ivx]+\) / =~ line } => lambda do |paragraph|
-      match = paragraph.contents.first.match(/^\(([ivx]+)\)/) unless not paragraph.contents.first
-      paragraph.contents.map! { |k| k.gsub(/^\([ivx]+\) /, '') }
+    /^\(([ivx]+)\) / => lambda do |paragraph, lines, regex|
+      match = lines.first.match(regex)[1]
+      lines.map! { |k| k.gsub(regex, '') }
       paragraph.type = :olitems
       paragraph.prop = :i
-      paragraph.start = to_arabic(match.captures.first) unless not match
+      paragraph.start = to_arabic(match) if match
     end,
 
     # The alphabetic version of ol
-    proc { |line| /^\([a-z]\) / =~ line } => lambda do |paragraph|
-      match = paragraph.contents.first.match(/^\(([a-z])\)/) unless not paragraph.contents.first
-      paragraph.contents.map! { |k| k.gsub(/^\([a-z]\) /, '') }
+    /^\(([a-z])\) / => lambda do |paragraph, lines, regex|
+      match = lines.first.match(regex)[1]
+      lines.map! { |k| k.gsub(regex, '') }
       paragraph.type = :olitems
       paragraph.prop = :a
-      paragraph.start = match.captures.first - 'a' + 1 unless not match
+      paragraph.start = match - 'a' + 1 if match
     end,
 
     # If all the lines in a paragraph begin with "- ", those
     # characters are stripped from the content, and the paragraph is
     # marked as an :ulitems.
-    proc { |line| /^- / =~ line } => lambda do |paragraph|
-      paragraph.contents.map! { |k| k.gsub(/^- /, '') }
+    /^- / => lambda do |paragraph, lines, regex|
+      lines.map! { |k| k.gsub(regex, '') }
       paragraph.type = :ulitems
     end,
 
     # If the paragraph has exactly one line prefixed with a '# ',
     # it is put into the :subheading type.
-    proc { |line| /^# / =~ line } => lambda do |paragraph|
-      paragraph.contents.map! { |k| k.gsub(/^# /, '') }
+    /^# / => lambda do |paragraph, lines, regex|
+      lines.map! { |k| k.gsub(regex, '') }
       paragraph.type = :subheading
     end,
 
@@ -81,9 +83,9 @@ module ClayText
     # on each line turning every link like http://url-over-33-chars to
     # <a href="http://google.com">30-characters-of-the-li...</a>
     # Also, special case github.com links.
-    proc { |line| /^\[\d+\]: / =~ line } => lambda do |paragraph|
+    /^\[\d+\]: / => lambda do |paragraph, lines, regex|
       paragraph.type = :footer
-      paragraph.contents.map! { |k| k.gsub(%r{^(\[\d+\]:) (.*://(.*))}) do
+      lines.map! { |k| k.gsub(%r{^(\[\d+\]:) (.*://(.*))}) do
           if $3.start_with? 'github.com'
             text = 'gh:' + $3[11, 30]
             trunc_len = 44 # 33 + 11
@@ -151,9 +153,9 @@ module ClayText
 
     paragraphs.each do |paragraph|
       # Apply the PARAGRAPH_LINE_FILTERS on all the paragraphs
-      ClayText::PARAGRAPH_LINE_FILTERS.each do |proc_match, lambda_cb|
-        if paragraph.contents.all?(&proc_match)
-          lambda_cb.call paragraph
+      ClayText::PARAGRAPH_LINE_FILTERS.each do |regex, lambda_cb|
+        if paragraph.contents.first and paragraph.contents.all? regex
+          lambda_cb.call paragraph, paragraph.contents, regex
         end
       end
     end
