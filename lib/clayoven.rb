@@ -64,8 +64,8 @@ module Clayoven
     abort 'error: index file not found; aborting' unless File.exists? 'index'
 
     config = Clayoven::ConfigData.new
-    all_files = (Dir.entries('.') -
-                 ['.', '..', '.clayoven', 'design']).reject do |entry|
+    all_files = (Dir.glob('**/*')).reject { |entry| File.directory? entry }
+    .reject { |entry| Regexp.union(/design\/.*/, /.clayoven\/.*/) =~ entry}.reject do |entry|
       config.ignore.any? { |pattern| %r{#{pattern}} =~ entry }
     end
 
