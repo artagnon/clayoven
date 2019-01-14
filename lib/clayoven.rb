@@ -81,7 +81,7 @@ module Clayoven
     # topics is the list of topics.  We need it for the sidebar
     index_files = ['index'] + all_files.select { |file| /\.index$/ =~ file }
     content_files = all_files - index_files
-    topics = index_files.map { |file| file.split('.index')[0] }
+    topics = index_files.map { |file| file.split('.index')[0] } + ['hidden']
 
     # Look for stray files.  All content_files are nested within directories
     (content_files.reject { |file| topics.include? file.split('/', 2)[0] })
