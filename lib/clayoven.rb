@@ -26,7 +26,7 @@ module Clayoven
     # Prints a '[GEN]' line for every file it writes out.
     def render topics
       @topics = topics
-      @paragraphs = ClayText.process @body
+      @paragraphs = if @body then ClayText.process @body else [] end
       Slim::Engine.set_options pretty: true, sort_attrs: false
       rendered = Slim::Template.new { IO.read 'design/template.slim' }.render self
       File.open(@target, _ = 'w') do |targetio|
