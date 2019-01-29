@@ -130,7 +130,7 @@ module ClayText
     # Split the body into Paragraphs
     paragraphs = []
     body.split("\n\n").each do |content|
-      paragraphs << Paragraph.new(content.lines.map! { |l| l.strip })
+      paragraphs << Paragraph.new(content.lines.map! { |l| l.rstrip })
     end
 
     # Special matching for the first paragraph.  This paragraph will

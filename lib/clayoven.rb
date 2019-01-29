@@ -4,13 +4,6 @@ require_relative 'clayoven/clayfeed'
 require_relative 'clayoven/claytext'
 require_relative 'clayoven/httpd'
 
-# Sorts a list of filenames by first-committed time.
-def git_sort files, reverse_p
-  reverse = ''
-  reverse = '--reverse' if reverse_p
-  `git log #{reverse} --format=%H --name-status --diff-filter=A -- #{files.join ' '} | grep ^A | cut -f2`.split "\n"
-end
-
 # Sorts a list of filenames lexicographically, but for 'index', which is first
 def lex_sort files
   ['index'] + (files.reject { |f| f == 'index'}).sort
@@ -19,7 +12,15 @@ end
 module Clayoven
   class Page
     attr_accessor :filename, :permalink, :timestamp, :title, :topic, :body,
-    :pubdate, :paragraphs, :target, :indexfill, :topics
+    :pubdate, :authdate, :paragraphs, :target, :indexfill, :topics
+
+    # Intialize with filename and authored dates from git
+    def initialize filename
+      @filename = filename
+      @dates = `git log --follow --format="%aD" #{@filename}`.split "\n"
+      @pubdate = @dates[0].split(' ')[0..3].join(' ')
+      @authdate = @dates[-1].split(' ')[0..3].join(' ')
+    end
 
     # Writes out HTML pages.  Takes a list of topics to render
     #
@@ -38,7 +39,7 @@ module Clayoven
 
   class IndexPage < Page
     def initialize filename
-      @filename = filename
+      super
       if @filename == 'index'
         @permalink = @filename
       else
@@ -50,14 +51,15 @@ module Clayoven
   end
 
   class ContentPage < Page
-    attr_accessor :pub_date
+    attr_accessor :unixdate
 
     def initialize filename
-      @filename = filename
+      super
       @topic, _ = @filename.split '/', 2
       @target = "#{@filename}.html"
       @permalink = @filename
       @indexfill = nil
+      @unixdate = `git log --follow --format="%at" #{@filename} | tail -n 1`
     end
   end
 
@@ -76,35 +78,29 @@ module Clayoven
       abort 'error: design/template.slim file not found; aborting'
     end
 
-    # index_files are files ending in '.index' and 'index'
+    # index_files are files ending in '.index', 'index', and '404'
     # content_files are all other files (we've already applied ignore)
     # topics is the list of topics.  We need it for the sidebar
-    index_files = ['index'] + all_files.select { |file| /\.index$/ =~ file }
+    index_files = ['index', '404'] + all_files.select { |file| /\.index$/ =~ file }
     content_files = all_files - index_files
-    topics = index_files.map { |file| file.split('.index')[0] } + ['hidden']
+    topics = (index_files - ['404']).map { |file| file.split('.index')[0] }
 
     # Look for stray files.  All content_files are nested within directories
-    (content_files.reject { |file| topics.include? file.split('/', 2)[0] })
-      .each do |stray_entry|
+    (content_files.reject { |file| topics.include? file.split('/', 2)[0] }).each do |stray_entry|
       content_files = content_files - [stray_entry]
       puts "[WARN] #{stray_entry} is a stray file or directory; ignored"
     end
 
     # Turn index_files and content_files into objects
-    index_pages = lex_sort(index_files).map { |filename| IndexPage.new filename }
-    content_pages = (git_sort content_files, false).map { |filename| ContentPage.new filename }
+    index_pages = (lex_sort index_files).map { |filename| IndexPage.new filename }
+    content_pages = content_files.map { |filename| ContentPage.new filename }.sort_by { |cp| cp.unixdate }.reverse!
 
     # Update topics to be a sorted Array extracted from index_pages.
-    topics = index_pages.map { |page| page.topic }
+    topics = index_pages.reject { |page| page.topic == '404' }.map { |page| page.topic }
 
     # Fill in page.title and page.body by reading the file
     (index_pages + content_pages).each do |page|
       page.title, page.body = (IO.read page.filename).split "\n\n", 2
-    end
-
-    # Fill in page.pubdate by asking git
-    (index_pages + content_pages).each do |page|
-      page.pubdate = `git log --format="%aD" #{page.filename} | head -n 1`.split(' ')[0..3].join(' ')
     end
 
     # Compute the indexfill for indexes
