@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 module ClayText
   # These are the values that Paragraph.type can take
-  PARAGRAPH_TYPES = %i[plain ulitems olitems subheading header footer]
+  PARAGRAPH_TYPES = %i[plain ulitems olitems subheading header footer codeblock]
 
   # see: http://php.net/manual/en/function.htmlspecialchars.php
   HTMLESCAPE_RULES = {
@@ -38,7 +38,7 @@ module ClayText
     # If all the lines in a paragraph begin with "\d+\. ", those
     # characters are stripped from the content, and the paragraph is
     # marked as an :olitems,
-    /^(\d+)\. / => lambda do |paragraph, lines, regex|
+    /^([0-9]+)\. / => lambda do |paragraph, lines, regex|
       match = lines.first.match(regex)[1]
       lines.map! { |k| k.gsub(regex, '') }
       paragraph.type = :olitems
@@ -145,9 +145,14 @@ module ClayText
     end
 
     paragraphs.each do |paragraph|
-      unless (paragraph.contents.size > 0 and paragraph.contents[0].start_with? '\[' and paragraph.contents[-1].end_with? '\]')
-        # First, htmlescape the body text
-        paragraph.contents.each { |l| l.gsub!(/[&"'<>]/, ClayText::HTMLESCAPE_RULES) }
+      if (paragraph.contents.size > 0 and paragraph.contents[0].start_with? '[[' and paragraph.contents[-1].end_with? ']]') then
+        paragraph.contents = paragraph.contents[1..-2]
+        paragraph.type = :codeblock
+      else
+        unless (paragraph.contents.size > 0 and paragraph.contents[0].start_with? '\[' and paragraph.contents[-1].end_with? '\]')
+          # First, htmlescape the body text
+          paragraph.contents.each { |l| l.gsub!(/[&"'<>]/, ClayText::HTMLESCAPE_RULES) }
+        end
       end
     end
 
