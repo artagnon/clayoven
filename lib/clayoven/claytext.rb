@@ -92,6 +92,18 @@ module ClayText
     end
   }
 
+  PARAGRAPH_START_END_FILTERS = {
+    # Strip out [[ and ]] for codeblocks
+    ['[[', ']]'] => lambda do |p|
+       p.contents = p.contents[1..-2]
+       p.type = :codeblock
+    end,
+    # Leave the MathJaX untouched
+    ['\[', '\]'] => ->(p) {},
+    # htmlescape everything else
+    [] => ->(p) { p.contents.each { |l| l.gsub!(/[&"'<>]/, ClayText::HTMLESCAPE_RULES) } }
+  }
+
   # A paragraph of text
   #
   # :content contains its content
@@ -129,22 +141,21 @@ module ClayText
     # Special matching for the first paragraph.  This paragraph will
     # be marked header:
     #
-    # (This is a really long first paragraph blah-blah-blah-blah-blah
-    # that spans to two lines)
-    if paragraphs[0].contents.size == 1 and
-       paragraphs[0].contents[0].start_with? '(' and
-       paragraphs[0].contents[0].end_with? ')'
+    # (This is first paragraph is the header)
+    p0content = paragraphs.first.contents.first
+    if paragraphs[0].contents.size == 1 and p0content.start_with? '(' and p0content.end_with? ')'
       paragraphs[0].type = :header
     end
 
-    paragraphs.each do |paragraph|
-      if (paragraph.contents.size > 0 and paragraph.contents[0].start_with? '[[' and paragraph.contents[-1].end_with? ']]') then
-        paragraph.contents = paragraph.contents[1..-2]
-        paragraph.type = :codeblock
-      else
-        unless (paragraph.contents.size > 0 and paragraph.contents[0].start_with? '\[' and paragraph.contents[-1].end_with? '\]')
-          # First, htmlescape the body text
-          paragraph.contents.each { |l| l.gsub!(/[&"'<>]/, ClayText::HTMLESCAPE_RULES) }
+    paragraphs.select { |p| p.contents.size > 0 }.each do |paragraph|
+      pfcontent = paragraph.contents.first
+      plcontent = paragraph.contents.last
+      # For codeblocks [[ and MathJaX blocks \[
+      PARAGRAPH_START_END_FILTERS.each do |delim, lambda_cb|
+        # The last delim is an empty array, whose lambda specifies htmlescape
+        if !delim.any? || (pfcontent.start_with? delim.first and plcontent.end_with? delim.last) then
+          lambda_cb.call paragraph
+          break
         end
       end
     end
