@@ -83,17 +83,10 @@ module ClayText
     # on each line turning every link like http://url-over-33-chars to
     # <a href="http://google.com">30-characters-of-the-li...</a>
     # Also, special case github.com links.
-    /^\[\d+\]: / => lambda do |paragraph, lines, regex|
+    /^\[\^\d+\]: / => lambda do |paragraph, lines, regex|
       paragraph.type = :footer
-      lines.map! { |k| k.gsub(%r{^(\[\d+\]:) (.*://(.*))}) do
-          if $3.start_with? 'github.com'
-            text = 'gh:' + $3[11, 30]
-            trunc_len = 44 # 33 + 11
-          else
-            text = $3[0, 30]
-            trunc_len = 33 # 33 = 30 + "...".size
-          end
-          "#{$1} <a href=\"#{$2}\">#{text}#{%{...} if $3.length > trunc_len}</a>"
+      lines.map! { |k| k.gsub(%r{(?<before>\[\^\d+\]:.*)(?<url>(http|https)://(?<urlstrip>[^ \)]*))(?<after>.*)}) do
+          "#{$~[:before]}<a href=\"#{$~[:url]}\">#{$~[:urlstrip]}</a>#{$~[:after]}"
         end
       }
     end
