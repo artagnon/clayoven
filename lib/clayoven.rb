@@ -18,8 +18,8 @@ module Clayoven
     def initialize filename
       @filename = filename
       @dates = `git log --follow --format="%aD" #{@filename}`.split "\n"
-      @pubdate = @dates[0].split(' ')[0..3].join(' ')
-      @authdate = @dates[-1].split(' ')[0..3].join(' ')
+      @pubdate = @dates.first.split(' ')[0..3].join(' ')
+      @authdate = @dates.last.split(' ')[0..3].join(' ')
     end
 
     # Writes out HTML pages.  Takes a list of topics to render
@@ -43,7 +43,7 @@ module Clayoven
       if @filename == 'index'
         @permalink = @filename
       else
-        @permalink = filename.split('.index')[0]
+        @permalink, _ = filename.split '.index'
       end
       @topic = @permalink
       @target = "#{@permalink}.html"
@@ -67,8 +67,7 @@ module Clayoven
     abort 'error: index file not found; aborting' unless File.exists? 'index'
 
     config = Clayoven::ConfigData.new
-    all_files = Dir.glob('**/*').reject { |entry| File.directory? entry }
-    .reject { |entry| Regexp.union(/design\/.*/, /.clayoven\/.*/) =~ entry}.reject do |entry|
+    all_files = Dir.glob('**/*').reject { |entry| File.directory? entry }.reject { |entry| Regexp.union(/design\/.*/, /.clayoven\/.*/) =~ entry}.reject do |entry|
       config.ignore.any? { |pattern| %r{#{pattern}} =~ entry }
     end
 
@@ -83,7 +82,7 @@ module Clayoven
     # topics is the list of topics.  We need it for the sidebar
     index_files = ['index', '404'] + all_files.select { |file| /\.index$/ =~ file }
     content_files = all_files - index_files
-    topics = (index_files - ['404']).map { |file| file.split('.index')[0] }
+    topics = (index_files - ['404']).map { |file| file.split('.index').first }
 
     # Look for stray files.  All content_files are nested within directories
     (content_files.reject { |file| topics.include? file.split('/', 2)[0] }).each do |stray_entry|

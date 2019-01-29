@@ -85,10 +85,6 @@ module ClayText
     # Also, special case github.com links.
     /^\[\^\d+\]: / => lambda do |paragraph, lines, regex|
       paragraph.type = :footer
-      lines.map! { |k| k.gsub(%r{(?<before>\[\^\d+\]:.*)(?<url>(http|https)://(?<urlstrip>[^ \)]*))(?<after>.*)}) do
-          "#{$~[:before]}<a href=\"#{$~[:url]}\">#{$~[:urlstrip]}</a>#{$~[:after]}"
-        end
-      }
     end
   }
 
