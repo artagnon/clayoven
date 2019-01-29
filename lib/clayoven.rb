@@ -105,11 +105,10 @@ module Clayoven
 
     # Compute the indexfill for indexes
     topics.each do |topic|
-      topic_index = index_pages.select { |page| page.topic == topic }[0]
+      topic_index = index_pages.select { |page| page.topic == topic }.first
       topic_index.indexfill = content_pages.select { |page| page.topic == topic }
     end
 
-    (index_pages + content_pages).each { |page| page.render (if topics.length == 1
-                                                            then nil else topics end) }
+    (index_pages + content_pages).each { |page| page.render topics }
   end
 end
