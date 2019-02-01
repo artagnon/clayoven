@@ -60,7 +60,7 @@ module ClayText
       lines.map! { |k| k.gsub(regex, '') }
       paragraph.type = :olitems
       paragraph.prop = :a
-      paragraph.start = match - 'a' + 1 if match
+      paragraph.start = match.ord - 'a'.ord + 1 if match
     end,
 
     # If all the lines in a paragraph begin with "- ", those

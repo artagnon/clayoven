@@ -23,12 +23,12 @@ So, if you have these files:
 
     index
     blog.index
-    blog:first
-    blog:second
+    blog/first
+    blog/second
     colophon.index
     design/template.slim
 
-clayoven automatically builds a sidebar with `index`, `blog` and `colophon`. In the page `/blog`, there will be links to the posts `/first` and `/second`.
+clayoven automatically builds a sidebar with `index`, `blog` and `colophon`. In the page `/blog`, there will be links to the posts `/blog/first` and `/blog/second`.
 
 The special "hidden" topic can be used to create content pages with no corresponding index or sidebar entry. This is useful for 404 pages, for example.
 
