@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 module ClayText
   # These are the values that Paragraph.type can take
-  PARAGRAPH_TYPES = %i[plain ulitems olitems subheading header footer codeblock]
+  PARAGRAPH_TYPES = %i[plain ulitems olitems subheading header footer codeblock horizrule mathjax]
 
   # see: http://php.net/manual/en/function.htmlspecialchars.php
   HTMLESCAPE_RULES = {
@@ -94,8 +94,13 @@ module ClayText
        p.contents = p.contents[1..-2]
        p.type = :codeblock
     end,
+    # Horizontal rule
+    ['--', '--'] => lambda do |p|
+      p.contents = ''
+      p.type = :horizrule
+    end,
     # Leave the MathJaX untouched
-    ['\[', '\]'] => ->(p) {},
+    ['\[', '\]'] => ->(p) { p.type = :mathjax },
     # htmlescape everything else
     [] => ->(p) { p.contents.each { |l| l.gsub!(/[&"'<>]/, ClayText::HTMLESCAPE_RULES) } }
   }
@@ -159,7 +164,7 @@ module ClayText
     paragraphs.each do |paragraph|
       # Apply the PARAGRAPH_LINE_FILTERS on all the paragraphs
       ClayText::PARAGRAPH_LINE_FILTERS.each do |regex, lambda_cb|
-        if paragraph.contents.first and paragraph.contents.all? regex
+        if not paragraph.contents.empty? and paragraph.contents.first and paragraph.contents.all? regex
           lambda_cb.call paragraph, paragraph.contents, regex
         end
       end
