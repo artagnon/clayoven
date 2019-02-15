@@ -96,7 +96,6 @@ module ClayText
     end,
     # Horizontal rule
     ['--', '--'] => lambda do |p|
-      p.contents = ''
       p.type = :horizrule
     end,
     # Leave the MathJaX untouched
@@ -154,7 +153,7 @@ module ClayText
       # For codeblocks [[ and MathJaX blocks \[
       PARAGRAPH_START_END_FILTERS.each do |delim, lambda_cb|
         # The last delim is an empty array, whose lambda specifies htmlescape
-        if !delim.any? || (pfcontent.start_with? delim.first and plcontent.end_with? delim.last) then
+        if delim.empty? || (pfcontent.start_with? delim.first and plcontent.end_with? delim.last) then
           lambda_cb.call paragraph
           break
         end
@@ -164,7 +163,7 @@ module ClayText
     paragraphs.each do |paragraph|
       # Apply the PARAGRAPH_LINE_FILTERS on all the paragraphs
       ClayText::PARAGRAPH_LINE_FILTERS.each do |regex, lambda_cb|
-        if not paragraph.contents.empty? and paragraph.contents.first and paragraph.contents.all? regex
+        if paragraph.contents.first and paragraph.contents.all? regex
           lambda_cb.call paragraph, paragraph.contents, regex
         end
       end
