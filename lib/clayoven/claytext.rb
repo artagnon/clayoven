@@ -3,14 +3,10 @@ module ClayText
   # These are the values that Paragraph.type can take
   PARAGRAPH_TYPES = %i[plain ulitems olitems subheading header footer codeblock horizrule mathjax]
 
-  # see: http://php.net/manual/en/function.htmlspecialchars.php
   HTMLESCAPE_RULES = {
     '&' => '&amp;',
-    '"' => '&quot;',
-    "'" => '&#39;',
     '<' => '&lt;',
-    '>' => '&gt;',
-    '...' => '&hellip;'
+    '>' => '&gt;'
   }
 
   ROMAN_NUMERALS = {
@@ -79,10 +75,7 @@ module ClayText
     end,
 
     # If all the lines in a paragraph begin with '[\d+]: ', the
-    # paragraph is marked as :footer.  Also, a regex substitution runs
-    # on each line turning every link like http://url-over-33-chars to
-    # <a href="http://google.com">30-characters-of-the-li...</a>
-    # Also, special case github.com links.
+    # paragraph is marked as :footer.
     /^\[\^\d+\]: / => lambda do |paragraph, lines, regex|
       paragraph.type = :footer
     end
@@ -95,13 +88,11 @@ module ClayText
        p.type = :codeblock
     end,
     # Horizontal rule
-    ['--', '--'] => lambda do |p|
-      p.type = :horizrule
-    end,
-    # Leave the MathJaX untouched
+    ['--', '--'] => ->(p) { p.type = :horizrule },
+    # MathJaX
     ['\[', '\]'] => ->(p) { p.type = :mathjax },
     # htmlescape everything else
-    [] => ->(p) { p.contents.each { |l| l.gsub!(/[&"'<>]/, ClayText::HTMLESCAPE_RULES) } }
+    [] => ->(p) { p.contents.each { |l| l.gsub!(/[<>&]/, ClayText::HTMLESCAPE_RULES) } }
   }
 
   # A paragraph of text
