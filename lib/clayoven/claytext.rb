@@ -72,6 +72,7 @@ module ClayText
     /^# / => lambda do |paragraph, lines, regex|
       lines.map! { |k| k.gsub(regex, '') }
       paragraph.type = :subheading
+      paragraph.bookmark = lines.first.downcase.gsub(' ', '-')
     end,
 
     # If all the lines in a paragraph begin with '[\d+]: ', the
@@ -101,13 +102,12 @@ module ClayText
   # :type can be one of PARAGRAPH_TYPES
   # :level is an integer which has a type-specific meaning
   class Paragraph
-    attr_accessor :contents, :type, :prop, :start
+    attr_accessor :contents, :type, :prop, :start, :bookmark
 
     def initialize contents
       @contents = contents
       @type = :plain
       @prop = :none
-      @start = :none
 
       # Generate is_*? methods for PARAGRAPH_TYPES
       Paragraph.class_eval do

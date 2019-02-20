@@ -14,8 +14,12 @@ module Clayoven
           res.set_redirect WEBrick::HTTPStatus::Found, 'index.html'
         elsif %r{(?<uri>.*)/$} =~ req.path_info
           res.set_redirect WEBrick::HTTPStatus::Found, "#{uri}.html"
+        elsif %r{(?<uri>.*)/#(?<bookmark>.*)$} =~ req.path_info
+          res.set_redirect WEBrick::HTTPStatus::Found, "#{uri}.html\##{bookmark}"
         elsif %r{^(?<page>(?!.*[.](html|css|js|ico|png)$).*$)} =~ req.path_info
           res.set_redirect WEBrick::HTTPStatus::Found, "#{page}.html"
+        else
+          res.set_redirect WEBrick::HTTPStatus::NotFound, "404.html"
         end
       end
 
