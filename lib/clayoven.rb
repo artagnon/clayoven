@@ -1,4 +1,6 @@
+require 'time'
 require 'slim'
+require 'sitemap_generator'
 require_relative 'clayoven/config'
 require_relative 'clayoven/clayfeed'
 require_relative 'clayoven/claytext'
@@ -109,5 +111,15 @@ module Clayoven
     end
 
     (index_pages + content_pages).each { |page| page.render topics }
+
+    # Sitemap generator
+    SitemapGenerator::Sitemap.default_host = 'http://artagnon.com'
+    SitemapGenerator::Sitemap.public_path = '.'
+    SitemapGenerator::Sitemap.create do
+      (index_pages + content_pages).each do |page|
+        add page.permalink, :lastmod => Time.parse(page.pubdate).strftime('%F')
+      end
+    end
+    SitemapGenerator::Sitemap.ping_search_engines
   end
 end
