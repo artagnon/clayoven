@@ -11,6 +11,16 @@ def lex_sort files
   ['index'] + (files.reject { |f| f == 'index'}).sort
 end
 
+# Look one directory deep to fetch all files
+def ls_files config
+  Dir.glob('**/*')
+    .reject { |entry| File.directory? entry }
+    .reject { |entry| Regexp.union(/design\/.*/, /.clayoven\/.*/) =~ entry}
+    .reject do |entry|
+    config.ignore.any? { |pattern| %r{#{pattern}} =~ entry }
+  end
+end
+
 module Clayoven
   class Page
     attr_accessor :filename, :permalink, :timestamp, :title, :topic, :body,
@@ -64,13 +74,39 @@ module Clayoven
     end
   end
 
+  # Populate the indexfill field in each topic
+  def self.indexfill topics, index_pages, content_pages
+    topics.each do |topic|
+      topic_index = index_pages.select { |page| page.topic == topic }.first
+      topic_index.indexfill = content_pages.select { |page| page.topic == topic }
+    end
+  end
+
+  def self.page_objects index_files, content_files
+    index_pages = (lex_sort index_files).map { |filename| IndexPage.new filename }
+    content_pages = content_files
+      .map { |filename| ContentPage.new filename }
+      .sort_by { |cp| cp.isoauthdate }
+      .reverse
+    return index_pages, content_pages
+  end
+
+  def self.generate_sitemap all_pages
+    SitemapGenerator::Sitemap.default_host = 'https://artagnon.com'
+    SitemapGenerator::Sitemap.public_path = '.'
+    SitemapGenerator::Sitemap.create do
+      all_pages.each do |page|
+        add page.permalink, :lastmod => page.isopubdate
+      end
+    end
+    SitemapGenerator::Sitemap.ping_search_engines
+  end
+
   def self.main
     abort 'error: index file not found; aborting' unless File.exists? 'index'
 
-    config = Clayoven::ConfigData.new
-    all_files = Dir.glob('**/*').reject { |entry| File.directory? entry }.reject { |entry| Regexp.union(/design\/.*/, /.clayoven\/.*/) =~ entry}.reject do |entry|
-      config.ignore.any? { |pattern| %r{#{pattern}} =~ entry }
-    end
+    # Collect the list of files from a directory listing
+    all_files = ls_files Clayoven::ConfigData.new
 
     # We must have a 'design' directory.  I don't plan on making this
     # a configuration variable.
@@ -86,39 +122,32 @@ module Clayoven
     topics = (index_files - ['404']).map { |file| file.split('.index').first }
 
     # Look for stray files.  All content_files are nested within directories
-    (content_files.reject { |file| topics.include? file.split('/', 2)[0] }).each do |stray_entry|
-      content_files = content_files - [stray_entry]
-      puts "[WARN] #{stray_entry} is a stray file or directory; ignored"
+    content_files
+      .reject { |file| topics.include? file.split('/', 2)[0] }
+      .each do |stray|
+      content_files = content_files - [stray]
+      puts "[WARN] #{stray} is a stray file or directory; ignored"
     end
 
     # Turn index_files and content_files into objects
-    index_pages = (lex_sort index_files).map { |filename| IndexPage.new filename }
-    content_pages = content_files.map { |filename| ContentPage.new filename }.sort_by { |cp| cp.isoauthdate }.reverse!
+    index_pages, content_pages = page_objects index_files, content_files
 
     # Update topics to be a sorted Array extracted from index_pages.
     topics = index_pages.reject { |page| page.topic == '404' }.map { |page| page.topic }
 
-    # Fill in page.title and page.body by reading the file
-    (index_pages + content_pages).each do |page|
+    # Compute the indexfill for indexes
+    indexfill topics, index_pages, content_pages
+
+    # Operations on all_pages follow
+    all_pages = index_pages + content_pages
+    
+    # Set the title and body for the render function
+    all_pages.each do |page|
       page.title, page.body = (IO.read page.filename).split "\n\n", 2
     end
 
-    # Compute the indexfill for indexes
-    topics.each do |topic|
-      topic_index = index_pages.select { |page| page.topic == topic }.first
-      topic_index.indexfill = content_pages.select { |page| page.topic == topic }
-    end
-
-    (index_pages + content_pages).each { |page| page.render topics }
-
-    # Sitemap generator
-    SitemapGenerator::Sitemap.default_host = 'https://artagnon.com'
-    SitemapGenerator::Sitemap.public_path = '.'
-    SitemapGenerator::Sitemap.create do
-      (index_pages + content_pages).each do |page|
-        add page.permalink, :lastmod => page.isopubdate
-      end
-    end
-    SitemapGenerator::Sitemap.ping_search_engines
+    # Produce the final HTML using slim
+    all_pages.each { |page| page.render topics }
+    generate_sitemap all_pages
   end
 end
