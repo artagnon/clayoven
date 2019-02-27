@@ -109,10 +109,46 @@ module ClayText
       @type = :plain
       @prop = :none
 
-      # Generate is_*? methods for PARAGRAPH_TYPES
+      # Generate is_*? methods on PARAGRAPH_TYPES
       Paragraph.class_eval do
         ClayText::PARAGRAPH_TYPES.each do |type|
           define_method("is_#{type.to_s}?") { @type == type }
+        end
+      end
+    end
+
+    def start? delim
+      @contents.first.start_with? delim
+    end
+
+    def end? delim
+      @contents.last.end_with? delim
+    end
+
+    def sized?
+      @contents.size > 0
+    end
+  end
+
+  def self.apply_start_end_filters! paragraphs
+    paragraphs.select { |p| p.sized? }.each do |paragraph|
+      # For codeblocks [[ and MathJaX blocks \[
+      PARAGRAPH_START_END_FILTERS.each do |delim, lambda_cb|
+        # The last delim is an empty array, whose lambda specifies htmlescape
+        if delim.empty? || (paragraph.start? delim.first and paragraph.end? delim.last) then
+          lambda_cb.call paragraph
+          break
+        end
+      end
+    end
+  end
+
+  def self.apply_line_filters! paragraphs
+    paragraphs.each do |paragraph|
+      # Apply the PARAGRAPH_LINE_FILTERS on all the paragraphs
+      ClayText::PARAGRAPH_LINE_FILTERS.each do |regex, lambda_cb|
+        if paragraph.contents.first and paragraph.contents.all? regex
+          lambda_cb.call paragraph, paragraph.contents, regex
         end
       end
     end
@@ -138,28 +174,8 @@ module ClayText
       paragraphs[0].type = :header
     end
 
-    paragraphs.select { |p| p.contents.size > 0 }.each do |paragraph|
-      pfcontent = paragraph.contents.first
-      plcontent = paragraph.contents.last
-      # For codeblocks [[ and MathJaX blocks \[
-      PARAGRAPH_START_END_FILTERS.each do |delim, lambda_cb|
-        # The last delim is an empty array, whose lambda specifies htmlescape
-        if delim.empty? || (pfcontent.start_with? delim.first and plcontent.end_with? delim.last) then
-          lambda_cb.call paragraph
-          break
-        end
-      end
-    end
-
-    paragraphs.each do |paragraph|
-      # Apply the PARAGRAPH_LINE_FILTERS on all the paragraphs
-      ClayText::PARAGRAPH_LINE_FILTERS.each do |regex, lambda_cb|
-        if paragraph.contents.first and paragraph.contents.all? regex
-          lambda_cb.call paragraph, paragraph.contents, regex
-        end
-      end
-    end
-
+    apply_start_end_filters! paragraphs
+    apply_line_filters! paragraphs
     paragraphs
   end
 end
