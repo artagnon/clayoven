@@ -14,14 +14,16 @@ end
 module Clayoven
   class Page
     attr_accessor :filename, :permalink, :timestamp, :title, :topic, :body,
-    :pubdate, :authdate, :paragraphs, :target, :indexfill, :topics
+    :pubdate, :isopubdate, :authdate, :isoauthdate, :paragraphs, :target, :indexfill, :topics
 
     # Intialize with filename and authored dates from git
     def initialize filename
       @filename = filename
       @dates = `git log --follow --format="%aD" #{@filename}`.split "\n"
       @pubdate = @dates.first.split(' ')[0..3].join(' ')
+      @isopubdate = Time.parse(@pubdate).strftime('%F')
       @authdate = @dates.last.split(' ')[0..3].join(' ')
+      @isoauthdate = Time.parse(@authdate).strftime('%F')
     end
 
     # Writes out HTML pages.  Takes a list of topics to render
@@ -53,15 +55,12 @@ module Clayoven
   end
 
   class ContentPage < Page
-    attr_accessor :unixdate
-
     def initialize filename
       super
       @topic, _ = @filename.split '/', 2
       @target = "#{@filename}.html"
       @permalink = @filename
       @indexfill = nil
-      @unixdate = `git log --follow --format="%at" #{@filename} | tail -n 1`
     end
   end
 
@@ -94,7 +93,7 @@ module Clayoven
 
     # Turn index_files and content_files into objects
     index_pages = (lex_sort index_files).map { |filename| IndexPage.new filename }
-    content_pages = content_files.map { |filename| ContentPage.new filename }.sort_by { |cp| cp.unixdate }.reverse!
+    content_pages = content_files.map { |filename| ContentPage.new filename }.sort_by { |cp| cp.isoauthdate }.reverse!
 
     # Update topics to be a sorted Array extracted from index_pages.
     topics = index_pages.reject { |page| page.topic == '404' }.map { |page| page.topic }
@@ -113,11 +112,11 @@ module Clayoven
     (index_pages + content_pages).each { |page| page.render topics }
 
     # Sitemap generator
-    SitemapGenerator::Sitemap.default_host = 'http://artagnon.com'
+    SitemapGenerator::Sitemap.default_host = 'https://artagnon.com'
     SitemapGenerator::Sitemap.public_path = '.'
     SitemapGenerator::Sitemap.create do
       (index_pages + content_pages).each do |page|
-        add page.permalink, :lastmod => Time.parse(page.pubdate).strftime('%F')
+        add page.permalink, :lastmod => page.isopubdate
       end
     end
     SitemapGenerator::Sitemap.ping_search_engines
