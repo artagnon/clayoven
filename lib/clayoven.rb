@@ -99,7 +99,6 @@ module Clayoven
         add page.permalink, :lastmod => page.isopubdate
       end
     end
-    SitemapGenerator::Sitemap.ping_search_engines
   end
 
   def self.main
