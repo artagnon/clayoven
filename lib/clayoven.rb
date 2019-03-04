@@ -24,16 +24,16 @@ end
 module Clayoven
   class Page
     attr_accessor :filename, :permalink, :timestamp, :title, :topic, :body,
-    :pubdate, :isopubdate, :authdate, :isoauthdate, :paragraphs, :target, :indexfill, :topics
+    :pubdate, :pubdateobj, :authdate, :authdateobj, :paragraphs, :target, :indexfill, :topics
 
     # Intialize with filename and authored dates from git
     def initialize filename
       @filename = filename
       @dates = `git log --follow --format="%aD" #{@filename}`.split "\n"
       @pubdate = @dates.first.split(' ')[0..3].join(' ')
-      @isopubdate = Time.parse(@pubdate).strftime('%F')
+      @pubdateobj = Time.parse(@pubdate)
       @authdate = @dates.last.split(' ')[0..3].join(' ')
-      @isoauthdate = Time.parse(@authdate).strftime('%F')
+      @authdateobj = Time.parse(@authdate)
     end
 
     # Writes out HTML pages.  Takes a list of topics to render
@@ -86,8 +86,7 @@ module Clayoven
     index_pages = (lex_sort index_files).map { |filename| IndexPage.new filename }
     content_pages = content_files
       .map { |filename| ContentPage.new filename }
-      .sort_by { |cp| cp.isoauthdate }
-      .reverse
+      .sort_by { |cp| [-cp.authdateobj.to_i, cp.filename] }
     return index_pages, content_pages
   end
 
@@ -96,7 +95,7 @@ module Clayoven
     SitemapGenerator::Sitemap.public_path = '.'
     SitemapGenerator::Sitemap.create do
       all_pages.each do |page|
-        add page.permalink, :lastmod => page.isopubdate
+        add page.permalink, :lastmod => page.pubdateobj
       end
     end
   end
