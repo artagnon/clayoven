@@ -24,16 +24,16 @@ end
 module Clayoven
   class Page
     attr_accessor :filename, :permalink, :timestamp, :title, :topic, :body,
-    :pubdate, :pubdateobj, :authdate, :authdateobj, :paragraphs, :target, :indexfill, :topics
+    :pubdateobj, :authdateobj, :paragraphs, :target, :indexfill, :topics
 
     # Intialize with filename and authored dates from git
     def initialize filename
       @filename = filename
       @dates = `git log --follow --format="%aD" #{@filename}`.split "\n"
-      @pubdate = @dates.first.split(' ')[0..3].join(' ')
-      @pubdateobj = Time.parse(@pubdate)
-      @authdate = @dates.last.split(' ')[0..3].join(' ')
-      @authdateobj = Time.parse(@authdate)
+      pubdate = @dates.first
+      @pubdateobj = Time.parse(pubdate)
+      authdate = @dates.last
+      @authdateobj = Time.parse(authdate)
     end
 
     # Writes out HTML pages.  Takes a list of topics to render
