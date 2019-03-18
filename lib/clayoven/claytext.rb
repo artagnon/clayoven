@@ -72,7 +72,10 @@ module ClayText
     /^# / => lambda do |paragraph, lines, regex|
       lines.map! { |k| k.gsub(regex, '') }
       paragraph.type = :subheading
-      paragraph.bookmark = lines.first.downcase.gsub(' ', '-')
+      # See RFC 3986, reserved characters
+      paragraph.bookmark = lines.first.downcase
+        .tr('!*\'();:@&=+$,/?#[]', '')
+        .gsub('\\', '').tr('{', '-').tr('}', '').tr(' ', '-')
     end,
 
     # If all the lines in a paragraph begin with '[\d+]: ', the
