@@ -116,14 +116,19 @@ module Clayoven
       .select { |filename| gidx.added_or_modified? filename }
       .map { |filename| ContentPage.new filename, gidx }
 
-    # First, see which index_pages are forced to be dirty by corresponding content_pages;
-    # then, add to the list the ones that are dirty by themselves
-    dirty_index_pages = dirty_content_pages.map do |dcp|
-      IndexPage.new "#{dcp.topic}.index", gidx
+    # An index_file that is added (or deleted) should mark all index_files as dirty
+    if index_files.any? { |filename| gidx.added? filename } then
+      dirty_index_pages = index_files.map { |filename| IndexPage.new filename, gidx }
+    else
+      # First, see which index_pages are forced dirty by corresponding content_pages;
+      # then, add to the list the ones that are dirty by themselves
+      dirty_index_pages = dirty_content_pages.map do |dcp|
+        IndexPage.new "#{dcp.topic}.index", gidx
+      end
+      dirty_index_pages += index_files
+        .select { |filename| gidx.modified? filename }
+        .map { |filename| IndexPage.new filename, gidx }
     end
-    dirty_index_pages += index_files
-      .select { |filename| gidx.added_or_modified? filename }
-      .map { |filename| IndexPage.new filename, gidx }
 
     # Now, set the indexfill for index_pages by looking at all the content_files
     # corresponding to a dirty index_page.
