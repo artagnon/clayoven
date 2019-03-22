@@ -61,10 +61,11 @@ module Clayoven
     attr_accessor :filename, :permalink, :title, :topic, :body, :pubdate, :authdate, :paragraphs, :target, :topics, :indexfill
 
     # Intialize with filename and authored dates from git
-    def initialize filename, gidx
+    # Expensive due to log --follow; avoid creating Page objects when not necessary.
+    def initialize filename, git
       @filename = filename
       # If a file is in the git index, use Time.now; otherwise, log --follow it.
-      @pubdate, @authdate = gidx.auth_pub_dates @filename
+      @pubdate, @authdate = git.auth_pub_dates @filename
       @title, @body = (IO.read @filename).split "\n\n", 2
     end
 
@@ -84,7 +85,7 @@ module Clayoven
   end
 
   class IndexPage < Page
-    def initialize filename, gidx
+    def initialize filename, git
       super
       if @filename == 'index'
         @permalink = @filename
@@ -97,7 +98,7 @@ module Clayoven
   end
 
   class ContentPage < Page
-    def initialize filename, gidx
+    def initialize filename, git
       super
       # There cannot be ContentPages nested under 'index'
       @topic, _ = @filename.split '/', 2
@@ -106,40 +107,31 @@ module Clayoven
     end
   end
 
-  def self.page_objects index_files, content_files
-    gidx = Git.new
-    index_pages = index_files.map { |filename| IndexPage.new filename, gidx }
-    content_pages = content_files.map { |filename| ContentPage.new filename, gidx }
-    index_pages.each do |ip|
-      ip.indexfill = content_pages
-        .select { |cp| ip.topic == cp.topic }
-        .sort_by { |cp| [-cp.authdate.to_i, cp.filename] }
-    end
-    return index_pages + content_pages
-  end
-
-  # Return index_pages and content_pages to generate
-  def self.pages_to_regenerate index_files, content_files
+  # Return index_pages and content_pages to generate; we work with
+  # content_files and index_files, because converting them to Page
+  # objects prematurely will result in unnecessary log --follows
+  def self.pages_to_regenerate index_files, content_files, is_aggressive
     # Check the git index exactly once to determine dirty files
-    gidx = Git.new
-
-    # Find out the dirty content_pages
-    dirty_content_pages = content_files
-      .select { |filename| gidx.added_or_modified? filename }
-      .map { |filename| ContentPage.new filename, gidx }
+    git = Git.new
 
     # An index_file that is added (or deleted) should mark all index_files as dirty
-    if index_files.any? { |filename| gidx.added? filename } then
-      dirty_index_pages = index_files.map { |filename| IndexPage.new filename, gidx }
+    if (index_files.any? { |filename| git.added? filename }) || is_aggressive then
+      dirty_index_pages = index_files.map { |filename| IndexPage.new filename, git }
+      dirty_content_pages = content_files.map { |filename| ContentPage.new filename, git }
     else
+      # Find out the dirty content_pages
+      dirty_content_pages = content_files
+        .select { |filename| git.added_or_modified? filename }
+        .map { |filename| ContentPage.new filename, git }
+
       # First, see which index_pages are forced dirty by corresponding content_pages;
       # then, add to the list the ones that are dirty by themselves
       dirty_index_pages = dirty_content_pages.map do |dcp|
-        IndexPage.new "#{dcp.topic}.index", gidx
+        IndexPage.new "#{dcp.topic}.index", git
       end
       dirty_index_pages += index_files
-        .select { |filename| gidx.modified? filename }
-        .map { |filename| IndexPage.new filename, gidx }
+        .select { |filename| git.modified? filename }
+        .map { |filename| IndexPage.new filename, git }
     end
 
     # Now, set the indexfill for index_pages by looking at all the content_files
@@ -147,13 +139,14 @@ module Clayoven
     dirty_index_pages.each do |dip|
       dip.indexfill = content_files
         .select { |cf| cf.split('/', 2).first == dip.topic }
-        .map { |cf| ContentPage.new cf, gidx }
+        .map { |cf| ContentPage.new cf, git }
         .sort_by { |cp| [-cp.authdate.to_i, cp.filename] }
     end
     return dirty_index_pages + dirty_content_pages
   end
 
-  def self.generate_sitemap all_pages
+  def self.generate_sitemap all_pages, is_aggressive
+    return if not is_aggressive
     SitemapGenerator::Sitemap.default_host = 'https://artagnon.com'
     SitemapGenerator::Sitemap.public_path = '.'
     SitemapGenerator::Sitemap.create do
@@ -190,16 +183,9 @@ module Clayoven
       puts "[WARN] #{stray} is a stray file or directory; ignored"
     end
 
-    if is_aggressive then
-      # Ignore all dependency information and blindly generate everything;
-      # required to generate sitemap
-      all_pages = page_objects index_files, content_files
-      all_pages.each { |page| page.render topics }
-      generate_sitemap all_pages
-    else
-      # Get a list of pages to regenerate, and produce the final HTML using slim
-      genpages = pages_to_regenerate index_files, content_files
-      genpages.each { |page| page.render topics }
-    end
+    # Get a list of pages to regenerate, and produce the final HTML using slim
+    genpages = pages_to_regenerate index_files, content_files, is_aggressive
+    genpages.each { |page| page.render topics }
+    generate_sitemap genpages, is_aggressive
   end
 end
