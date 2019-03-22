@@ -27,11 +27,12 @@ module Clayoven
     :pubdateobj, :authdateobj, :paragraphs, :target, :indexfill, :topics
 
     # Intialize with filename and authored dates from git
-    def initialize filename
+    def initialize filename, gidx
       @filename = filename
-      @dates = `git log --follow --format="%aD" #{@filename}`.split "\n"
+      @dates = `git log --follow --format="%aD" --date=unix #{@filename}`.split "\n"
       pubdate = @dates.first
-      @pubdateobj = Time.parse(pubdate)
+      # If a file is in the git index, use Time.now; otherwise, log --follow it.
+      @pubdateobj = if gidx.include? @filename then Time.now else Time.parse(pubdate) end
       authdate = @dates.last
       @authdateobj = Time.parse(authdate)
     end
@@ -52,7 +53,7 @@ module Clayoven
   end
 
   class IndexPage < Page
-    def initialize filename
+    def initialize filename, gidx
       super
       if @filename == 'index'
         @permalink = @filename
@@ -65,7 +66,7 @@ module Clayoven
   end
 
   class ContentPage < Page
-    def initialize filename
+    def initialize filename, gidx
       super
       @topic, _ = @filename.split '/', 2
       @target = "#{@filename}.html"
@@ -83,9 +84,11 @@ module Clayoven
   end
 
   def self.page_objects index_files, content_files
-    index_pages = (lex_sort index_files).map { |filename| IndexPage.new filename }
+    # Check the git index exactly once to determine dirty files
+    gidx = `git diff --name-only @`.split "\n"
+    index_pages = (lex_sort index_files).map { |filename| IndexPage.new filename, gidx }
     content_pages = content_files
-      .map { |filename| ContentPage.new filename }
+      .map { |filename| ContentPage.new filename, gidx }
       .sort_by { |cp| [-cp.authdateobj.to_i, cp.filename] }
     return index_pages, content_pages
   end
@@ -138,7 +141,7 @@ module Clayoven
 
     # Operations on all_pages follow
     all_pages = index_pages + content_pages
-    
+
     # Set the title and body for the render function
     all_pages.each do |page|
       page.title, page.body = (IO.read page.filename).split "\n\n", 2
