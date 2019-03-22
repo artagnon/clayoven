@@ -106,6 +106,18 @@ module Clayoven
     end
   end
 
+  def self.page_objects index_files, content_files
+    gidx = Git.new
+    index_pages = index_files.map { |filename| IndexPage.new filename, gidx }
+    content_pages = content_files.map { |filename| ContentPage.new filename, gidx }
+    index_pages.each do |ip|
+      ip.indexfill = content_pages
+        .select { |cp| ip.topic == cp.topic }
+        .sort_by { |cp| [-cp.authdate.to_i, cp.filename] }
+    end
+    return index_pages + content_pages
+  end
+
   # Return index_pages and content_pages to generate
   def self.pages_to_regenerate index_files, content_files
     # Check the git index exactly once to determine dirty files
@@ -151,7 +163,7 @@ module Clayoven
     end
   end
 
-  def self.main
+  def self.main is_aggressive = false
     abort 'error: index file not found; aborting' unless File.exists? 'index'
 
     # Collect the list of files from a directory listing
@@ -178,9 +190,16 @@ module Clayoven
       puts "[WARN] #{stray} is a stray file or directory; ignored"
     end
 
-    # Get a list of pages to regenerate, and produce the final HTML using slim
-    genpages = pages_to_regenerate index_files, content_files
-    genpages.each { |page| page.render topics }
-    # generate_sitemap all_pages
+    if is_aggressive then
+      # Ignore all dependency information and blindly generate everything;
+      # required to generate sitemap
+      all_pages = page_objects index_files, content_files
+      all_pages.each { |page| page.render topics }
+      generate_sitemap all_pages
+    else
+      # Get a list of pages to regenerate, and produce the final HTML using slim
+      genpages = pages_to_regenerate index_files, content_files
+      genpages.each { |page| page.render topics }
+    end
   end
 end
