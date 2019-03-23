@@ -45,8 +45,16 @@ module Clayoven
       @added.include?(file) || @untracked.include?(file)
     end
 
+    def any_added? files
+      files.any? { |file| added? file }
+    end
+
     def added_or_modified? file
       added?(file) || modified?(file)
+    end
+
+    def design_changed?
+      modified? 'design/template.slim'
     end
 
     def auth_pub_dates file
@@ -117,7 +125,7 @@ module Clayoven
     git = Git.new
 
     # An index_file that is added (or deleted) should mark all index_files as dirty
-    if (index_files.any? { |filename| git.added? filename }) || is_aggressive then
+    if git.any_added?(index_files) || git.design_changed? || is_aggressive then
       dirty_index_pages = index_files.map { |filename| IndexPage.new filename, git }
       dirty_content_pages = content_files.map { |filename| ContentPage.new filename, git }
     else
