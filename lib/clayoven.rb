@@ -25,6 +25,7 @@ module Clayoven
   class Git
     def initialize
       git_ns = `git diff --name-status @`
+      @untracked = `git ls-files --others --exclude-standard`.split "\n"
       if not git_ns.empty? then
         git_index = git_ns.split("\n").map { |line| line.split("\t")[0..1] }
         git_mod_index = git_index.select { |idx| idx.first == "M" }
@@ -41,7 +42,7 @@ module Clayoven
     end
 
     def added? file
-      @added.include? file
+      @added.include?(file) || @untracked.include?(file)
     end
 
     def added_or_modified? file
@@ -50,6 +51,7 @@ module Clayoven
 
     def auth_pub_dates file
       dates = `git log --follow --format="%aD" --date=unix #{file}`.split "\n"
+      return Time.now, Time.now if not dates.first
       pubdate = if added_or_modified? file then
         Time.now else Time.parse dates.first
       end
@@ -74,7 +76,7 @@ module Clayoven
     # Prints a '[GEN]' line for every file it writes out.
     def render topics
       @topics = topics
-      @paragraphs = if @body then ClayText.process @body else [] end
+      @paragraphs = if @body and not @body.empty? then ClayText.process @body else [] end
       Slim::Engine.set_options pretty: true, sort_attrs: false
       rendered = Slim::Template.new { IO.read 'design/template.slim' }.render self
       File.open(@target, _ = 'w') do |targetio|
