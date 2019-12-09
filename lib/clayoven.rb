@@ -135,10 +135,10 @@ module Clayoven
         .map { |filename| ContentPage.new filename, git }
 
       # First, see which index_pages are forced dirty by corresponding content_pages;
-      # then, add to the list the ones that are dirty by themselves
-      dirty_index_pages = dirty_content_pages.map do |dcp|
-        IndexPage.new "#{dcp.topic}.index", git
-      end
+      # then, add to the list the ones that are dirty by themselves; avoid adding the
+      # index page twice when there are two dirty content_pages under the same index
+      dirty_index_pages = dirty_content_pages.map { |dcp| "#{dcp.topic}.index" }.uniq
+                                             .map { |dif| IndexPage.new dif, git }
       dirty_index_pages += index_files
         .select { |filename| git.modified? filename }
         .map { |filename| IndexPage.new filename, git }

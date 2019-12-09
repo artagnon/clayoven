@@ -1,21 +1,20 @@
-# -*- coding: utf-8 -*-
 module ClayText
   # These are the values that Paragraph.type can take
-  PARAGRAPH_TYPES = %i[plain ulitems olitems subheading header footer codeblock horizrule mathjax]
+  PARAGRAPH_TYPES = %i[plain ulitems olitems subheading header footer codeblock horizrule mathjax].freeze
 
   HTMLESCAPE_RULES = {
     '&' => '&amp;',
     '<' => '&lt;',
     '>' => '&gt;'
-  }
+  }.freeze
 
   ROMAN_NUMERALS = {
-    10 =>'x',
+    10 => 'x',
     9 => 'ix',
     5 => 'v',
     4 => 'iv',
     1 => 'i'
-  }
+  }.freeze
 
   def self.to_arabic str
     result = 0
@@ -74,22 +73,23 @@ module ClayText
       paragraph.type = :subheading
       # See RFC 3986, reserved characters
       paragraph.bookmark = lines.first.downcase
-        .tr('!*\'();:@&=+$,/?#[]', '')
-        .gsub('\\', '').tr('{', '-').tr('}', '').tr(' ', '-')
+                                .tr('!*\'();:@&=+$,/?#[]', '')
+                                .gsub('\\', '').tr('{', '-').tr('}', '')
+                                .tr(' ', '-')
     end,
 
     # If all the lines in a paragraph begin with '[\d+]: ', the
     # paragraph is marked as :footer.
-    /^\[\^\d+\]: / => lambda do |paragraph, lines, regex|
+    /^\[\^\d+\]: / => lambda do |paragraph, _, _|
       paragraph.type = :footer
     end
-  }
+  }.freeze
 
   PARAGRAPH_START_END_FILTERS = {
     # Strip out [[ and ]] for codeblocks
     ['[[', ']]'] => lambda do |p|
-       p.contents = p.contents[1..-2]
-       p.type = :codeblock
+      p.contents = p.contents[1..-2]
+      p.type = :codeblock
     end,
     # Horizontal rule
     ['--', '--'] => ->(p) { p.type = :horizrule },
@@ -97,7 +97,7 @@ module ClayText
     ['\[', '\]'] => ->(p) { p.type = :mathjax },
     # htmlescape everything else
     [] => ->(p) { p.contents.each { |l| l.gsub!(/[<>&]/, ClayText::HTMLESCAPE_RULES) } }
-  }
+  }.freeze
 
   # A paragraph of text
   #
@@ -115,30 +115,22 @@ module ClayText
       # Generate is_*? methods on PARAGRAPH_TYPES
       Paragraph.class_eval do
         ClayText::PARAGRAPH_TYPES.each do |type|
-          define_method("is_#{type.to_s}?") { @type == type }
+          define_method("is_#{type}?") { @type == type }
         end
       end
     end
 
-    def start? delim
-      @contents.first.start_with? delim
-    end
-
-    def end? delim
-      @contents.last.end_with? delim
-    end
-
-    def sized?
-      @contents.size > 0
-    end
+    def start?(delim) @contents.first.start_with? delim end
+    def end?(delim) @contents.last.end_with? delim end
+    def sized?() !@contents.empty? end
   end
 
   def self.apply_start_end_filters! paragraphs
-    paragraphs.select { |p| p.sized? }.each do |paragraph|
+    paragraphs.select(&:sized?).each do |paragraph|
       # For codeblocks [[ and MathJaX blocks \[
       PARAGRAPH_START_END_FILTERS.each do |delim, lambda_cb|
         # The last delim is an empty array, whose lambda specifies htmlescape
-        if delim.empty? || (paragraph.start? delim.first and paragraph.end? delim.last) then
+        if delim.empty? || (paragraph.start?(delim.first) && paragraph.end?(delim.last))
           lambda_cb.call paragraph
           break
         end
@@ -150,7 +142,7 @@ module ClayText
     paragraphs.each do |paragraph|
       # Apply the PARAGRAPH_LINE_FILTERS on all the paragraphs
       ClayText::PARAGRAPH_LINE_FILTERS.each do |regex, lambda_cb|
-        if paragraph.contents.first and paragraph.contents.all? regex
+        if paragraph.contents.first && paragraph.contents.all?(regex)
           lambda_cb.call paragraph, paragraph.contents, regex
         end
       end
@@ -165,7 +157,7 @@ module ClayText
     # Split the body into Paragraphs
     paragraphs = []
     body.split("\n\n").each do |content|
-      paragraphs << Paragraph.new(content.lines.map! { |l| l.rstrip })
+      paragraphs << Paragraph.new(content.lines.map!(&:rstrip))
     end
 
     # Special matching for the first paragraph.  This paragraph will
@@ -173,7 +165,7 @@ module ClayText
     #
     # (This is first paragraph is the header)
     p0content = paragraphs.first.contents.first
-    if paragraphs[0].contents.size == 1 and p0content.start_with? '(' and p0content.end_with? ')'
+    if paragraphs[0].contents.size == 1 && p0content.start_with?('(') && p0content.end_with?(')')
       paragraphs[0].type = :header
     end
 
