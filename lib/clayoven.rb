@@ -6,16 +6,15 @@ require_relative 'clayoven/clayfeed'
 require_relative 'clayoven/claytext'
 require_relative 'clayoven/httpd'
 
-# Sorts a list of filenames lexicographically, but for 'index', which is first
+# Sorts a list of filenames lexicographically, but for 'index.clay', which is first
 def lex_sort files
-  ['index'] + (files.reject { |f| f == 'index'}).sort
+  ['index'] + (files.reject { |f| f == 'index.clay'}).sort
 end
 
-# Look one directory deep to fetch all files
+# Look one directory deep to fetch all .clay files
 def ls_files config
-  Dir.glob('**/*')
+  Dir.glob('**/*.clay')
     .reject { |entry| File.directory? entry }
-    .reject { |entry| Regexp.union(/design\/.*/, /.clayoven\/.*/) =~ entry}
     .reject do |entry|
     config.ignore.any? { |pattern| %r{#{pattern}} =~ entry }
   end
@@ -37,25 +36,11 @@ module Clayoven
       end
     end
 
-    def modified? file
-      @modified.include? file
-    end
-
-    def added? file
-      @added.include?(file) || @untracked.include?(file)
-    end
-
-    def any_added? files
-      files.any? { |file| added? file }
-    end
-
-    def added_or_modified? file
-      added?(file) || modified?(file)
-    end
-
-    def design_changed?
-      modified? 'design/template.slim'
-    end
+    def modified?(file) @modified.include? file end
+    def added?(file) @added.include?(file) || @untracked.include?(file) end
+    def any_added?(files) files.any? { |file| added? file } end
+    def added_or_modified?(file) added?(file) || modified?(file) end
+    def design_changed?; modified? 'design/template.slim' end
 
     def auth_pub_dates file
       dates = `git log --follow --format="%aD" --date=unix #{file}`.split "\n"
@@ -97,11 +82,9 @@ module Clayoven
   class IndexPage < Page
     def initialize filename, git
       super
-      if @filename == 'index'
-        @permalink = @filename
-      else
-        @permalink, _ = filename.split '.index'
-      end
+      # Special handling for 'index.clay' and '404.clay': every other IndexFile is a '*.index.clay'
+      @permalink = if @filename.end_with?('.index.clay') then filename.split('.index.clay').first
+      else filename.split('.clay').first end
       @topic = @permalink
       @target = "#{@permalink}.html"
     end
@@ -112,8 +95,8 @@ module Clayoven
       super
       # There cannot be ContentPages nested under 'index'
       @topic, _ = @filename.split '/', 2
-      @target = "#{@filename}.html"
-      @permalink = @filename
+      @permalink = @filename.split('.clay').first
+      @target = "#{@permalink}.html"
     end
   end
 
@@ -137,7 +120,7 @@ module Clayoven
       # First, see which index_pages are forced dirty by corresponding content_pages;
       # then, add to the list the ones that are dirty by themselves; avoid adding the
       # index page twice when there are two dirty content_pages under the same index
-      dirty_index_pages = dirty_content_pages.map { |dcp| "#{dcp.topic}.index" }.uniq
+      dirty_index_pages = dirty_content_pages.map { |dcp| "#{dcp.topic}.index.clay" }.uniq
                                              .map { |dif| IndexPage.new dif, git }
       dirty_index_pages += index_files
         .select { |filename| git.modified? filename }
@@ -150,7 +133,7 @@ module Clayoven
       dip.indexfill = content_files
         .select { |cf| cf.split('/', 2).first == dip.topic }
         .map { |cf| ContentPage.new cf, git }
-        .sort_by { |cp| [-cp.authdate.to_i, cp.filename] }
+        .sort_by { |cp| [-cp.authdate.to_i, cp.permalink] }
     end
     return dirty_index_pages + dirty_content_pages
   end
@@ -167,23 +150,22 @@ module Clayoven
   end
 
   def self.main is_aggressive = false
-    abort 'error: index file not found; aborting' unless File.exists? 'index'
+    abort 'error: index.clay file not found; aborting' unless File.exists? 'index.clay'
 
     # Collect the list of files from a directory listing
     all_files = ls_files Clayoven::ConfigData.new
 
-    # We must have a 'design' directory.  I don't plan on making this
-    # a configuration variable.
+    # We must have a 'design' directory.
     unless Dir.entries('design').include? 'template.slim'
       abort 'error: design/template.slim file not found; aborting'
     end
 
-    # index_files are files ending in '.index', 'index', and '404'
+    # index_files are files ending in '.index.clay', 'index.clay', and '404.clay'
     # content_files are all other files (we've already applied ignore)
     # topics is the list of topics.  We need it for the sidebar
-    index_files = ['index', '404'] + all_files.select { |file| /\.index$/ =~ file }
+    index_files = ['index.clay', '404.clay'] + all_files.select { |file| /\.index\.clay$/ =~ file }
     content_files = all_files - index_files
-    topics = lex_sort(index_files - ['404']).map { |file| file.split('.index').first }
+    topics = lex_sort(index_files - ['404.clay']).map { |file| file.split('.index.clay').first }
 
     # Look for stray files.  All content_files are nested within directories
     content_files

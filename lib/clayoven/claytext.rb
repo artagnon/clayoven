@@ -122,7 +122,7 @@ module ClayText
 
     def start?(delim) @contents.first.start_with? delim end
     def end?(delim) @contents.last.end_with? delim end
-    def sized?() !@contents.empty? end
+    def sized?; !@contents.empty? end
   end
 
   def self.apply_start_end_filters! paragraphs
