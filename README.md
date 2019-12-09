@@ -12,20 +12,21 @@ The whole point of using clayoven is so you can hack on it: don't use gems. Just
 
 ## Usage
 
-* Run `clayoven` on your website's repository to generate HTML files.
+* Run `clayoven` on your website's repository to generate HTML files incrementally based on the current git index.
+* Run `clayoven all` to regenerate the entire website along with a sitemap. You can run this occassionally.
 * Run `clayoven httpd` to preview your website locally.
 
 ## Pages
 
-Every site needs a sidebar that allows the user to navigate through various sections: these are called Topics. Each topic has one Index Page (named `<topic>.index`; `<topic>` is the permalink), and several Content Pages (named `<topic>/<content>`, with the same permalink) corresponding to it. `index` is a special index page corresponding to the permalink `/`. Additionally, every repository should contain a `design/template.slim` to specify how to render content.
+Every site needs a sidebar that allows the user to navigate through various sections: these are called "topics". Each topic has one Index Page (named `<topic>.index.clay`; `<topic>` is the permalink), and several Content Pages (named `<topic>/<content>.clay`, with the permalink `<topic>/<content>`) corresponding to it. `index.clay` is a special index page corresponding to the permalink `/`. Additionally, every repository should contain a `design/template.slim` to specify how to render content.
 
 So, if you have these files:
 
-    index
-    blog.index
-    blog/first
-    blog/second
-    colophon.index
+    index.clay
+    blog.index.clay
+    blog/first.clay
+    blog/second.clay
+    colophon.index.clay
     design/template.slim
 
 clayoven automatically builds a sidebar with `index`, `blog` and `colophon`. In the page `/blog`, there will be links to the posts `/blog/first` and `/blog/second`.
@@ -34,7 +35,7 @@ Content pages are sorted based on the committer-timestamp of the commit that fir
 
 ## Configuration
 
-On the first run, clayoven will create a `.clayoven/ignore` file in your repository. This is a gitignore-like file (but uses full regular expressions) specifying which files clayoven should ignore. Useful for your site's `README.md` and drafts.
+`.clayoven/ignore` is a gitignore-like file (but uses full regular expressions) specifying which files clayoven should ignore. Useful for drafts.
 
 ## Slim template
 

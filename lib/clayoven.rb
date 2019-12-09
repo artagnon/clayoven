@@ -161,7 +161,7 @@ module Clayoven
     end
 
     # index_files are files ending in '.index.clay', 'index.clay', and '404.clay'
-    # content_files are all other files (we've already applied ignore)
+    # content_files are all other files (we've already applied ignore in ls_files)
     # topics is the list of topics.  We need it for the sidebar
     index_files = ['index.clay', '404.clay'] + all_files.select { |file| /\.index\.clay$/ =~ file }
     content_files = all_files - index_files
