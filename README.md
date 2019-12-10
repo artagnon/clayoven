@@ -4,7 +4,7 @@
 
 Modern website generator with a traditional design. Generates html from custom textual input, termed claytext, deriving certain elements from markdown. See [artagnon.com](https://artagnon.com) as an example.
 
-At its core, clayoven is a paragraph-processor which intentionally avoids the complexity of a markdown-based generator like jekyll. All that claytext consists of is `PARAGRAPH_LINE_FILTERS`, which matches paragraphs where all lines begin with some regex, `PARAGRAPH_START_END_FILTERS` which matches paragraphs that start with some regex, and end with another regex. For things that involve using a regex to match text in the middle of a paragraph, [javascript](https://github.com/artagnon/artagnon.com/blob/master/design/claytext.js) is the hassle-free way of getting it done. The non-claytext part of clayoven is _cool_: when files are laid out in a certain way, and checked into git, clayoven automatically updates timestamps and sorts posts based on git-added date.
+At its core, clayoven is a paragraph-processor which intentionally avoids the complexity of a markdown-based generator like jekyll. All that claytext consists of is `PARAGRAPH_LINE_FILTERS`, which matches paragraphs where all lines begin with some regex, `PARAGRAPH_START_END_FILTERS` which matches paragraphs that start with some regex, and end with another regex. For things that involve using a regex to match text in the middle of a paragraph, [javascript](https://github.com/artagnon/artagnon.com/blob/master/design/claytext.js) is the hassle-free way of getting it done. When files are laid out in a certain way, and checked into git, clayoven automatically updates timestamps and sorts posts based on git-added date; clayoven _incrementally_ builds only pages that changed, according to git.
 
 ## Installation
 
@@ -12,9 +12,9 @@ The whole point of using clayoven is so you can hack on it: don't use gems. Just
 
 ## Usage
 
-* Run `clayoven` on your website's repository to generate HTML files incrementally based on the current git index.
-* Run `clayoven all` to regenerate the entire website along with a sitemap. You can run this occassionally.
-* Run `clayoven httpd` to preview your website locally.
+- Run `clayoven` on your website's repository to generate HTML files incrementally based on the current git index.
+- Run `clayoven all` to regenerate the entire website along with a sitemap. You can run this occassionally.
+- Run `clayoven httpd` to preview your website locally.
 
 ## Pages
 

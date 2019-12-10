@@ -3,7 +3,7 @@ module Clayoven
     attr_accessor :rootpath, :ignorepath, :ignore
 
     def initialize
-      @rootpath = '.clayoven'
+      @rootpath = ".clayoven"
       Dir.mkdir @rootpath unless Dir.exists? @rootpath
 
       @ignorepath = "#{rootpath}/ignore"

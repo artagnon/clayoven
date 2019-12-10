@@ -2,12 +2,12 @@
 
 $:.unshift File.join(__dir__, *%w{ .. lib })
 
-require 'clayoven'
+require "clayoven"
 
 case ARGV[0]
-when 'httpd'
+when "httpd"
   Clayoven::Httpd.start
-when 'all'
+when "all"
   Clayoven.main true
 else
   Clayoven.main

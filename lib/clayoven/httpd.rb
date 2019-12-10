@@ -1,4 +1,4 @@
-require 'webrick'
+require "webrick"
 
 module Clayoven
   module Httpd
@@ -11,7 +11,7 @@ module Clayoven
         # index.html, and anything-that-doesn't-end-in-.html/css/js is
         # rewritten to that-thing.html.
         if %r{^/$} =~ req.path_info
-          res.set_redirect WEBrick::HTTPStatus::Found, 'index.html'
+          res.set_redirect WEBrick::HTTPStatus::Found, "index.html"
         elsif %r{(?<uri>.*)/$} =~ req.path_info
           res.set_redirect WEBrick::HTTPStatus::Found, "#{uri}.html"
         elsif %r{^(?<page>(?!.*[.](html|css|js|ico|png)$).*$)} =~ req.path_info
