@@ -1,6 +1,6 @@
 module ClayText
   # These are the values that Paragraph.type can take
-  PARAGRAPH_TYPES = %i[plain ulitems olitems subheading header footer codeblock horizrule mathjax].freeze
+  PARAGRAPH_TYPES = %i[plain ulitems olitems subheading header footer codeblock images horizrule mathjax].freeze
 
   HTMLESCAPE_RULES = {
     "&" => "&amp;",
@@ -91,10 +91,15 @@ module ClayText
       p.contents = p.contents[1..-2]
       p.type = :codeblock
     end,
+    # Strip out << and >> for images
+    ["<<", ">>"] => lambda do |p|
+      p.contents = p.contents[1..-2]
+      p.type = :images
+    end,
     # Horizontal rule
     ["--", "--"] => ->(p) { p.type = :horizrule },
     # MathJaX
-    ['\[', '\]'] => ->(p) { p.type = :mathjax },
+    ["$$", "$$"] => ->(p) { p.type = :mathjax },
     # htmlescape everything else
     [] => ->(p) { p.contents.each { |l| l.gsub!(/[<>&]/, ClayText::HTMLESCAPE_RULES) } },
   }.freeze

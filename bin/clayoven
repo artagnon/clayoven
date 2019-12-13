@@ -7,7 +7,7 @@ require "clayoven"
 case ARGV[0]
 when "httpd"
   Clayoven::Httpd.start
-when "all"
+when "aggressive"
   Clayoven.main true
 else
   Clayoven.main
