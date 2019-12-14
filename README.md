@@ -4,7 +4,7 @@
 
 clayoven is an minimalist website generator with a carefully curated set of features. It has been built at a glacial pace, over a period of [seven years](https://github.com/artagnon/clayoven/commit/d4d40161e9f76dbe74078c669de9af698cf621d6), as [my website](https://artagnon.com) expanded in content. I have a spread of mathematical notes, software-related posts, and even one wider-audience article; it suffices to say that clayoven is good on all three fronts. The source files are written in "claytext", a custom format built for elegance and speed.
 
-## The claytext processor, briefly
+## The claytext format
 
 Here's an excerpt of claytext, illustrating the main features.
 
@@ -95,20 +95,20 @@ The site-generation engine works closely with the git object store, and builds a
 Install the `slim` and `sitemap_generator` gems, and run `clayoven` in an empty directory; on a first-run, the necessary template-files are created, and git is initialized. An `index.html` is produced.
 
 - `clayoven` on your website's repository to generate html files incrementally based on the current git index and untracked files.
-- `clayoven aggressive` to regenerate the entire site along with a `sitemap.xml`. You can run this occassionally, when you add or remove files.
+- `clayoven aggressive` to regenerate the entire site along with a `sitemap.xml.gz`. You can run this occassionally, when you add or remove files.
 - `clayoven httpd` to preview your website at `localhost:8000`.
 
 Use [MathJax](https://www.mathjax.org) to render LaTeX, and [highlight.js](https://highlightjs.org) to do syntax highlighting.
 
 ## Configuration
 
-`.clayoven/hidden` is a list of `IndexFiles` that should be built, but not displayed in the sidebar. You would want to use it for your 404 page and drafts.
+`.clayoven/sitename` is URL of the site, excluding the `https://` prefix. `.clayoven/hidden` is a list of `IndexFiles` that should be built, but not displayed in the sidebar. You would want to use it for your 404 page and drafts.
 
 ## Workflow and vscode integration
 
 Getting _some_ syntax highlighting in `.clay` files in vscode is pretty simple: you simply have to tell it to associate the extension with the `latex` mode. A build-on-save is also pretty easy to set up: write a custom build task, and use [an extension](https://marketplace.visualstudio.com/items?itemName=Gruntfuggly.triggertaskonsave) to trigger the build on save.
 
-## [Appendix A] The claytext processor, in greater detail
+## [Appendix A] The claytext processor
 
 The claytext processor is, at its core, a paragraph-processor; all content must be split up into paragraphs, decorated with optional first-and-last-line-markers. The function of `<< ... >>`, `$$ ... $$`, and `[[ ... ]]` markers should be evident; the marker tokens must be in lines of their own. The first paragraph is optionally a header, and if so, markers `( ... )` must be used. The last paragraph is an optional footer, prefixed with `[^\d+]:` lines to enable the footer. The `#` prefix for a paragraph is for subheadings. In a paragraph with lists, each line must begin with the numeral or roman numeral, as shown. The format is strict, and the processor doesn't like files with paragraphs wrapped using hard line breaks, for instance.
 

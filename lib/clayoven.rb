@@ -143,7 +143,7 @@ module Clayoven
 
   def self.generate_sitemap(all_pages, is_aggressive)
     return if not is_aggressive
-    SitemapGenerator::Sitemap.default_host = "https://artagnon.com"
+    SitemapGenerator::Sitemap.default_host = "https://#{@sitename}"
     SitemapGenerator::Sitemap.public_path = "."
     SitemapGenerator::Sitemap.create do
       all_pages.each do |page|
@@ -153,16 +153,19 @@ module Clayoven
   end
 
   def self.main(is_aggressive = false)
+    # Write out template files, if necessary
+    @config = Clayoven::ConfigData.new
+    @sitename = @config.sitename
+
     # Collect the list of files from a directory listing
-    config = Clayoven::ConfigData.new
-    all_files = ls_files config
+    all_files = ls_files @config
 
     # index_files are files ending in '.index.clay' and 'index.clay'
     # content_files are all other files; topics is the list of topics: we need it for the sidebar
     index_files = ["index.clay"] + all_files.select { |file| /\.index\.clay$/ =~ file }
     content_files = all_files - index_files
     topic_pages = index_files.reject do |entry|
-      config.hidden.any? { |hidden_entry| hidden_entry == entry }
+      @config.hidden.any? { |hidden_entry| hidden_entry == entry }
     end
     topics = lex_sort(topic_pages).map { |file| file.split(".index.clay").first }
 
