@@ -162,7 +162,7 @@ module Clayoven
     index_files = ["index.clay"] + all_files.select { |file| /\.index\.clay$/ =~ file }
     content_files = all_files - index_files
     topic_pages = index_files.reject do |entry|
-      config.hidden.any? { |pattern| %r{#{pattern}} =~ entry }
+      config.hidden.any? { |hidden_entry| hidden_entry == entry }
     end
     topics = lex_sort(topic_pages).map { |file| file.split(".index.clay").first }
 

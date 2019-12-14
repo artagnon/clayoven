@@ -2,13 +2,13 @@
 
 [![Code Climate](https://codeclimate.com/github/artagnon/clayoven.png)](https://codeclimate.com/github/artagnon/clayoven)
 
-clayoven is an minimalist website generator with a carefully curated set of features. It has been built at a glacial pace, over a period of [seven years](https://github.com/artagnon/clayoven/commit/d4d40161e9f76dbe74078c669de9af698cf621d6), as [my website](https://artagnon.com) content expanded. I have a spread of mathematics notes, software-related posts, and even one wider-audience article; it suffices to say that clayoven is good on all three fronts. The source files are written in "claytext", a custom minimalist format built for elegance and speed.
+clayoven is an minimalist website generator with a carefully curated set of features. It has been built at a glacial pace, over a period of [seven years](https://github.com/artagnon/clayoven/commit/d4d40161e9f76dbe74078c669de9af698cf621d6), as [my website](https://artagnon.com) expanded in content. I have a spread of mathematical notes, software-related posts, and even one wider-audience article; it suffices to say that clayoven is good on all three fronts. The source files are written in "claytext", a custom format built for elegance and speed.
 
 ## The claytext processor, briefly
 
 Here's an excerpt of claytext, illustrating the main features.
 
-```
+```latex
 claytext demo
 
 (Posts here have been ressurrected from several years ago)
@@ -52,22 +52,22 @@ void assignHeads(std::vector<Statement*> branchHeads,
 
 ## The site-generation engine, briefly
 
-All site content is split up into "topics", to put in the sidebar, each of which can either serve as an index to a collection of ContentPages (as a bunch of `.clay` files in a subdirectory with the name "#{topic}/"), or a single IndexPage (named `#{topic}.index.clay`). `index.clay` is special-cased to serve as the root of the site.
+All site content is split up into "topics", to put in the sidebar, each of which can either serve as an index to a collection of `ContentPages` (as a bunch of `.clay` files in a subdirectory with the name `#{topic}`), or a single `IndexPage` (named `#{topic}.index.clay`). `index.clay` is special-cased to serve as the root of the site.
 
-So, if you have these files:
+So, if you have these files,
 
     index.clay
     design/template.slim
     blog.index.clay
-    blog/first.clay
-    blog/second.clay
+    blog/1.clay
+    blog/2.clay
     colophon.index.clay
 
-clayoven automatically builds a sidebar with `index`, `blog` and `colophon`; the IndexPages. In the page `/blog`, there will be links to the posts `/blog/first` and `/blog/second`, the ContentPages, with the headings appearing in the index pages. If there are ContentPages for a topic, the IndexPage simply serves to give a small introduction, with links to articles appearing thereafter.
+clayoven automatically builds a sidebar with `index`, `blog` and `colophon` (the `IndexPages`). `/blog` will have links to the posts `/blog/1` and `/blog/2` (the `ContentPages`), with the headings extracted. If there are `ContentPages` for a topic, the `IndexPage` simply serves to give a introduction, with links to articles appearing thereafter.
 
-`IndexPages` and `ContentPages` are run through the same `template.slim` via `slim`, which is expected to conditionally reason about the available accessors. To illustrate, here's a simple `template.slim` that you might use:
+`IndexPages` and `ContentPages` are run through the same `template.slim` via `slim`, which is expected to conditionally reason about the available accessors. To illustrate, here's a simple `template.slim` that clayoven provides on first run:
 
-```
+```slim
 doctype html
 html
   head
@@ -76,10 +76,6 @@ html
     div id="main"
       h1 #{title}
       time #{authdate.strftime('%F')}
-      - paragraphs.each do |paragraph|
-        - if paragraph.is_header?
-          p class="header"
-            == paragraph.contents.join "\n"
         - if paragraph.is_plain?
           p
             == paragraph.contents.join "\n"
@@ -92,21 +88,21 @@ html
                 = topic
 ```
 
-The site-generation engine works closely with git; it incrementally builds only pages that changed, according to git. It also pulls out the created-timestamp (`authdate`) and last-modified-timestamp (`pubdate`) from the git information, respecting moves. As long as there is a significant correlation between old content and new content, authdate is calculated on the old content; content matters, not files.
+The site-generation engine works closely with git, and builds are incremental by default; it mostly Just Works, and when it doesn't, there's an option to force a full build. The engine also pulls out the created-timestamp (`authdate`) and last-modified-timestamp (`pubdate`) from the git object store, respecting moves. As long as there is a significant correlation between old content and new content, `authdate` is calculated on the old content.
 
 ## Usage
 
-Install the `slim` and `sitemap_generator` gems, and run `clayoven` on your website-repository's directory; on a first-run, necessary simple template-files will be created. An `index.html` is produced.
+Install the `slim` and `sitemap_generator` gems, and run `clayoven` in an empty directory; on a first-run, the necessary template-files are created, and git is initialized. An `index.html` is produced.
 
 - Run `clayoven` on your website's repository to generate HTML files incrementally based on the current git index.
-- Run `clayoven aggressive` to regenerate the entire site along with a `sitemap.xml`. You can run this occassionally, when you create new pages.
+- Run `clayoven aggressive` to regenerate the entire site along with a `sitemap.xml`. You can run this occassionally, when you add or remove files.
 - Run `clayoven httpd` to preview your website locally.
 
 Use MathJax to render the LaTeX.
 
 ## Configuration
 
-`.clayoven/hidden` is a list of IndexFiles that should be built, but not displayed in the sidebar. You would want to use it for your 404 page.
+`.clayoven/hidden` is a list of `IndexFiles` that should be built, but not displayed in the sidebar. You would want to use it for your 404 page.
 
 ## Workflow and vscode integration
 
@@ -122,18 +118,21 @@ clayoven fills in a template html using `slim`; you need a `design/template.slim
 
 ## [Appendix B] Details of the site-generation engine
 
-Content pages are sorted based on the committer-timestamp of the commit that first introduced the file, reverse-chronologically. Index pages are sorted alphabetically, but for `index`.
+`ContentPages` are sorted by `authdate`, reverse-chronologically, and `IndexPages` are sorted alphabetically, but for `index`, which comes first.
 
 ## [Appendix C] Tips
 
+- This document serves as an introduction, as is not an exhaustive list of features.
 - Check in the generated html to the site's repository, so that eyeballing `git diff` can serve as a testing mechanism.
+- Use suitable rewrite rules for your webserver to have URLs without the ugly `.html` at the end.
 - If you accidentally commit `.clay` files before running clayoven, running it afterward will do nothing, since it will see a clean git index; you'll need to run the aggressive version. This kind of situation doesn't occur in the first place, if you follow the [Workflow guidelines](/README.md#workflow-and-vscode-integration) outlined above.
-- Importing historical content is easy; a `git commit --date="#{historical_date}"` would give the post an appropriate authdate that will be respected in the sorting-order.
-- Don't bother attempting to optimize the Ruby; the major contributor to the runtime, by far, is `git log --follow`.
+- Importing historical content is easy; a `git commit --date="#{historical_date}"` would give the post an appropriate `authdate` that will be respected in the sorting-order.
+- For drafts, simply [hide](/README.md#configuration) a `drafts.index.clay`.
+- Don't bother attempting to optimize the Ruby; the biggest contributor to the runtime, by far, are the multiple shell-outs to `git log --follow`.
 
-## [Appendix D] Some planned features, and anti-features
+## [Appendix D] Planned features, and anti-features
 
 - A vscode extension for syntax highlighting, as an extension to the latex mode.
-- A linguist definition, if there are enough users.
-- Anti: attempting to avoid the git shell-outs using Rugged or some other bindings; the shell-out cost is balanced out by the simplicity.
-- Anti: attempting to automate the testing; a `git diff` is simple and sufficient.
+- A `linguist` definition, if there are enough users.
+- Anti: extending claytext in ways that would necessitate an ugly implementation.
+- Anti: attempting to shave the startup time using Rugged or some other bindings; the shell-out cost is balanced out by the simplicity.

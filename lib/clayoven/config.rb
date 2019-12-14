@@ -27,9 +27,6 @@ module Clayoven
             h1 \#{title}
             time \#{authdate.strftime("%F")}
             - paragraphs.each do |paragraph|
-              - if paragraph.is_header?
-                p class="header"
-                  == paragraph.contents.join "\\n"
               - if paragraph.is_plain?
                 p
                   == paragraph.contents.join "\\n"
