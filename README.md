@@ -63,9 +63,9 @@ So, if you have these files,
     blog/2.clay
     colophon.index.clay
 
-clayoven automatically builds a sidebar with `index`, `blog` and `colophon` (the `IndexPages`). `/blog` will have links to the posts `/blog/1` and `/blog/2` (the `ContentPages`), with the headings extracted. If there are `ContentPages` for a topic, the `IndexPage` simply serves to give a introduction, with links to articles appearing thereafter.
+clayoven automatically builds a sidebar with `index`, `blog` and `colophon` (the `IndexPages`). `/blog` will have links to the posts `/blog/1` and `/blog/2` (the `ContentPages`). If there are `ContentPages` for a topic, the `IndexPage` simply serves to give a introduction, with links to articles appearing after the introduction.
 
-`IndexPages` and `ContentPages` are run through the same `template.slim` via `slim`, which is expected to conditionally reason about the available accessors. To illustrate, here's a simple `template.slim` that clayoven provides on first run:
+`IndexPages` and `ContentPages` are run through the same `template.slim`, which is expected to conditionally reason about the available accessors. To illustrate, here's a simple `template.slim`:
 
 ```slim
 doctype html
@@ -88,51 +88,43 @@ html
                 = topic
 ```
 
-The site-generation engine works closely with git, and builds are incremental by default; it mostly Just Works, and when it doesn't, there's an option to force a full build. The engine also pulls out the created-timestamp (`authdate`) and last-modified-timestamp (`pubdate`) from the git object store, respecting moves. As long as there is a significant correlation between old content and new content, `authdate` is calculated on the old content.
+The site-generation engine works closely with the git object store, and builds are incremental by default; it mostly Just Works, and when it doesn't, there's an option to force a full build. The engine also pulls out the created-timestamp (`authdate`) and last-modified-timestamp (`pubdate`) from git, respecting moves; as long as there is a significant correlation between old content and new content, `authdate` is calculated on the old content. `ContentPages` are sorted by `authdate`, reverse-chronologically, and `IndexPages` are sorted alphabetically.
 
 ## Usage
 
 Install the `slim` and `sitemap_generator` gems, and run `clayoven` in an empty directory; on a first-run, the necessary template-files are created, and git is initialized. An `index.html` is produced.
 
-- Run `clayoven` on your website's repository to generate HTML files incrementally based on the current git index.
-- Run `clayoven aggressive` to regenerate the entire site along with a `sitemap.xml`. You can run this occassionally, when you add or remove files.
-- Run `clayoven httpd` to preview your website locally.
+- `clayoven` on your website's repository to generate html files incrementally based on the current git index and untracked files.
+- `clayoven aggressive` to regenerate the entire site along with a `sitemap.xml`. You can run this occassionally, when you add or remove files.
+- `clayoven httpd` to preview your website at `localhost:8000`.
 
-Use MathJax to render the LaTeX.
+Use [MathJax](https://www.mathjax.org) to render LaTeX, and [highlight.js](https://highlightjs.org) to do syntax highlighting.
 
 ## Configuration
 
-`.clayoven/hidden` is a list of `IndexFiles` that should be built, but not displayed in the sidebar. You would want to use it for your 404 page.
+`.clayoven/hidden` is a list of `IndexFiles` that should be built, but not displayed in the sidebar. You would want to use it for your 404 page and drafts.
 
 ## Workflow and vscode integration
 
 Getting _some_ syntax highlighting in `.clay` files in vscode is pretty simple: you simply have to tell it to associate the extension with the `latex` mode. A build-on-save is also pretty easy to set up: write a custom build task, and use [an extension](https://marketplace.visualstudio.com/items?itemName=Gruntfuggly.triggertaskonsave) to trigger the build on save.
 
-## [Appendix A] Details of the claytext processor
+## [Appendix A] The claytext processor, in greater detail
 
-The claytext processor is, at its core, a paragraph-processor; all content must be split up into paragraphs, decorated with optional first-and-last-line-markers. The markers '<< ... >>', '$$ ... $$', and '[[ ... ]]' should be clear from the example; the marker tokens must be in lines of their own. The first paragraph is optionally a header, and uses the markers '( ... )' to disambiguate. The last paragraph is an optional footer, prefixed with "[^\d+]: " lines to disambiguate. The '#' prefix for a paragraph is for subheadings, and only one level of subheading is allowed. In paragraph with lists, each line must begin with the numeral or roman numeral, as shown. The format is strict, and doesn't like files with paragraphs wrapped using hard line breaks, for instance.
+The claytext processor is, at its core, a paragraph-processor; all content must be split up into paragraphs, decorated with optional first-and-last-line-markers. The function of `<< ... >>`, `$$ ... $$`, and `[[ ... ]]` markers should be evident; the marker tokens must be in lines of their own. The first paragraph is optionally a header, and if so, markers `( ... )` must be used. The last paragraph is an optional footer, prefixed with `[^\d+]:` lines to enable the footer. The `#` prefix for a paragraph is for subheadings. In a paragraph with lists, each line must begin with the numeral or roman numeral, as shown. The format is strict, and the processor doesn't like files with paragraphs wrapped using hard line breaks, for instance.
 
-clayoven fills in a template html using `slim`; you need a `design/template.slim` that utilizes the accessors of the objects exposed by clayoven.
+`PARAGRAPH_LINE_FILTERS` matches paragraphs where all lines begin with some regex, and `PARAGRAPH_START_END_FILTERS` match paragraphs that start and end with the specified tokens. For things that involve using a regex to match text in the middle of a paragraph like the markdown-style links in the example, [javascript](https://github.com/artagnon/artagnon.com/blob/master/design/claytext.js) is the easy way of getting it done.
 
-`PARAGRAPH_LINE_FILTERS` matches paragraphs where all lines begin with some regex, and `PARAGRAPH_START_END_FILTERS` match paragraphs that start and end with the specified tokens. For things that involve using a regex to match text in the middle of a paragraph link the markdown-style link in the example, [javascript](https://github.com/artagnon/artagnon.com/blob/master/design/claytext.js) is the hassle-free way of getting it done.
+## [Appendix B] Tips
 
-## [Appendix B] Details of the site-generation engine
-
-`ContentPages` are sorted by `authdate`, reverse-chronologically, and `IndexPages` are sorted alphabetically, but for `index`, which comes first.
-
-## [Appendix C] Tips
-
-- This document serves as an introduction, as is not an exhaustive list of features.
+- This document is not an exhaustive list of features.
 - Check in the generated html to the site's repository, so that eyeballing `git diff` can serve as a testing mechanism.
-- Use suitable rewrite rules for your webserver to have URLs without the ugly `.html` at the end.
-- If you accidentally commit `.clay` files before running clayoven, running it afterward will do nothing, since it will see a clean git index; you'll need to run the aggressive version. This kind of situation doesn't occur in the first place, if you follow the [Workflow guidelines](/README.md#workflow-and-vscode-integration) outlined above.
+- Use suitable rewrite rules for your webserver to have URLs without the ugly `.html` suffix.
+- If you accidentally commit `.clay` files before running clayoven, running it afterward will do nothing, since it will see a clean git index; you'll need to run the aggressive version. This kind of situation doesn't occur in the first place, if you follow the [workflow guidelines](/README.md#workflow-and-vscode-integration).
 - Importing historical content is easy; a `git commit --date="#{historical_date}"` would give the post an appropriate `authdate` that will be respected in the sorting-order.
-- For drafts, simply [hide](/README.md#configuration) a `drafts.index.clay`.
 - Don't bother attempting to optimize the Ruby; the biggest contributor to the runtime, by far, are the multiple shell-outs to `git log --follow`.
 
-## [Appendix D] Planned features, and anti-features
+## [Appendix C] Planned features, and anti-features
 
-- A vscode extension for syntax highlighting, as an extension to the latex mode.
-- A `linguist` definition, if there are enough users.
+- A vscode extension for syntax highlighting.
 - Anti: extending claytext in ways that would necessitate an ugly implementation.
 - Anti: attempting to shave the startup time using Rugged or some other bindings; the shell-out cost is balanced out by the simplicity.
