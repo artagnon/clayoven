@@ -10,13 +10,7 @@ require_relative "clayoven/httpd"
 def lex_sort(files) ["index"] + (files.reject { |f| f == "index.clay" }).sort end
 
 # Look one directory deep to fetch all .clay files
-def ls_files(config)
-  Dir.glob("**/*.clay")
-    .reject { |entry| File.directory? entry }
-    .reject do |entry|
-    config.ignore.any? { |pattern| %r{#{pattern}} =~ entry }
-  end
-end
+def ls_files(config) Dir.glob("**/*.clay").reject { |entry| File.directory? entry } end
 
 module Clayoven
   class Git
@@ -81,8 +75,10 @@ module Clayoven
   class IndexPage < Page
     def initialize(filename, git)
       super
-      # Special handling for 'index.clay' and '404.clay': every other IndexFile is a '*.index.clay'
-      @permalink = if @filename.end_with?(".index.clay") then filename.split(".index.clay").first else filename.split(".clay").first end
+      # Special handling for 'index.clay': every other IndexFile is a '*.index.clay'
+      @permalink = if @filename == "index.clay"
+                     filename.split(".clay").first
+                   else filename.split(".index.clay").first                    end
       @topic = @permalink
       @target = "#{@permalink}.html"
     end
@@ -151,19 +147,22 @@ module Clayoven
     abort "error: index.clay file not found; aborting" unless File.exists? "index.clay"
 
     # Collect the list of files from a directory listing
-    all_files = ls_files Clayoven::ConfigData.new
+    config = Clayoven::ConfigData.new
+    all_files = ls_files config
 
     # We must have a 'design' directory.
     unless Dir.entries("design").include? "template.slim"
       abort "error: design/template.slim file not found; aborting"
     end
 
-    # index_files are files ending in '.index.clay', 'index.clay', and '404.clay'
-    # content_files are all other files (we've already applied ignore in ls_files)
-    # topics is the list of topics.  We need it for the sidebar
-    index_files = ["index.clay", "404.clay"] + all_files.select { |file| /\.index\.clay$/ =~ file }
+    # index_files are files ending in '.index.clay' and 'index.clay'
+    # content_files are all other files; topics is the list of topics: we need it for the sidebar
+    index_files = ["index.clay"] + all_files.select { |file| /\.index\.clay$/ =~ file }
     content_files = all_files - index_files
-    topics = lex_sort(index_files - ["404.clay"]).map { |file| file.split(".index.clay").first }
+    topic_pages = index_files.reject do |entry|
+      config.hidden.any? { |pattern| %r{#{pattern}} =~ entry }
+    end
+    topics = lex_sort(topic_pages).map { |file| file.split(".index.clay").first }
 
     # Look for stray files.  All content_files are nested within directories
     content_files

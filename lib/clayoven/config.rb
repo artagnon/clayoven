@@ -1,13 +1,13 @@
 module Clayoven
   class ConfigData
-    attr_accessor :rootpath, :ignorepath, :ignore
+    attr_accessor :hidden
 
     def initialize
-      @rootpath = ".clayoven"
-      Dir.mkdir @rootpath unless Dir.exists? @rootpath
+      rootpath = ".clayoven"
+      Dir.mkdir rootpath unless Dir.exists? rootpath
 
-      @ignorepath = "#{rootpath}/ignore"
-      @ignore = File.exists?(@ignorepath) ? IO.read(@ignorepath).split("\n") : []
+      path = "#{rootpath}/hidden"
+      @hidden = File.exists?(path) ? IO.read(path).split("\n") : []
     end
   end
 end
