@@ -1,4 +1,4 @@
-# clayoven
+# clayoven ![logo](clayoven.png)
 
 [![Code Climate](https://codeclimate.com/github/artagnon/clayoven.png)](https://codeclimate.com/github/artagnon/clayoven)
 
@@ -13,7 +13,7 @@ The whole point of using clayoven is so you can hack on it: don't use gems. Just
 ## Usage
 
 - Run `clayoven` on your website's repository to generate HTML files incrementally based on the current git index.
-- Run `clayoven all` to regenerate the entire website along with a sitemap. You can run this occassionally.
+- Run `clayoven aggressive` to regenerate the entire website along with a sitemap. You can run this occassionally, when you create new pages.
 - Run `clayoven httpd` to preview your website locally.
 
 ## Pages
@@ -44,5 +44,3 @@ Look at the [template](https://github.com/artagnon/artagnon.com/blob/master/desi
 ## Hacking
 
 Fork and customize as you please. Your testsuite is a clean `git diff`.
-
-You may optionally contribute back changes if you think I will find it useful. Either use pull requests, or email me your patches.
