@@ -15,6 +15,14 @@ def ls_files(config) Dir.glob("**/*.clay").reject { |entry| File.directory? entr
 module Clayoven
   class Git
     def initialize
+      @fresh = false
+      if not Dir.exists? ".git"
+        `git init`
+        `git add .`
+        `git commit -m "[Initial] Template"`
+        @fresh = true
+      end
+
       git_ns = `git diff --name-status @`
       @untracked = `git ls-files --others --exclude-standard`.split "\n"
       if not git_ns.empty?
@@ -28,6 +36,7 @@ module Clayoven
       end
     end
 
+    def is_fresh?; @fresh end
     def modified?(file) @modified.include? file end
     def added?(file) @added.include?(file) || @untracked.include?(file) end
     def any_added?(files) files.any? { |file| added? file } end
@@ -102,7 +111,7 @@ module Clayoven
     git = Git.new
 
     # An index_file that is added (or deleted) should mark all index_files as dirty
-    if git.any_added?(index_files) || git.design_changed? || is_aggressive
+    if git.any_added?(index_files) || git.design_changed? || git.is_fresh? || is_aggressive
       dirty_index_pages = index_files.map { |filename| IndexPage.new filename, git }
       dirty_content_pages = content_files.map { |filename| ContentPage.new filename, git }
     else
@@ -144,16 +153,9 @@ module Clayoven
   end
 
   def self.main(is_aggressive = false)
-    abort "error: index.clay file not found; aborting" unless File.exists? "index.clay"
-
     # Collect the list of files from a directory listing
     config = Clayoven::ConfigData.new
     all_files = ls_files config
-
-    # We must have a 'design' directory.
-    unless Dir.entries("design").include? "template.slim"
-      abort "error: design/template.slim file not found; aborting"
-    end
 
     # index_files are files ending in '.index.clay' and 'index.clay'
     # content_files are all other files; topics is the list of topics: we need it for the sidebar
