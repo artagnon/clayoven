@@ -98,7 +98,7 @@ Install the `slim` and `sitemap_generator` gems, and run `clayoven` in an empty 
 - `clayoven aggressive` to regenerate the entire site along with a `sitemap.xml.gz`. Run occassionally, when files are added or removed.
 - `clayoven httpd` to preview your website locally.
 
-Use [MathJax](https://www.mathjax.org) to render LaTeX, and [highlight.js](https://highlightjs.org) to do syntax highlighting.
+Use [MathJax](https://www.mathjax.org) to render LaTeX, an [extension](https://github.com/sonoisa/XyJax) to render commutative diagrams, and [highlight.js](https://highlightjs.org) to do syntax highlighting.
 
 ## Configuration
 
