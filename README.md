@@ -6,49 +6,9 @@ clayoven is a beautiful website generator with a carefully curated set of featur
 
 ## The claytext format
 
-Here's an excerpt of claytext, illustrating the main features.
+Here's an excerpt of claytext, illustrating the main features. I've chosen to use a picture, because syntax highlighting is implemented in vscode, but not in `linguist`.
 
-```latex
-claytext demo
-
-(Posts here have been ressurrected from several years ago)
-
-<<
-rM-reading.jpg
-rM-writing.jpg
->>
-
-I have written a lot of [code](https://github.com/artagnon) in the past.
-
-# Functors
-
-For a fixed field $K$, consider the functors
-
-$$
-\begin{xy}
-\xymatrix{
-\textbf{Set}\ar@<.5ex>[r]^V & \textbf{Vct}_K\ar@<.5ex>[l]^U
-}
-\end{xy}
-$$
-
---
-
-[[
-void assignHeads(std::vector<Statement*> branchHeads,
-                 std::vector<Statement*> headsToStaggerWith,
-                 Statement* nestWithin, Statement* toEnclose);
-]]
-
-(ii) Every element of $A$ is either unit or nilpotent.
-(iii) $A/\mathfrak{N}$ is a field.
-
-1. The Merge dominates the Split, in which case, the Merge dominates everything lying on the outEdges of the Split leading to the Merge
-2. The Split dominates the Merge, in which case, the Split dominates everything on its outEdges leading to the Merge.
-
-[^1]: Hat tip to [Sanjoy](http://playingwithpointers.com) for pointing out the fifth case.
-[^2]: You might want to merge loops that share a header in a post-pass.
-```
+![vsclay demo](vsclay-demo.png)
 
 ## The site-generation engine
 
@@ -106,7 +66,7 @@ Use [MathJax](https://www.mathjax.org) to render LaTeX, an [extension](https://g
 
 ## Workflow and vscode integration
 
-Getting _some_ syntax highlighting in `.clay` files in vscode is pretty simple: you simply have to tell it to associate the extension with the `latex` mode. A build-on-save is also pretty easy to set up: write a custom build task, and use [an extension](https://marketplace.visualstudio.com/items?itemName=Gruntfuggly.triggertaskonsave) to trigger the build on save.
+Use [vsclay](https://github.com/artagnon/vsclay) for syntax highligting claytext; it additionally installs [another extension](https://marketplace.visualstudio.com/items?itemName=Gruntfuggly.triggertaskonsave), which needs to be configured to trigger build-on-save.
 
 ## Tips
 
@@ -124,5 +84,5 @@ The claytext processor is, at its core, a paragraph-processor; all content must 
 
 ## Planned features, and anti-features
 
-- A vscode extension for syntax highlighting.
+- Improve vsclay.
 - Anti: extending claytext in ways that would necessitate an ugly implementation.
