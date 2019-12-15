@@ -114,7 +114,7 @@ Getting _some_ syntax highlighting in `.clay` files in vscode is pretty simple: 
 - Use suitable rewrite rules for your webserver to have URLs without the ugly `.html` suffix.
 - If you accidentally commit `.clay` files before running clayoven, running it afterward will do nothing, since it will see a clean git index; you'll need to run the aggressive variant. This kind of situation doesn't occur in the first place if you follow the [workflow guidelines](/README.md#workflow-and-vscode-integration).
 - Importing historical content is easy; a `git commit --date="#{historical_date}"` would give the post an appropriate `authdate` that will be respected in the sorting-order.
-- Don't bother attempting to optimize the Ruby; the biggest contributor to the runtime, by far, are the multiple shell-outs to `git log --follow`.
+- Attempting to shave startup time by optimizing the Ruby is not a productive direction; the biggest contributor to the runtime, by far, are the multiple shell-outs to git. Using `libgit2` bindings might be a good idea, but for the fact that it doesn't implement `git log --follow`.
 
 ## The claytext processor
 
