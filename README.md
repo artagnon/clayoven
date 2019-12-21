@@ -85,4 +85,5 @@ The claytext processor is, at its core, a paragraph-processor; all content must 
 ## Planned features, and anti-features
 
 - Improve vsclay.
+- Port to [Crystal](https://crystal-lang.org/) once Crystal is mature enough.
 - Anti: extending claytext in ways that would necessitate an ugly implementation.
