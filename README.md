@@ -1,4 +1,4 @@
-# clayoven ![logo](clayoven.png)
+# clayoven ![logo](assets/clayoven.png)
 
 [![Code Climate](https://codeclimate.com/github/artagnon/clayoven.png)](https://codeclimate.com/github/artagnon/clayoven)
 
@@ -8,7 +8,7 @@ clayoven is a beautiful website generator with a carefully curated set of featur
 
 Here's an excerpt of claytext, illustrating the main features. I've chosen to use a picture, because syntax highlighting is implemented in vscode, but not in `linguist`.
 
-![vsclay demo](vsclay-demo.png)
+![vsclay demo](assets/vsclay-demo.png)
 
 ## The site-generation engine
 
