@@ -52,7 +52,7 @@ The engine works closely with the git object store, and builds are incremental b
 
 ## Usage
 
-Install the `slim` and `sitemap_generator` gems, and run `clayoven` in an empty directory; on a first-run, the necessary template-files are created, and git is initialized. An `index.html` is produced.
+Run `bundle` to install the required gems, and `clayoven` in an empty directory; on a first-run, the necessary template-files are created, and git is initialized. An `index.html` is produced.
 
 - `clayoven` to generate html files incrementally based on the current git index.
 - `clayoven aggressive` to regenerate the entire site along with a `sitemap.xml.gz`. Run occassionally, when files are added or removed.

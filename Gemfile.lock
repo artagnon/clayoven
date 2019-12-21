@@ -1,0 +1,21 @@
+GEM
+  remote: https://rubygems.org/
+  specs:
+    builder (3.2.4)
+    sitemap_generator (6.0.2)
+      builder (~> 3.0)
+    slim (4.0.1)
+      temple (>= 0.7.6, < 0.9)
+      tilt (>= 2.0.6, < 2.1)
+    temple (0.8.2)
+    tilt (2.0.10)
+
+PLATFORMS
+  ruby
+
+DEPENDENCIES
+  sitemap_generator (>= 6.0.2)
+  slim (>= 4.0.1)
+
+BUNDLED WITH
+   2.1.0.pre.3

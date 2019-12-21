@@ -2,7 +2,6 @@ require "time"
 require "slim"
 require "sitemap_generator"
 require_relative "clayoven/config"
-require_relative "clayoven/clayfeed"
 require_relative "clayoven/claytext"
 require_relative "clayoven/httpd"
 
