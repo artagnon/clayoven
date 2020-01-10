@@ -85,6 +85,16 @@ module ClayText
     end,
   }.freeze
 
+  # Start and end markers, making it easy to write commutative diagrams
+  XYMATRIX_START = <<-'EOF'
+  \begin{xy}
+  \xymatrix{
+  EOF
+  XYMATRIX_END = <<-'EOF'
+  }
+  \end{xy}
+  EOF
+
   PARAGRAPH_START_END_FILTERS = {
     # Strip out [[ and ]] for codeblocks
     ["[[", "]]"] => lambda do |p|
@@ -100,6 +110,11 @@ module ClayText
     ["--", "--"] => ->(p) { p.type = :horizrule },
     # MathJaX
     ["$$", "$$"] => ->(p) { p.type = :mathjax },
+    # Writing commutative diagrams using xypic
+    ["{{", "}}"] => lambda do |p|
+      p.contents = ["$$", XYMATRIX_START] + p.contents[1..-2] + [XYMATRIX_END, "$$"]
+      p.type = :mathjax
+    end,
     # htmlescape everything else
     [] => ->(p) { p.contents.each { |l| l.gsub!(/[<>&]/, ClayText::HTMLESCAPE_RULES) } },
   }.freeze
