@@ -4,12 +4,7 @@ require_relative "clayoven/config"
 require_relative "clayoven/claytext"
 require_relative "clayoven/httpd"
 require_relative "clayoven/git"
-
-# Sorts a list of filenames lexicographically, but for 'index.clay', which is first
-def lex_sort(files) ["index"] + (files.reject { |f| f == "index.clay" }).sort end
-
-# Look one directory deep to fetch all .clay files
-def ls_files(config) Dir.glob("**/*.clay").reject { |entry| File.directory? entry } end
+require_relative "clayoven/util"
 
 module Clayoven
   class Page
@@ -121,7 +116,7 @@ module Clayoven
       @sitename = @config.sitename
 
       # Collect the list of files from a directory listing
-      all_files = ls_files @config
+      all_files = Util::ls_files @config
 
       # index_files are files ending in '.index.clay' and 'index.clay'
       # content_files are all other files; topics is the list of topics: we need it for the sidebar
@@ -130,7 +125,7 @@ module Clayoven
       topic_pages = index_files.reject do |entry|
         @config.hidden.any? { |hidden_entry| hidden_entry == entry }
       end
-      topics = lex_sort(topic_pages).map { |file| file.split(".index.clay").first }
+      topics = Util::lex_sort(topic_pages).map { |file| file.split(".index.clay").first }
 
       # Look for stray files.  All content_files are nested within directories
       content_files
