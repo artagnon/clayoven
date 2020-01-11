@@ -8,7 +8,7 @@ require_relative "clayoven/util"
 
 module Clayoven
   class Page
-    attr_accessor :filename, :permalink, :title, :topic, :body, :pubdate, :authdate, :locations,
+    attr_accessor :filename, :permalink, :title, :topic, :body, :lastmod, :crdate, :locations,
                   :paragraphs, :target, :topics, :indexfill
 
     # Intialize with filename and authored dates from git
@@ -16,7 +16,7 @@ module Clayoven
     def initialize(filename, git)
       @filename = filename
       # If a file is in the git index, use Time.now; otherwise, log --follow it.
-      @pubdate, @authdate, @locations = git.metadata @filename
+      @lastmod, @crdate, @locations = git.metadata @filename
       @title, @body = (IO.read @filename).split "\n\n", 2
     end
 
@@ -90,7 +90,7 @@ module Clayoven
       dip.indexfill = content_files
         .select { |cf| cf.split("/", 2).first == dip.topic }
         .map { |cf| ContentPage.new cf, git }
-        .sort_by { |cp| [-cp.authdate.to_i, cp.permalink] }
+        .sort_by { |cp| [-cp.crdate.to_i, cp.permalink] }
     end
     return dirty_index_pages + dirty_content_pages
   end
@@ -101,7 +101,7 @@ module Clayoven
     SitemapGenerator::Sitemap.public_path = "."
     SitemapGenerator::Sitemap.create do
       all_pages.each do |page|
-        add page.permalink, :lastmod => page.pubdate
+        add page.permalink, :lastmod => page.lastmod
       end
     end
   end
