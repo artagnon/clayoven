@@ -17,25 +17,25 @@ module Clayoven
     end
 
     def initialize
-      slim_default = <<-EOF
+      slim_default = <<-'EOF'
       doctype html
       html
         head
-          title clayoven: \#{permalink}
+          title clayoven: #{permalink}
         body
           div id="main"
-            h1 \#{title}
-            time \#{authdate.strftime("%F")}
+            h1 #{title}
+            time #{authdate.strftime("%F")}
             - paragraphs.each do |paragraph|
               - if paragraph.is_plain?
                 p
-                  == paragraph.contents.join "\\n"
+                  == paragraph.contents.join "\n"
           div id="sidebar"
             ul
               - if topics
                 - topics.each do |topic|
                   li
-                    a href="/\#{topic}"
+                    a href="/#{topic}"
                       = topic
       EOF
 
