@@ -2,7 +2,7 @@
 
 [![Code Climate](https://codeclimate.com/github/artagnon/clayoven.png)](https://codeclimate.com/github/artagnon/clayoven)
 
-clayoven is a beautiful website generator with a carefully curated set of features. It has been built at a glacial pace, over a period of [seven years](https://github.com/artagnon/clayoven/commit/d4d40161e9f76dbe74078c669de9af698cf621d6), as [my website](https://artagnon.com) expanded in content. I have a spread of mathematical notes, software-related posts, and even one wider-audience article; it suffices to say that clayoven is good on all three fronts. The source files are written in "claytext", a custom format built for elegance and speed.
+clayoven is a beautiful website generator with a carefully curated set of features. It has been built at a glacial pace, over a period of [seven years](https://github.com/artagnon/clayoven/commit/d4d40161e9f76dbe74078c669de9af698cf621d6), as [my website](https://artagnon.com) expanded in content. I have a spread of mathematical notes, software-related posts, and even a couple of wider-audience articles; it suffices to say that clayoven is good on all three fronts. The source files are written in "claytext", a custom format built for elegance and speed.
 
 ## The claytext format
 
@@ -48,21 +48,23 @@ html
                 = topic
 ```
 
-The engine works closely with the git object store, and builds are incremental by default; it mostly Just Works, and when it doesn't, there's an option to force a full build. The engine also pulls out the created-timestamp (`authdate`) and last-modified-timestamp (`pubdate`) from git, respecting moves; as long as there is a significant correlation between old content and new content, `authdate` is calculated on the old content. `ContentPages` are sorted by `authdate`, reverse-chronologically, and `IndexPages` are sorted alphabetically.
+The engine works closely with the git object store, and builds are incremental by default; it mostly Just Works, and when it doesn't, there's an option to force a full build. The engine also pulls out the created-timestamp (`Page#crdate`) and last-modified-timestamp (`Page#lastmod`) from git, respecting moves; as long as there is a significant correlation between old content and new content, `authdate` is calculated on the old content. `ContentPages` are sorted by `authdate`, reverse-chronologically, and `IndexPages` are sorted alphabetically.
 
 ## Usage
 
-Run `bundle` to install the required gems, and `clayoven` in an empty directory; on a first-run, the necessary template-files are created, and git is initialized. An `index.html` is produced.
+Run `bundle` to install the required gems, and `clayoven` in a fresh git repository; it generates some template files, and an `index.html` is produced.
 
 - `clayoven` to generate html files incrementally based on the current git index.
-- `clayoven aggressive` to regenerate the entire site along with a `sitemap.xml.gz`. Run occassionally, when files are added or removed.
+- `clayoven aggressive` to regenerate the entire site along with a `sitemap.xml.gz`; run occassionally.
 - `clayoven httpd` to preview your website locally.
 
 Use [MathJax](https://www.mathjax.org) to render LaTeX, an [extension](https://github.com/sonoisa/XyJax) to render commutative diagrams, and [highlight.js](https://highlightjs.org) to do syntax highlighting.
 
 ## Configuration
 
-`.clayoven/sitename` is URL of the site, excluding the `https://` prefix. `.clayoven/hidden` is a list of `IndexFiles` that should be built, but not displayed in the sidebar. You would want to use it for your 404 page and drafts.
+1. `.clayoven/sitename` is URL of the site, excluding the `https://` prefix.
+2. `.clayoven/hidden` is a list of `IndexFiles` that should be built, but not displayed in the sidebar. You would want to use it for your 404 page and drafts.
+3. `.clayoven/tz` is a timezone-to-location mapping with lines of the form `+0000 London`. clayoven digs through the git history for locations, and exposes a `Page#locations`.
 
 ## Workflow and vscode integration
 
@@ -73,7 +75,7 @@ Use [vsclay](https://github.com/artagnon/vsclay) for syntax highligting claytext
 - Check in the generated html to the site's repository, so that eyeballing `git diff` can serve as a testing mechanism.
 - Use suitable rewrite rules for your webserver to have URLs without the ugly `.html` suffix.
 - If you accidentally commit `.clay` files before running clayoven, running it afterward will do nothing, since it will see a clean git index; you'll need to run the aggressive variant. This kind of situation doesn't occur in the first place if you follow the [workflow guidelines](/README.md#workflow-and-vscode-integration).
-- Importing historical content is easy; a `git commit --date="#{historical_date}"` would give the post an appropriate `authdate` that will be respected in the sorting-order.
+- Importing historical content is easy; a `git commit --date="#{historical_date}"` would give the post an appropriate creation date that will be respected in the sorting-order.
 - Attempting to shave startup time by optimizing the Ruby is not a productive direction; the biggest contributor to the runtime, by far, are the multiple shell-outs to git. Using `libgit2` bindings might be a good idea, but for the fact that it doesn't implement `git log --follow`.
 
 ## The claytext processor
