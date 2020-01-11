@@ -3,7 +3,7 @@ require "time"
 module Git
   class Info
     def initialize
-      git_ns = `git diff --name-status @`
+      git_ns = `git diff --name-status @ 2>/dev/null`
       @untracked = `git ls-files --others --exclude-standard`.split "\n"
       if not git_ns.empty?
         git_index = git_ns.split("\n").map { |line| line.split("\t")[0..1] }
@@ -23,7 +23,7 @@ module Git
     def design_changed?; modified? "design/template.slim" end
 
     def metadata(file)
-      dates = `git log --follow --format="%aD" --date=unix #{file}`.split "\n"
+      dates = `git log --follow --format="%aD" --date=unix #{file} 2>/dev/null`.split "\n"
       return Time.now, Time.now if not dates.first
       pubdate = if added_or_modified? file
                   Time.now
