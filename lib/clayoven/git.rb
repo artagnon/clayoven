@@ -7,8 +7,8 @@ module Git
       if not git_ns.empty?
         git_index = git_ns.split("\n").map { |line| line.split("\t")[0..1] }
         git_mod_index = git_index.select { |idx| idx.first == "M" }
-        @modified = git_mod_index.map { |idx| idx.last }
-        @added = (git_index - git_mod_index).map { |idx| idx.last }
+        @modified = git_mod_index.map &:last
+        @added = (git_index - git_mod_index).map &:last
       else
         @modified = []
         @added = []

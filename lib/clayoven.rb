@@ -117,7 +117,7 @@ module Clayoven
     abort if toplevel.empty?
     Dir.chdir(toplevel) do
       # Write out template files, if necessary
-      @config = Clayoven::ConfigData.new
+      @config = Config::Data.new
       @sitename = @config.sitename
 
       # Collect the list of files from a directory listing
