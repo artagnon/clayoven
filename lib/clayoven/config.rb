@@ -1,6 +1,6 @@
 module Clayoven
   class ConfigData
-    attr_accessor :sitename, :hidden
+    attr_accessor :sitename, :hidden, :tzmap
 
     # Creates file at path, if it doesn't exist, with template text
     def create_template(path, template)
@@ -47,8 +47,13 @@ module Clayoven
       Enjoy using clayoven!
       EOF
 
+      tz_default = <<-EOF
+      +0000 UTC
+      EOF
+
       @sitename = create_template(".clayoven/sitename", "clayoven.io").first
       @hidden = create_template ".clayoven/hidden", ["404.index.clay"].join("\n")
+      @tzmap = (create_template ".clayoven/tz", tz_default).map { |l| l.split(" ", 2) }.to_h
       create_template "design/template.slim", slim_default
       create_template "index.clay", index_default
     end

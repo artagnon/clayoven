@@ -67,7 +67,7 @@ module Clayoven
   # objects prematurely will result in unnecessary log --follows
   def self.pages_to_regenerate(index_files, content_files, is_aggressive)
     # Check the git index exactly once to determine dirty files
-    git = Git::Info.new
+    git = Git::Info.new @config.tzmap
 
     # An index_file that is added (or deleted) should mark all index_files as dirty
     if git.any_added?(index_files) || git.design_changed? || is_aggressive

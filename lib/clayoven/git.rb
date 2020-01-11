@@ -1,9 +1,8 @@
-require "time"
-
 module Git
   class Info
-    def initialize
+    def initialize(tzmap)
       git_ns = `git diff --name-status @ 2>/dev/null`
+      @tzmap = tzmap
       @untracked = `git ls-files --others --exclude-standard`.split "\n"
       if not git_ns.empty?
         git_index = git_ns.split("\n").map { |line| line.split("\t")[0..1] }
@@ -22,13 +21,16 @@ module Git
     def added_or_modified?(file) added?(file) || modified?(file) end
     def design_changed?; modified? "design/template.slim" end
 
+    # Returns a #<Last updated date>|#<Creation date>|[#<Location string>]
     def metadata(file)
-      dates = `git log --follow --format="%aD" --date=unix #{file} 2>/dev/null`.split "\n"
-      return Time.now, Time.now if not dates.first
+      dates = `git log --follow --format="%aD" --date=unix #{file} 2>/dev/null`.split("\n")
+                                                                               .map { |d| Time.parse d }
+      locs = dates.map { |d| d.strftime("%z") }.uniq.map { |tz| @tzmap[tz] }
+      return Time.now, Time.now, locs if not dates.first
       pubdate = if added_or_modified? file
                   Time.now
-                else Time.parse dates.first                 end
-      return pubdate, Time.parse(dates.last), ["Paris"]
+                else dates.first                 end
+      return pubdate, dates.last, locs
     end
   end
 end
