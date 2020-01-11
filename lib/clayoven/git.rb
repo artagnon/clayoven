@@ -27,9 +27,7 @@ module Git
                                                                                .map { |d| Time.parse d }
       locs = dates.map { |d| d.strftime("%z") }.uniq.map { |tz| @tzmap[tz] }
       return Time.now, Time.now, locs if not dates.first
-      pubdate = if added_or_modified? file
-                  Time.now
-                else dates.first                 end
+      pubdate = added_or_modified?(file) ? Time.now : dates.first
       return pubdate, dates.last, locs
     end
   end
