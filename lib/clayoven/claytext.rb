@@ -29,58 +29,69 @@ module ClayText
 
   # Key is used to match each line in a paragraph, and value is the
   # lambda that'll act on the matched paragraph.
-  PARAGRAPH_LINE_FILTERS = {
+  PARAGRAPH_LINE_TRANSFORMS = {
     # If all the lines in a paragraph begin with "\d+\. ", those
     # characters are stripped from the content, and the paragraph is
     # marked as an :olitems,
-    /^([0-9]+)\. / => lambda do |paragraph, lines, regex|
-      match = lines.first.match(regex)[1]
-      lines.map! { |k| k.gsub(regex, "") }
+    /^([0-9]+)\. / => lambda do |paragraph, regex|
+      match = paragraph.match regex
+      paragraph.gsub! regex, ""
       paragraph.type = :olitems
-      paragraph.start = match if match
+      paragraph.start = match[1] if match
     end,
 
     # The Roman-numeral version of ol
-    /^\(([ivx]+)\) / => lambda do |paragraph, lines, regex|
-      match = lines.first.match(regex)[1]
-      lines.map! { |k| k.gsub(regex, "") }
+    /^\(([ivx]+)\) / => lambda do |paragraph, regex|
+      match = paragraph.match regex
+      paragraph.gsub! regex, ""
       paragraph.type = :olitems
       paragraph.prop = :i
-      paragraph.start = to_arabic(match) if match
+      paragraph.start = to_arabic(match[1]) if match
     end,
 
     # The alphabetic version of ol
-    /^\(([a-z])\) / => lambda do |paragraph, lines, regex|
-      match = lines.first.match(regex)[1]
-      lines.map! { |k| k.gsub(regex, "") }
+    /^\(([a-z])\) / => lambda do |paragraph, regex|
+      match = paragraph.match regex
+      paragraph.gsub! regex, ""
       paragraph.type = :olitems
       paragraph.prop = :a
-      paragraph.start = match.ord - "a".ord + 1 if match
+      paragraph.start = match[1].ord - "a".ord + 1 if match
     end,
 
     # If all the lines in a paragraph begin with "- ", those
     # characters are stripped from the content, and the paragraph is
     # marked as an :ulitems.
-    /^- / => lambda do |paragraph, lines, regex|
-      lines.map! { |k| k.gsub(regex, "") }
+    /^- / => lambda do |paragraph, regex|
+      paragraph.gsub! regex, ""
       paragraph.type = :ulitems
+    end,
+
+    # Shorthand for one-line exercise blocks
+    /^\+ / => lambda do |paragraph, regex|
+      paragraph.gsub! regex, ""
+      paragraph.type = :exercise
     end,
 
     # If the paragraph has exactly one line prefixed with a '# ',
     # it is put into the :subheading type.
-    /^# / => lambda do |paragraph, lines, regex|
-      lines.map! { |k| k.gsub(regex, "") }
+    /^# / => lambda do |paragraph, regex|
+      paragraph.gsub! regex, ""
       paragraph.type = :subheading
       # See RFC 3986, reserved characters
-      paragraph.bookmark = lines.first.downcase
-                                .tr('!*\'();:@&=+$,/?#[]', "")
-                                .gsub('\\', "").tr("{", "-").tr("}", "")
-                                .tr(" ", "-")
+      paragraph.bookmark = paragraph.downcase
+        .tr('!*\'();:@&=+$,/?#[]', "")
+        .gsub('\\', "").tr("{", "-").tr("}", "")
+        .tr(" ", "-")
+    end,
+
+    # Horizontal line, in a paragraph of its own
+    /^--$/ => lambda do |paragraph, _|
+      paragraph.type = :horizrule
     end,
 
     # If all the lines in a paragraph begin with '[\d+]: ', the
     # paragraph is marked as :footer.
-    /^\[\^\d+\]: / => lambda do |paragraph, _, _|
+    /^\[\^\d+\]: / => lambda do |paragraph, _|
       paragraph.type = :footer
     end,
   }.freeze
@@ -95,86 +106,80 @@ module ClayText
   \end{xy}
   EOF
 
-  PARAGRAPH_START_END_FILTERS = {
-    # Strip out ... and ... for blurbs
-    ["...", "..."] => lambda do |p|
-      p.contents = p.contents[1..-2]
-      p.type = :blurb
+  PARAGRAPH_FENCED_TRANSFORMS = {
+    ["...", "..."] => ->(p) { p.type = :blurb },
+    ["[[", "]]"] => ->(p) { p.type = :codeblock },
+    ["<<", ">>"] => ->(p) { p.type = :images },
+    ["++", "++"] => ->(p) { p.type = :exercise },
+
+    # MathJaX: put the markers back, since js needs it
+    ["$$", "$$"] => lambda do |p|
+      p.type = :mathjax
+      p.replace ["$$", p.to_s, "$$"].join("\n")
     end,
-    # Strip out [[ and ]] for codeblocks
-    ["[[", "]]"] => lambda do |p|
-      p.contents = p.contents[1..-2]
-      p.type = :codeblock
-    end,
-    # Strip out << and >> for images
-    ["<<", ">>"] => lambda do |p|
-      p.contents = p.contents[1..-2]
-      p.type = :images
-    end,
-    # Exercise problem; solutions follow
-    ["++", "++"] => lambda do |p|
-      p.contents = p.contents[1..-2]
-      p.type = :exercise
-    end,
-    # Horizontal rule
-    ["--", "--"] => ->(p) { p.type = :horizrule },
-    # MathJaX
-    ["$$", "$$"] => ->(p) { p.type = :mathjax },
+
     # Writing commutative diagrams using xypic
     ["{{", "}}"] => lambda do |p|
-      p.contents = ["$$", XYMATRIX_START] + p.contents[1..-2] + [XYMATRIX_END, "$$"]
       p.type = :mathjax
+      p.replace ["$$", XYMATRIX_START, p.to_s, XYMATRIX_END, "$$"].join("\n")
     end,
-    # htmlescape everything else
-    [] => ->(p) { p.contents.each { |l| l.gsub!(/[<>&]/, ClayText::HTMLESCAPE_RULES) } },
   }.freeze
 
   # A paragraph of text
   #
-  # :content contains its content
+  # :content is a string that contains a fenced block (after merge_fenced!)
   # :type can be one of PARAGRAPH_TYPES
-  # :level is an integer which has a type-specific meaning
-  class Paragraph
-    attr_accessor :contents, :type, :prop, :start, :bookmark
+  # :prop is auxiliary type-specific information
+  # :start is an auxiliary field for list-numbering
+  # :bookmark is another auxiliary field that makes sense in :subheading
+  class Paragraph < String
+    attr_accessor :type, :prop, :start, :bookmark
 
     def initialize(contents)
-      @contents = contents
+      super contents
       @type = :plain
       @prop = :none
 
       # Generate is_*? methods on PARAGRAPH_TYPES
       Paragraph.class_eval do
-        ClayText::PARAGRAPH_TYPES.each do |type|
+        PARAGRAPH_TYPES.each do |type|
           define_method("is_#{type}?") { @type == type }
         end
       end
     end
-
-    def start?(delim) @contents.first.start_with? delim end
-    def end?(delim) @contents.last.end_with? delim end
-    def sized?; !@contents.empty? end
   end
 
-  def self.apply_start_end_filters!(paragraphs)
-    paragraphs.select(&:sized?).each do |paragraph|
-      # For codeblocks [[ and MathJaX blocks \[
-      PARAGRAPH_START_END_FILTERS.each do |delim, lambda_cb|
-        # The last delim is an empty array, whose lambda specifies htmlescape
-        if delim.empty? || (paragraph.start?(delim.first) && paragraph.end?(delim.last))
-          lambda_cb.call paragraph
-          break
-        end
+  def self.merge_fenced!(arr, first, last)
+    matched_blocks = []
+    arr.each_with_index do |p, pidx|
+      next if not p.start_with? first
+      arr[pidx..-1].each_with_index do |q, idx|
+        qidx = pidx + idx # the real index
+        next if not q.end_with? last
+        # strip out the delims at the beginning and end
+        p.replace(arr[pidx..qidx].join("\n\n"))
+         .gsub!(/((^#{Regexp.quote first}\s*)|(\s*#{Regexp.quote last}$))/, "")
+        matched_blocks << p
+        arr.slice! pidx + 1, idx
+        break
       end
+    end
+    matched_blocks
+  end
+
+  def self.fenced_transforms!(paragraphs)
+    # For MathJax, exercises, codeblocks, and other fenced content
+    PARAGRAPH_FENCED_TRANSFORMS.each do |delims, lambda_cb|
+      blocks = merge_fenced!(paragraphs, delims.first, delims.last)
+      blocks.each { |p| lambda_cb.call p }
     end
   end
 
-  def self.apply_line_filters!(paragraphs)
-    paragraphs.each do |paragraph|
-      # Apply the PARAGRAPH_LINE_FILTERS on all the paragraphs
-      ClayText::PARAGRAPH_LINE_FILTERS.each do |regex, lambda_cb|
-        if paragraph.contents.first && paragraph.contents.all?(regex)
-          lambda_cb.call paragraph, paragraph.contents, regex
-        end
+  def self.line_transforms!(paragraphs)
+    paragraphs.each do |p|
+      # Apply the PARAGRAPH_LINE_TRANSFORMS on all the paragraphs
+      PARAGRAPH_LINE_TRANSFORMS.each do |regex, lambda_cb|
+        lambda_cb.call(p, regex) if p.split("\n").all?(regex)
       end
     end
   end
@@ -185,13 +190,18 @@ module ClayText
   # Returns a list of Paragraphs
   def self.process(body)
     # Split the body into Paragraphs
-    paragraphs = []
-    body.split("\n\n").each do |content|
-      paragraphs << Paragraph.new(content.lines.map!(&:rstrip))
+    paragraphs = body.split("\n\n").map { |p| Paragraph.new p.rstrip }
+
+    # merge paragraphs according to fences, and do the transforms
+    fenced_transforms! paragraphs
+    line_transforms! paragraphs
+
+    # at the end of both sets of transforms, htmlescape everything but mathjax and codeblocks
+    paragraphs.filter { |p| not(p.is_mathjax? or p.is_codeblock?) }.each do |p|
+      p.gsub!(/[<>&]/, ClayText::HTMLESCAPE_RULES)
     end
 
-    apply_start_end_filters! paragraphs
-    apply_line_filters! paragraphs
+    # return the final list of paragraphs
     paragraphs
   end
 end
