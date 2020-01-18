@@ -1,6 +1,6 @@
 module ClayText
   # These are the values that Paragraph.type can take
-  PARAGRAPH_TYPES = %i[plain ulitems olitems subheading blurb footer codeblock images horizrule mathjax].freeze
+  PARAGRAPH_TYPES = %i[plain ulitems olitems subheading exercise blurb footer codeblock images horizrule mathjax].freeze
 
   HTMLESCAPE_RULES = {
     "&" => "&amp;",
@@ -110,6 +110,11 @@ module ClayText
     ["<<", ">>"] => lambda do |p|
       p.contents = p.contents[1..-2]
       p.type = :images
+    end,
+    # Exercise problem; solutions follow
+    ["++", "++"] => lambda do |p|
+      p.contents = p.contents[1..-2]
+      p.type = :exercise
     end,
     # Horizontal rule
     ["--", "--"] => ->(p) { p.type = :horizrule },
