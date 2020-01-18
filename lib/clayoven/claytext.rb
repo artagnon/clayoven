@@ -1,6 +1,6 @@
 module ClayText
   # These are the values that Paragraph.type can take
-  PARAGRAPH_TYPES = %i[plain ulitems olitems subheading header footer codeblock images horizrule mathjax].freeze
+  PARAGRAPH_TYPES = %i[plain ulitems olitems subheading blurb footer codeblock images horizrule mathjax].freeze
 
   HTMLESCAPE_RULES = {
     "&" => "&amp;",
@@ -96,6 +96,11 @@ module ClayText
   EOF
 
   PARAGRAPH_START_END_FILTERS = {
+    # Strip out ... and ... for blurbs
+    ["...", "..."] => lambda do |p|
+      p.contents = p.contents[1..-2]
+      p.type = :blurb
+    end,
     # Strip out [[ and ]] for codeblocks
     ["[[", "]]"] => lambda do |p|
       p.contents = p.contents[1..-2]
@@ -178,15 +183,6 @@ module ClayText
     paragraphs = []
     body.split("\n\n").each do |content|
       paragraphs << Paragraph.new(content.lines.map!(&:rstrip))
-    end
-
-    # Special matching for the first paragraph.  This paragraph will
-    # be marked header:
-    #
-    # (This is first paragraph is the header)
-    p0content = paragraphs.first.contents.first
-    if paragraphs[0].contents.size == 1 && p0content.start_with?("(") && p0content.end_with?(")")
-      paragraphs[0].type = :header
     end
 
     apply_start_end_filters! paragraphs
