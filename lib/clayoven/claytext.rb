@@ -37,7 +37,7 @@ module ClayText
       match = paragraph.match regex
       paragraph.gsub! regex, ""
       paragraph.type = :olitems
-      paragraph.start = match[1] if match
+      paragraph.olstart = match[1] if match
     end,
 
     # The Roman-numeral version of ol
@@ -46,7 +46,7 @@ module ClayText
       paragraph.gsub! regex, ""
       paragraph.type = :olitems
       paragraph.prop = :i
-      paragraph.start = to_arabic(match[1]) if match
+      paragraph.olstart = to_arabic(match[1]) if match
     end,
 
     # The alphabetic version of ol
@@ -55,7 +55,7 @@ module ClayText
       paragraph.gsub! regex, ""
       paragraph.type = :olitems
       paragraph.prop = :a
-      paragraph.start = match[1].ord - "a".ord + 1 if match
+      paragraph.olstart = match[1].ord - "a".ord + 1 if match
     end,
 
     # If all the lines in a paragraph begin with "- ", those
@@ -130,10 +130,10 @@ module ClayText
   # :content is a string that contains a fenced block (after merge_fenced!)
   # :type can be one of PARAGRAPH_TYPES
   # :prop is auxiliary type-specific information
-  # :start is an auxiliary field for list-numbering
+  # :olstart is an auxiliary field for list-numbering
   # :bookmark is another auxiliary field that makes sense in :subheading
   class Paragraph < String
-    attr_accessor :type, :prop, :start, :bookmark
+    attr_accessor :type, :prop, :olstart, :bookmark
 
     def initialize(contents)
       super contents
