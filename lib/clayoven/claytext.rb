@@ -132,13 +132,15 @@ module ClayText
   # :prop is auxiliary type-specific information
   # :olstart is an auxiliary field for list-numbering
   # :bookmark is another auxiliary field that makes sense in :subheading
+  # :children stores children paragraph, a field that makes sense in :exercise
   class Paragraph < String
-    attr_accessor :type, :prop, :olstart, :bookmark
+    attr_accessor :type, :prop, :olstart, :bookmark, :children
 
     def initialize(contents)
       super contents
       @type = :plain
       @prop = :none
+      @children = nil
 
       # Generate is_*? methods on PARAGRAPH_TYPES
       Paragraph.class_eval do
@@ -192,7 +194,7 @@ module ClayText
     # Split the body into Paragraphs
     paragraphs = body.split("\n\n").map { |p| Paragraph.new p.rstrip }
 
-    # merge paragraphs according to fences, and do the transforms
+    # merge paragraphs along fences, and do the transforms
     fenced_transforms! paragraphs
     line_transforms! paragraphs
 
