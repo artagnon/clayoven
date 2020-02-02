@@ -109,6 +109,7 @@ module ClayText
   PARAGRAPH_FENCED_TRANSFORMS = {
     ["...", "..."] => ->(p) { p.type = :blurb },
     ["[[", "]]"] => ->(p) { p.type = :codeblock },
+    ["~~", "~~"] => ->(p) { p.type = :codeblock; p.prop = :coq },
     ["<<", ">>"] => ->(p) { p.type = :images },
     ["++", "++"] => ->(p) { p.type = :exercise },
 
@@ -129,7 +130,7 @@ module ClayText
   #
   # :content is a string that contains a fenced block (after merge_fenced!)
   # :type can be one of PARAGRAPH_TYPES
-  # :prop is auxiliary type-specific information
+  # :prop is auxiliary type-specific information (:a is for lettered-lists, :i is for numbered-lists, and :coq is for coq-code)
   # :olstart is an auxiliary field for list-numbering
   # :bookmark is another auxiliary field that makes sense in :subheading
   # :children stores children paragraph, a field that makes sense in :exercise
