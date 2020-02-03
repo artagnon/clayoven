@@ -65,7 +65,7 @@ module Clayoven
     git = Git::Info.new @config.tzmap
 
     # An index_file that is added (or deleted) should mark all index_files as dirty
-    if git.any_added?(index_files) || git.design_changed? || is_aggressive
+    if git.any_added?(index_files) || git.template_changed? || is_aggressive
       dirty_index_pages = index_files.map { |filename| IndexPage.new filename, git }
       dirty_content_pages = content_files.map { |filename| ContentPage.new filename, git }
     else
@@ -92,7 +92,7 @@ module Clayoven
         .map { |cf| ContentPage.new cf, git }
         .sort_by { |cp| [-cp.crdate.to_i, cp.permalink] }
     end
-    return dirty_index_pages + dirty_content_pages
+    return dirty_index_pages + dirty_content_pages, git
   end
 
   def self.generate_sitemap(all_pages, is_aggressive)
@@ -136,8 +136,14 @@ module Clayoven
       end
 
       # Get a list of pages to regenerate, and produce the final HTML using slim
-      genpages = pages_to_regenerate index_files, content_files, is_aggressive
+      genpages, git = pages_to_regenerate index_files, content_files, is_aggressive
       genpages.each { |page| page.render topics }
+
+      # Run gulp if css/js files were modified
+      printf `gulp` if git.design_changed?
+
+      # Finally, generate the sitemap if we're being aggressive
+      is_aggressive = true if git.template_changed?
       generate_sitemap genpages, is_aggressive
     end
   end

@@ -15,11 +15,12 @@ module Git
       end
     end
 
-    def modified?(file) @modified.include? file end
-    def added?(file) @added.include?(file) || @untracked.include?(file) end
+    def modified?(file) @modified.any?(file) end
+    def added?(file) @added.any?(file) || @untracked.any?(file) end
     def any_added?(files) files.any? { |file| added? file } end
     def added_or_modified?(file) added?(file) || modified?(file) end
-    def design_changed?; modified? "design/template.slim" end
+    def template_changed?; modified? "design/template.slim" end
+    def design_changed?; modified? %r{design/.+\.(css|js)} end
 
     # Returns a #<Last updated date>|#<Creation date>|[#<Location string>]
     def metadata(file)
