@@ -2,6 +2,7 @@ GEM
   remote: https://rubygems.org/
   specs:
     builder (3.2.4)
+    colorize (0.8.1)
     sitemap_generator (6.0.2)
       builder (~> 3.0)
     slim (4.0.1)
@@ -14,6 +15,7 @@ PLATFORMS
   ruby
 
 DEPENDENCIES
+  colorize (>= 0.8.1)
   sitemap_generator (>= 6.0.2)
   slim (>= 4.0.1)
 

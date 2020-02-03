@@ -1,4 +1,5 @@
 require "slim"
+require "colorize"
 require "sitemap_generator"
 require_relative "clayoven/config"
 require_relative "clayoven/claytext"
@@ -30,7 +31,7 @@ module Clayoven
       rendered = Slim::Template.new { IO.read "design/template.slim" }.render self
       File.open(@target, _ = "w") do |targetio|
         nbytes = targetio.write rendered
-        puts "[GEN] #{@target} (#{nbytes} bytes out)"
+        puts "[#{"GEN".green}] #{@target} (#{(nbytes / 1024).to_s.red} kilobytes out)"
       end
     end
   end
@@ -95,8 +96,7 @@ module Clayoven
     return dirty_index_pages + dirty_content_pages, git
   end
 
-  def self.generate_sitemap(all_pages, is_aggressive)
-    return if not is_aggressive
+  def self.generate_sitemap(all_pages)
     SitemapGenerator::Sitemap.default_host = "https://#{@sitename}"
     SitemapGenerator::Sitemap.public_path = "."
     SitemapGenerator::Sitemap.create do
@@ -139,12 +139,10 @@ module Clayoven
       genpages, git = pages_to_regenerate index_files, content_files, is_aggressive
       genpages.each { |page| page.render topics }
 
-      # Run gulp if css/js files were modified
-      printf `gulp` if git.design_changed?
-
-      # Finally, generate the sitemap if we're being aggressive
+      # Finally, execute gulp and regenerate the sitemap conditionally
       is_aggressive = true if git.template_changed?
-      generate_sitemap genpages, is_aggressive
+      puts `gulp --color` if git.design_changed? or is_aggressive
+      generate_sitemap genpages if is_aggressive
     end
   end
 end

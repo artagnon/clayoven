@@ -7,7 +7,7 @@ module Config
     body
       div id="main"
         h1 #{title}
-        time #{authdate.strftime("%F")}
+        time #{crdate.strftime("%F")}
         - paragraphs.each do |paragraph|
           - if paragraph.is_plain?
             p
