@@ -2,7 +2,7 @@
 
 [![Code Climate](https://codeclimate.com/github/artagnon/clayoven.png)](https://codeclimate.com/github/artagnon/clayoven)
 
-clayoven is a beautiful website generator with a carefully curated set of features. It has been built at a glacial pace, over a period of [seven years](https://github.com/artagnon/clayoven/commit/d4d40161e9f76dbe74078c669de9af698cf621d6), as [my website](https://artagnon.com) expanded in content. I have a spread of mathematical notes, software-related posts, and even a couple of wider-audience articles; it suffices to say that clayoven is good on all three fronts. The source files are written in "claytext", a custom format built for elegance and speed.
+clayoven is a beautiful website generator with a carefully curated set of features. It has been built at a glacial pace, over a period of [seven years](https://github.com/artagnon/clayoven/commit/d4d40161e9f76dbe74078c669de9af698cf621d6), as [my website](https://artagnon.com) expanded in content. I have a spread of mathematical notes, software-related posts, and even some wider-audience [articles](https://artagnon.com/articles); it suffices to say that clayoven is good on all three fronts. The source files are written in "claytext", a custom format built for elegance and speed.
 
 ## The claytext format
 
@@ -34,18 +34,17 @@ html
     title clayoven: #{permalink}
   body
     div id="main"
-      h1 #{title}
-      time #{authdate.strftime('%F')}
+      h1 = title
+      time = crdate.strftime("%F")
+      - paragraphs.each do |paragraph|
         - if paragraph.is_plain?
-          p
-            == paragraph.contents.join "\n"
+          = paragraph.to_s
     div id="sidebar"
       ul
         - if topics
           - topics.each do |topic|
             li
-              a href="/#{topic}"
-                = topic
+              a href="/#{topic}" = topic
 ```
 
 The engine works closely with the git object store, and builds are incremental by default; it mostly Just Works, and when it doesn't, there's an option to force a full build. The engine also pulls out the created-timestamp (`Page#crdate`) and last-modified-timestamp (`Page#lastmod`) from git, respecting moves; as long as there is a significant correlation between old content and new content, `authdate` is calculated on the old content. `ContentPages` are sorted by `authdate`, reverse-chronologically, and `IndexPages` are sorted alphabetically.

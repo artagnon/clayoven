@@ -6,25 +6,23 @@ module Config
       title clayoven: #{permalink}
     body
       div id="main"
-        h1 #{title}
-        time #{crdate.strftime("%F")}
+        h1 = title
+        time = crdate.strftime("%F")
         - paragraphs.each do |paragraph|
           - if paragraph.is_plain?
-            p
-              == paragraph.contents.join "\n"
+            = paragraph.to_s
       div id="sidebar"
         ul
           - if topics
             - topics.each do |topic|
               li
-                a href="/#{topic}"
-                  = topic
+                a href="/#{topic}" = topic
   EOF
 
   INDEX_DEFAULT = <<-'EOF'
   clayoven
 
-  https://github.com/artagnon/clayoven/blob/master/README.md should have you covered.
+  [README](https://github.com/artagnon/clayoven/blob/master/README.md) should have you covered.
   Enjoy using clayoven!
   EOF
 

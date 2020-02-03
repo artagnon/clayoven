@@ -31,7 +31,7 @@ module Clayoven
       rendered = Slim::Template.new { IO.read "design/template.slim" }.render self
       File.open(@target, _ = "w") do |targetio|
         nbytes = targetio.write rendered
-        puts "[#{"GEN".green}] #{@target} (#{(nbytes / 1024).to_s.red} kilobytes out)"
+        puts "[#{"GEN".green}] #{@target} (#{nbytes.to_s.red} bytes out)"
       end
     end
   end
