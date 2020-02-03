@@ -142,13 +142,6 @@ module ClayText
       @type = :plain
       @prop = :none
       @children = nil
-
-      # Generate is_*? methods on PARAGRAPH_TYPES
-      Paragraph.class_eval do
-        PARAGRAPH_TYPES.each do |type|
-          define_method("is_#{type}?") { @type == type }
-        end
-      end
     end
   end
 
@@ -200,7 +193,7 @@ module ClayText
     line_transforms! paragraphs
 
     # at the end of both sets of transforms, htmlescape everything but mathjax and codeblocks
-    paragraphs.filter { |p| not(p.is_mathjax? or p.is_codeblock?) }.each do |p|
+    paragraphs.filter { |p| not(p.type == :mathjax or p.type == :codeblock) }.each do |p|
       p.gsub!(/[<>&]/, ClayText::HTMLESCAPE_RULES)
     end
 
