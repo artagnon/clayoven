@@ -24,11 +24,11 @@ module Clayoven
     # Writes out HTML pages.  Takes a list of topics to render
     #
     # Prints a '[GEN]' line for every file it writes out.
-    def render(topics)
+    def render(topics, template)
       @topics = topics
       @paragraphs = if @body and not @body.empty? then ClayText.process @body else [] end
       Slim::Engine.set_options pretty: true, sort_attrs: false
-      rendered = Slim::Template.new { IO.read "design/template.slim" }.render self
+      rendered = Slim::Template.new { template }.render self
       File.open(@target, _ = "w") do |targetio|
         nbytes = targetio.write rendered
         puts "[#{"GEN".green}] #{@target} (#{nbytes.to_s.red} bytes out)"
@@ -137,7 +137,7 @@ module Clayoven
 
       # Get a list of pages to regenerate, and produce the final HTML using slim
       genpages, git = pages_to_regenerate index_files, content_files, is_aggressive
-      genpages.each { |page| page.render topics }
+      genpages.each { |page| page.render topics, @config.template }
 
       # Finally, execute gulp and regenerate the sitemap conditionally
       is_aggressive = true if git.template_changed?
