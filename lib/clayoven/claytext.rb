@@ -1,6 +1,6 @@
 module ClayText
   # These are the values that Paragraph.type can take
-  PARAGRAPH_TYPES = %i[plain ulitems olitems subheading exercise blurb footer codeblock images horizrule mathjax].freeze
+  # PARAGRAPH_TYPES = %i[plain ulitems olitems subheading exercise blurb footer codeblock images horizrule mathjax].freeze
 
   HTMLESCAPE_RULES = {
     "&" => "&amp;",
@@ -87,6 +87,13 @@ module ClayText
     # Horizontal line, in a paragraph of its own
     /^--$/ => lambda do |paragraph, _|
       paragraph.type = :horizrule
+      paragraph.prop = :horizrule
+    end,
+
+    # Ellipses hr, in a paragraph of its own
+    /^\.\.$/ => lambda do |paragraph, _|
+      paragraph.type = :horizrule
+      paragraph.prop = :ellipses
     end,
 
     # If all the lines in a paragraph begin with '[\d+]: ', the
