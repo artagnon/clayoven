@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 module Git
   class Info
     def initialize(tzmap)

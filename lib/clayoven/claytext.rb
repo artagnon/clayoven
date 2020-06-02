@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 module ClayText
   # These are the values that Paragraph.type can take
   # PARAGRAPH_TYPES = %i[plain ulitems olitems subheading exercise blurb footer codeblock images horizrule mathjax].freeze
@@ -96,9 +98,9 @@ module ClayText
       paragraph.prop = :ellipses
     end,
 
-    # If all the lines in a paragraph begin with '[\d+]: ', the
+    # If all the lines in a paragraph begin with certain unicode symbols, the
     # paragraph is marked as :footer.
-    /^\[\^\d+\]: / => lambda do |paragraph, _|
+    /^(\*|†|‡|§|||¶) / => lambda do |paragraph, _|
       paragraph.type = :footer
     end,
   }.freeze
