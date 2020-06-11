@@ -97,7 +97,8 @@ module Clayoven
       dip.indexfill = content_files
         .select { |cf| cf.split("/", 2).first == dip.topic }
         .map { |cf| ContentPage.new cf, git, audmap }
-        .sort_by { |cp| [-cp.crdate.to_i, cp.permalink] }
+        .sort_by { |cp| cp.permalink }.reverse
+        .sort_by { |cp| -cp.crdate.to_i }
     end
     return dirty_index_pages + dirty_content_pages, git
   end
