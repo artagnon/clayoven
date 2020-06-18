@@ -122,25 +122,25 @@ module Clayoven
       @config = Config::Data.new
       @sitename = @config.sitename
 
-      # Collect the list of files from a directory listing, ignoring hidden entries
-      all_files = (Util::ls_files @config).reject do |entry|
-        @config.hidden.any? { |hidden_entry| hidden_entry == entry }
-      end
+      # Collect the list of files from a directory listing
+      all_files = Util::ls_files @config
 
       # index_files are files ending in '.index.clay' and 'index.clay'
       # content_files are all other files; topics is the list of topics: we need it for the sidebar
       index_files = ["index.clay"] + all_files.select { |file| /\.index\.clay$/ =~ file }
       content_files = all_files - index_files
-      topic_pages = index_files
+      topic_pages = index_files.reject do |entry|
+        @config.hidden.any? { |hidden_entry| hidden_entry == entry }
+      end
       topics = Util::lex_sort(topic_pages).map { |file| file.split(".index.clay").first }
 
       # Look for stray files.  All content_files are nested within directories
       content_files
         .reject { |file| topics.include? file.split("/", 2).first }
         .each do |stray|
-          content_files = content_files - [stray]
-          puts "[WARN] #{stray} is a stray file or directory; ignored"
-        end
+        content_files = content_files - [stray]
+        puts "[WARN] #{stray} is a stray file or directory; ignored"
+      end
 
       # Get a list of pages to regenerate, and produce the final HTML using slim
       genpages, git = pages_to_regenerate index_files, content_files, is_aggressive
