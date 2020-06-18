@@ -11,7 +11,7 @@ module Config
         h1 = title
         time = crdate.strftime("%F")
         - paragraphs.each do |paragraph|
-          - if paragraph.is_plain?
+          - if paragraph.type == :plain
             = paragraph.to_s
       div id="sidebar"
         ul
@@ -33,6 +33,7 @@ module Config
   EOF
 
   AUDIENCE_DEFAULT = <<-'EOF'
+  index w
   EOF
 
   class Data
