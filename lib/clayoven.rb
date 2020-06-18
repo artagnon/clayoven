@@ -93,8 +93,11 @@ module Clayoven
 
     # Now, set the indexfill for index_pages by looking at all the content_files
     # corresponding to a dirty index_page.
+    # Additionally, reject hidden content_files from the corresponding indexfill
     dirty_index_pages.each do |dip|
-      dip.indexfill = content_files
+      dip.indexfill = content_files.reject do |cf|
+          @config.hidden.any? { |hidden_entry| "#{hidden_entry}.clay" == cf }
+        end
         .select { |cf| cf.split("/", 2).first == dip.topic }
         .map { |cf| ContentPage.new cf, git, audmap }
         .sort_by { |cp| cp.permalink }.reverse
@@ -116,7 +119,7 @@ module Clayoven
   def self.main(is_aggressive = false)
     # Only operate on git repositories
     toplevel = `git rev-parse --show-toplevel`.strip
-    abort if toplevel.empty?
+    abort "[ERR] Not a clayoven project" if toplevel.empty? or not File.directory? '.clayoven'
     Dir.chdir(toplevel) do
       # Write out template files, if necessary
       @config = Config::Data.new
@@ -130,7 +133,7 @@ module Clayoven
       index_files = ["index.clay"] + all_files.select { |file| /\.index\.clay$/ =~ file }
       content_files = all_files - index_files
       topic_pages = index_files.reject do |entry|
-        @config.hidden.any? { |hidden_entry| hidden_entry == entry }
+        @config.hidden.any? { |hidden_entry| "#{hidden_entry}.index.clay" == entry }
       end
       topics = Util::lex_sort(topic_pages).map { |file| file.split(".index.clay").first }
 
@@ -138,9 +141,9 @@ module Clayoven
       content_files
         .reject { |file| topics.include? file.split("/", 2).first }
         .each do |stray|
-        content_files = content_files - [stray]
-        puts "[WARN] #{stray} is a stray file or directory; ignored"
-      end
+          content_files = content_files - [stray]
+          puts "[WARN] #{stray} is a stray file or directory; ignored"
+        end
 
       # Get a list of pages to regenerate, and produce the final HTML using slim
       genpages, git = pages_to_regenerate index_files, content_files, is_aggressive

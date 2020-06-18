@@ -54,7 +54,7 @@ module Config
 
     def initialize
       @sitename = create_template(".clayoven/sitename", "clayoven.io").first
-      @hidden = create_template ".clayoven/hidden", ["404.index.clay"].join("\n")
+      @hidden = create_template ".clayoven/hidden", ["404"].join("\n")
       @tzmap = (create_template ".clayoven/tz", TZ_DEFAULT).map { |l| l.split(" ", 2) }.to_h
       @audmap = (create_template ".clayoven/audience", AUDIENCE_DEFAULT).map { |l| l.split(" ", 2) }.to_h
       @template = (create_template "design/template.slim", SLIM_DEFAULT).join "\n"
