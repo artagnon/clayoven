@@ -119,7 +119,7 @@ module Clayoven
   def self.main(is_aggressive = false)
     # Only operate on git repositories
     toplevel = `git rev-parse --show-toplevel`.strip
-    abort "[ERR] Not a clayoven project" if toplevel.empty? or not File.directory? '.clayoven'
+    abort "[#{"ERR".red}] Not a clayoven project" if toplevel.empty? or not File.directory? '.clayoven'
     Dir.chdir(toplevel) do
       # Write out template files, if necessary
       @config = Config::Data.new
@@ -142,7 +142,7 @@ module Clayoven
         .reject { |file| topics.include? file.split("/", 2).first }
         .each do |stray|
           content_files = content_files - [stray]
-          puts "[WARN] #{stray} is a stray file or directory; ignored"
+          puts "[#{"WARN".red}] #{stray} is a stray file or directory; ignored"
         end
 
       # Get a list of pages to regenerate, and produce the final HTML using slim
