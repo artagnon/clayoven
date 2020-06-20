@@ -28,7 +28,7 @@ module Git
     def metadata(file)
       dates = `git log --follow --format="%aD" --date=unix #{file} 2>/dev/null`.split("\n")
                                                                                .map { |d| Time.parse d }
-      locs = dates.map { |d| d.strftime("%z") }.uniq.map { |tz| @tzmap[tz] }
+      locs = dates.map { |d| d.strftime("%z") }.map { |tz| @tzmap[tz] }.uniq
       return Time.now, Time.now, locs if not dates.first
       lastmod = added_or_modified?(file) ? Time.now : dates.first
       return lastmod, dates.last, locs
