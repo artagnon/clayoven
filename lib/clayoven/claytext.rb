@@ -2,7 +2,7 @@
 
 module ClayText
   # These are the values that Paragraph.type can take
-  # PARAGRAPH_TYPES = %i[plain ulitems olitems subheading exercise blurb footer codeblock images horizrule mathjax].freeze
+  # PARAGRAPH_TYPES = %i[plain olitems subheading exercise indent blurb footer codeblock images horizrule mathjax].freeze
 
   HTMLESCAPE_RULES = {
     "&" => "&amp;",
@@ -60,18 +60,16 @@ module ClayText
       paragraph.olstart = match[1].ord - "a".ord + 1 if match
     end,
 
-    # If all the lines in a paragraph begin with "- ", those
-    # characters are stripped from the content, and the paragraph is
-    # marked as an :ulitems.
-    /^- / => lambda do |paragraph, regex|
-      paragraph.gsub! regex, ""
-      paragraph.type = :ulitems
-    end,
-
-    # Shorthand for one-line exercise blocks
+    # Exercise blocks
     /^\+ / => lambda do |paragraph, regex|
       paragraph.gsub! regex, ""
       paragraph.type = :exercise
+    end,
+
+    # Extending exercise blocks by indenting them
+    /^- / => lambda do |paragraph, regex|
+      paragraph.gsub! regex, ""
+      paragraph.type = :indent
     end,
 
     # If the paragraph has exactly one line prefixed with a '# ',
@@ -120,7 +118,6 @@ module ClayText
     ["[[", "]]"] => ->(p) { p.type = :codeblock },
     ["~~", "~~"] => ->(p) { p.type = :codeblock; p.prop = :coq },
     ["<<", ">>"] => ->(p) { p.type = :images },
-    ["++", "++"] => ->(p) { p.type = :exercise },
 
     # MathJaX: put the markers back, since js needs it
     ["$$", "$$"] => lambda do |p|
