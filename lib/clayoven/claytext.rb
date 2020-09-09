@@ -206,8 +206,8 @@ module ClayText
     # Insert HTML breaks in :plain paragraphs
     paragraphs.filter { |p| p.type == :plain }.each { |p| p.gsub! /\n/, "<br/>\n" }
 
-    # Insert <{mark, a}> in :plain and :olitems paragraphs
-    paragraphs.filter { |p| p.type == :plain or p.type == :olitems }.each do |p|
+    # Insert <{mark, a}> in :plain, :olitems, and :footer paragraphs
+    paragraphs.filter { |p| p.type == :plain or p.type == :olitems or p.type == :footer }.each do |p|
       p.gsub! /`([^`]+)`/, '<mark>\1</mark>'
       p.gsub! /\[([^\]]+)\]\(([^)]+)\)/, '<a href="\2">\1</a>'
     end
