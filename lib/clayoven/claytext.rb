@@ -144,7 +144,7 @@ module ClayText
     attr_accessor :type, :prop, :olstart, :bookmark, :children
 
     def initialize(contents)
-      super contents
+      super
       @type = :plain
       @prop = :none
       @children = nil
@@ -203,7 +203,11 @@ module ClayText
       p.gsub!(/[<>&]/, ClayText::HTMLESCAPE_RULES)
     end
 
-    # return the final list of paragraphs
+    # Insert HTML breaks in :plain paragraphs
+    paragraphs.filter { |p| p.type == :plain }.each do |p|
+      p.gsub!(/\n/, "<br/>\n")
+    end
+
     paragraphs
   end
 end
