@@ -203,9 +203,11 @@ module ClayText
       p.gsub!(/[<>&]/, ClayText::HTMLESCAPE_RULES)
     end
 
-    # Insert HTML breaks, links, and marks in :plain and :olitems paragraphs
+    # Insert HTML breaks in :plain paragraphs
+    paragraphs.filter { |p| p.type == :plain }.each { |p| p.gsub! /\n/, "<br/>\n" }
+
+    # Insert <{mark, a}> in :plain and :olitems paragraphs
     paragraphs.filter { |p| p.type == :plain or p.type == :olitems }.each do |p|
-      p.gsub! /\n/, "<br/>\n"
       p.gsub! /`([^`]+)`/, '<mark>\1</mark>'
       p.gsub! /\[([^\]]+)\]\(([^)]+)\)/, '<a href="\2">\1</a>'
     end
