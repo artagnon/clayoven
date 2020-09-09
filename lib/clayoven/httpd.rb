@@ -1,4 +1,5 @@
 require "webrick"
+require "uri"
 
 module Clayoven
   module Httpd
@@ -13,9 +14,9 @@ module Clayoven
         if %r{^/$} =~ req.path_info
           res.set_redirect WEBrick::HTTPStatus::Found, "index.html"
         elsif %r{(?<uri>.*)/$} =~ req.path_info
-          res.set_redirect WEBrick::HTTPStatus::Found, "#{uri}.html"
+          res.set_redirect WEBrick::HTTPStatus::Found, "#{URI.parse(URI.escape(uri))}.html"
         elsif %r{^(?<page>(?!.*[.](html|css|js|ico|png|jpg)$).*$)} =~ req.path_info
-          res.set_redirect WEBrick::HTTPStatus::Found, "#{page}.html"
+          res.set_redirect WEBrick::HTTPStatus::Found, "#{URI.parse(URI.escape(page))}.html"
         end
       end
 
