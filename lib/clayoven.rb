@@ -63,10 +63,7 @@ module Clayoven
     end
   end
 
-  # Return index_pages and content_pages to generate; we work with
-  # content_files and index_files, because converting them to Page
-  # objects prematurely will result in unnecessary log --follows
-  def self.pages_to_regenerate(index_files, content_files, is_aggressive)
+  def self.dirty_pages(index_files, content_files, is_aggressive)
     # Check the git index exactly once to determine dirty files
     git = Git::Info.new @config.tzmap
     audmap = @config.audmap
@@ -91,6 +88,15 @@ module Clayoven
         .map { |filename| IndexPage.new filename, git }
     end
 
+    return dirty_index_pages, dirty_content_pages, git
+  end
+
+  # Return index_pages and content_pages to generate; we work with
+  # content_files and index_files, because converting them to Page
+  # objects prematurely will result in unnecessary log --follows
+  def self.pages_to_regenerate(index_files, content_files, is_aggressive)
+    dirty_index_pages, dirty_content_pages, git = dirty_pages index_files, content_files, is_aggressive
+
     # Now, set the indexfill for index_pages by looking at all the content_files
     # corresponding to a dirty index_page.
     # Additionally, reject hidden content_files from the corresponding indexfill
@@ -99,7 +105,7 @@ module Clayoven
           @config.hidden.any? { |hidden_entry| "#{hidden_entry}.clay" == cf }
         end
         .select { |cf| cf.split("/", 2).first == dip.topic }
-        .map { |cf| ContentPage.new cf, git, audmap }
+        .map { |cf| ContentPage.new cf, git, @config.audmap }
         .sort_by { |cp| cp.permalink }.reverse
         .sort_by { |cp| -cp.crdate.to_i }
     end
@@ -116,6 +122,27 @@ module Clayoven
     end
   end
 
+  def self.index_content_files(all_files)
+    # index_files are files ending in '.index.clay' and 'index.clay'
+    # content_files are all other files; topics is the list of topics: we need it for the sidebar
+    index_files = ["index.clay"] + all_files.select { |file| /\.index\.clay$/ =~ file }
+    content_files = all_files - index_files
+    all_topics = Util::lex_sort(index_files).map { |file| file.split(".index.clay").first }
+    topics = all_topics.reject do |entry|
+      @config.hidden.any? { |hidden_entry| hidden_entry == entry }
+    end
+
+    # Look for stray files.  All content_files are nested within directories
+    content_files
+      .reject { |file| all_topics.include? file.split("/", 2).first }
+      .each do |stray|
+        content_files = content_files - [stray]
+        puts "[#{"WARN".red}] #{stray} is a stray file or directory; ignored"
+      end
+
+    return index_files, content_files, topics
+  end
+
   def self.main(is_aggressive = false)
     # Only operate on git repositories
     toplevel = `git rev-parse --show-toplevel`.strip
@@ -128,22 +155,8 @@ module Clayoven
       # Collect the list of files from a directory listing
       all_files = Util::ls_files @config
 
-      # index_files are files ending in '.index.clay' and 'index.clay'
-      # content_files are all other files; topics is the list of topics: we need it for the sidebar
-      index_files = ["index.clay"] + all_files.select { |file| /\.index\.clay$/ =~ file }
-      content_files = all_files - index_files
-      all_topics = Util::lex_sort(index_files).map { |file| file.split(".index.clay").first }
-      topics = all_topics.reject do |entry|
-        @config.hidden.any? { |hidden_entry| hidden_entry == entry }
-      end
-
-      # Look for stray files.  All content_files are nested within directories
-      content_files
-        .reject { |file| all_topics.include? file.split("/", 2).first }
-        .each do |stray|
-          content_files = content_files - [stray]
-          puts "[#{"WARN".red}] #{stray} is a stray file or directory; ignored"
-        end
+      # From all_files, get the list of index_files, content_files, and topics
+      index_files, content_files, topics = index_content_files all_files
 
       # Get a list of pages to regenerate, and produce the final HTML using slim
       genpages, git = pages_to_regenerate index_files, content_files, is_aggressive
