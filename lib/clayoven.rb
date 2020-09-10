@@ -132,14 +132,14 @@ module Clayoven
       # content_files are all other files; topics is the list of topics: we need it for the sidebar
       index_files = ["index.clay"] + all_files.select { |file| /\.index\.clay$/ =~ file }
       content_files = all_files - index_files
-      topic_pages = index_files.reject do |entry|
-        @config.hidden.any? { |hidden_entry| "#{hidden_entry}.index.clay" == entry }
+      all_topics = Util::lex_sort(index_files).map { |file| file.split(".index.clay").first }
+      topics = all_topics.reject do |entry|
+        @config.hidden.any? { |hidden_entry| hidden_entry == entry }
       end
-      topics = Util::lex_sort(topic_pages).map { |file| file.split(".index.clay").first }
 
       # Look for stray files.  All content_files are nested within directories
       content_files
-        .reject { |file| topics.include? file.split("/", 2).first }
+        .reject { |file| all_topics.include? file.split("/", 2).first }
         .each do |stray|
           content_files = content_files - [stray]
           puts "[#{"WARN".red}] #{stray} is a stray file or directory; ignored"
