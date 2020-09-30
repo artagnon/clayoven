@@ -200,8 +200,8 @@ module ClayText
     fenced_transforms! paragraphs
     line_transforms! paragraphs
 
-    # at the end of both sets of transforms, htmlescape everything but mathjax and codeblocks
-    paragraphs.filter { |p| not(p.type == :mathjax or p.type == :codeblock) }.each do |p|
+    # at the end of both sets of transforms, htmlescape everything but mathjax
+    paragraphs.filter { |p| not(p.type == :mathjax) }.each do |p|
       p.gsub!(/[<>&]/, ClayText::HTMLESCAPE_RULES)
     end
 
