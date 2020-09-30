@@ -116,7 +116,7 @@ module ClayText
   PARAGRAPH_FENCED_TRANSFORMS = {
     [/\A\.\.\.$/, /^\.\.\.\z/] => ->(p, _, _) { p.type = :blurb },
     [/\A~~$/, /^~~\z/] => ->(p, _, _) { p.type = :codeblock; p.prop = :coq },
-    [/\A```([a-z]+)$/, /^```\z/] => ->(p, fc, _) { p.type = :codeblock },
+    [/\A```(\w+)$/, /^```\z/] => ->(p, fc, _) { p.type = :codeblock; p.prop = fc.captures[0] },
     [/\A<<$/, /^>>\z/] => ->(p, _, _) { p.type = :images },
 
     # MathJaX: put the markers back, since js needs it
@@ -153,6 +153,7 @@ module ClayText
   end
 
   def self.merge_fenced!(arr, fregex, lregex)
+    mb = Struct.new(:block, :fc, :lc)
     matched_blocks = []
     arr.each_with_index do |p, pidx|
       next if not fregex.match p
@@ -160,8 +161,9 @@ module ClayText
         qidx = pidx + idx # the real index
         next if not lregex.match q
         # strip out the delims at the beginning and end
+        matches = fregex.match(p), lregex.match(q)
         p.replace(arr[pidx..qidx].join("\n\n")).sub!(fregex, "").sub!(lregex, "").strip!
-        matched_blocks << p
+        matched_blocks << mb.new(p, matches[0], matches[1])
         arr.slice! pidx + 1, idx
         break
       end
@@ -173,7 +175,7 @@ module ClayText
     # For MathJax, exercises, codeblocks, and other fenced content
     PARAGRAPH_FENCED_TRANSFORMS.each do |delims, lambda_cb|
       blocks = merge_fenced! paragraphs, delims[0], delims[1]
-      blocks.each { |block| lambda_cb.call block, nil, nil }
+      blocks.each { |blk| lambda_cb.call blk.block, blk.fc, blk.lc }
     end
   end
 
