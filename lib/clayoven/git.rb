@@ -21,7 +21,7 @@ module Git
     def added?(file) @added.any?(file) || @untracked.any?(file) end
     def any_added?(files) files.any? { |file| added? file } end
     def added_or_modified?(file) added?(file) || modified?(file) end
-    def template_changed?; modified? "design/template.slim" end
+    def template_changed?; modified?("design/template.slim") || modified?(".clayoven/hidden") || modified?(".clayoven/tz") end
     def design_changed?; modified? %r{design/.+\.(css|js)} end
 
     # Returns a #<Last updated date>|#<Creation date>|[#<Location string>]

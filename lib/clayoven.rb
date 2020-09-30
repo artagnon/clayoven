@@ -14,7 +14,6 @@ module Clayoven
     attr_accessor :filename, :permalink, :title, :topic, :body, :lastmod, :crdate, :locations,
                   :paragraphs, :target, :topics, :indexfill, :audience
 
-
     # Intialize with filename and authored dates from git
     # Expensive due to log --follow; avoid creating Page objects when not necessary.
     def initialize(filename, git, audmap = {})
@@ -44,7 +43,7 @@ module Clayoven
       super
       # Special handling for 'index.clay': every other IndexFile is a '*.index.clay'
       @permalink = if @filename == "index.clay"
-                     filename.split(".clay").first
+                     "index"
                    else filename.split(".index.clay").first                    end
       @topic = @permalink
       @target = "#{@permalink}.html"
@@ -102,8 +101,8 @@ module Clayoven
     # Additionally, reject hidden content_files from the corresponding indexfill
     dirty_index_pages.each do |dip|
       dip.indexfill = content_files.reject do |cf|
-          @config.hidden.any? { |hidden_entry| "#{hidden_entry}.clay" == cf }
-        end
+        @config.hidden.any? { |hidden_entry| "#{hidden_entry}.clay" == cf }
+      end
         .select { |cf| cf.split("/", 2).first == dip.topic }
         .map { |cf| ContentPage.new cf, git, @config.audmap }
         .sort_by { |cp| cp.permalink }.reverse
@@ -136,9 +135,9 @@ module Clayoven
     content_files
       .reject { |file| all_topics.include? file.split("/", 2).first }
       .each do |stray|
-        content_files = content_files - [stray]
-        puts "[#{"WARN".red}] #{stray} is a stray file or directory; ignored"
-      end
+      content_files = content_files - [stray]
+      puts "[#{"WARN".red}] #{stray} is a stray file or directory; ignored"
+    end
 
     return index_files, content_files, topics
   end
@@ -146,7 +145,7 @@ module Clayoven
   def self.main(is_aggressive = false)
     # Only operate on git repositories
     toplevel = `git rev-parse --show-toplevel`.strip
-    abort "[#{"ERR".red}] Not a clayoven project" if toplevel.empty? or not File.directory? '.clayoven'
+    abort "[#{"ERR".red}] Not a clayoven project" if toplevel.empty? or not File.directory? ".clayoven"
     Dir.chdir(toplevel) do
       # Write out template files, if necessary
       @config = Config::Data.new

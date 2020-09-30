@@ -61,7 +61,7 @@ module ClayText
     end,
 
     # Exercise blocks
-    /^\+ / => lambda do |paragraph, regex|
+    /^(\+|§) / => lambda do |paragraph, regex|
       paragraph.gsub! regex, ""
       paragraph.type = :exercise
     end,
@@ -114,19 +114,20 @@ module ClayText
   EOF
 
   PARAGRAPH_FENCED_TRANSFORMS = {
-    ["...", "..."] => ->(p) { p.type = :blurb },
-    ["[[", "]]"] => ->(p) { p.type = :codeblock },
-    ["~~", "~~"] => ->(p) { p.type = :codeblock; p.prop = :coq },
-    ["<<", ">>"] => ->(p) { p.type = :images },
+    [/\A\.\.\.$/, /^\.\.\.\z/] => ->(p, _, _) { p.type = :blurb },
+    [/\A~~$/, /^~~\z/] => ->(p, _, _) { p.type = :codeblock; p.prop = :coq },
+    [/\A```([a-z]+)$/, /^```\z/] => ->(p, fc, _) { p.type = :codeblock },
+    [/\A<<$/, /^>>\z/] => ->(p, _, _) { p.type = :images },
 
     # MathJaX: put the markers back, since js needs it
-    ["$$", "$$"] => lambda do |p|
+    # Missing $ and ^ markers due to backward-compatibility
+    [/\A\$\$/, /\$\$\z/] => lambda do |p, _, _|
       p.type = :mathjax
       p.replace ["$$", p.to_s, "$$"].join("\n")
     end,
 
     # Writing commutative diagrams using xypic
-    ["{{", "}}"] => lambda do |p|
+    [/\A\{\{$/, /^\}\}\z/] => lambda do |p, _, _|
       p.type = :mathjax
       p.replace ["$$", XYMATRIX_START, p.to_s, XYMATRIX_END, "$$"].join("\n")
     end,
@@ -151,16 +152,15 @@ module ClayText
     end
   end
 
-  def self.merge_fenced!(arr, first, last)
+  def self.merge_fenced!(arr, fregex, lregex)
     matched_blocks = []
     arr.each_with_index do |p, pidx|
-      next if not p.start_with? first
+      next if not fregex.match p
       arr[pidx..-1].each_with_index do |q, idx|
         qidx = pidx + idx # the real index
-        next if not q.end_with? last
+        next if not lregex.match q
         # strip out the delims at the beginning and end
-        p.replace(arr[pidx..qidx].join("\n\n"))
-         .gsub!(/((^#{Regexp.quote first}\s*)|(\s*#{Regexp.quote last}$))/, "")
+        p.replace(arr[pidx..qidx].join("\n\n")).sub!(fregex, "").sub!(lregex, "").strip!
         matched_blocks << p
         arr.slice! pidx + 1, idx
         break
@@ -172,8 +172,8 @@ module ClayText
   def self.fenced_transforms!(paragraphs)
     # For MathJax, exercises, codeblocks, and other fenced content
     PARAGRAPH_FENCED_TRANSFORMS.each do |delims, lambda_cb|
-      blocks = merge_fenced!(paragraphs, delims.first, delims.last)
-      blocks.each { |p| lambda_cb.call p }
+      blocks = merge_fenced! paragraphs, delims[0], delims[1]
+      blocks.each { |block| lambda_cb.call block, nil, nil }
     end
   end
 
@@ -207,7 +207,7 @@ module ClayText
     paragraphs.filter { |p| p.type == :plain }.each { |p| p.gsub! /\n/, "<br/>\n" }
 
     # Insert <{mark, a}> in :plain, :olitems, and :footer paragraphs
-    paragraphs.filter { |p| p.type == :plain or p.type == :olitems or p.type == :footer }.each do |p|
+    paragraphs.filter { |p| p.type == :plain or p.type == :olitems or p.type == :exercise or p.type == :footer }.each do |p|
       p.gsub! /`([^`]+)`/, '<mark>\1</mark>'
       p.gsub! /\[([^\]]+)\]\(([^)]+)\)/, '<a href="\2">\1</a>'
     end
