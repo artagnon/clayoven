@@ -12,11 +12,11 @@ require_relative "clayoven/util"
 module Clayoven
   class Page
     attr_accessor :filename, :permalink, :title, :topic, :body, :lastmod, :crdate, :locations,
-                  :paragraphs, :target, :topics, :indexfill, :audience
+                  :paragraphs, :target, :topics, :indexfill
 
     # Intialize with filename and authored dates from git
     # Expensive due to log --follow; avoid creating Page objects when not necessary.
-    def initialize(filename, git, audmap = {})
+    def initialize(filename, git)
       @filename = filename
       # If a file is in the git index, use Time.now; otherwise, log --follow it.
       @lastmod, @crdate, @locations = git.metadata @filename
@@ -47,35 +47,32 @@ module Clayoven
                    else filename.split(".index.clay").first                    end
       @topic = @permalink
       @target = "#{@permalink}.html"
-      @audience = :none
     end
   end
 
   class ContentPage < Page
-    def initialize(filename, git, audmap)
+    def initialize(filename, git)
       super
       # There cannot be ContentPages nested under 'index'
       @topic, _ = @filename.split "/", 2
       @permalink = @filename.split(".clay").first
       @target = "#{@permalink}.html"
-      @audience = audmap.empty? ? :none : audmap[@permalink]
     end
   end
 
   def self.dirty_pages(index_files, content_files, is_aggressive)
     # Check the git index exactly once to determine dirty files
     git = Git::Info.new @config.tzmap
-    audmap = @config.audmap
 
     # An index_file that is added (or deleted) should mark all index_files as dirty
     if git.any_added?(index_files) || git.template_changed? || is_aggressive
       dirty_index_pages = index_files.map { |filename| IndexPage.new filename, git }
-      dirty_content_pages = content_files.map { |filename| ContentPage.new filename, git, audmap }
+      dirty_content_pages = content_files.map { |filename| ContentPage.new filename, git }
     else
       # Find out the dirty content_pages
       dirty_content_pages = content_files
         .select { |filename| git.added_or_modified? filename }
-        .map { |filename| ContentPage.new filename, git, audmap }
+        .map { |filename| ContentPage.new filename, git }
 
       # First, see which index_pages are forced dirty by corresponding content_pages;
       # then, add to the list the ones that are dirty by themselves; avoid adding the
@@ -104,7 +101,7 @@ module Clayoven
         @config.hidden.any? { |hidden_entry| "#{hidden_entry}.clay" == cf }
       end
         .select { |cf| cf.split("/", 2).first == dip.topic }
-        .map { |cf| ContentPage.new cf, git, @config.audmap }
+        .map { |cf| ContentPage.new cf, git }
         .sort_by { |cp| cp.permalink }.reverse
         .sort_by { |cp| -cp.crdate.to_i }
     end
