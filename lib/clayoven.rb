@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-
 require "slim"
 require "colorize"
 require "sitemap_generator"
@@ -43,8 +41,8 @@ module Clayoven
       super
       # Special handling for 'index.clay': every other IndexFile is a '*.index.clay'
       @permalink = if @filename == "index.clay"
-                     "index"
-                   else filename.split(".index.clay").first                    end
+          "index"
+        else filename.split(".index.clay").first         end
       @topic = @permalink
       @target = "#{@permalink}.html"
     end
@@ -130,7 +128,7 @@ module Clayoven
 
     # Look for stray files.  All content_files are nested within directories
     content_files
-      .reject { |file| all_topics.include? file.split("/", 2).first }
+      .reject { |file| all_topics.include? file.split("/").first }
       .each do |stray|
       content_files = content_files - [stray]
       puts "[#{"WARN".red}] #{stray} is a stray file or directory; ignored"

@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-
 module Config
   SLIM_DEFAULT = <<-'EOF'
   doctype html

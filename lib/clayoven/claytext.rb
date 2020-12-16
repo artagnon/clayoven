@@ -72,11 +72,13 @@ module ClayText
       paragraph.type = :indent
     end,
 
-    # If the paragraph has exactly one line prefixed with a '# ',
+    # If the paragraph has exactly one line prefixed with hashes,
     # it is put into the :subheading type.
-    /^# / => lambda do |paragraph, regex|
+    /^(#+) / => lambda do |paragraph, regex|
+      match = paragraph.match regex
       paragraph.gsub! regex, ""
       paragraph.type = :subheading
+      paragraph.prop = match[1].length
       # See RFC 3986, reserved characters
       paragraph.bookmark = paragraph.downcase
         .tr('!*\'();:@&=+$,/?#[]', "")
@@ -115,8 +117,12 @@ module ClayText
 
   PARAGRAPH_FENCED_TRANSFORMS = {
     [/\A\.\.\.$/, /^\.\.\.\z/] => ->(p, _, _) { p.type = :blurb },
-    [/\A~~$/, /^~~\z/] => ->(p, _, _) { p.type = :codeblock; p.prop = :coq },
-    [/\A```(\w+)$/, /^```\z/] => ->(p, fc, _) { p.type = :codeblock; p.prop = fc.captures[0] },
+    [/\A```(\w*)$/, /^```\z/] => ->(p, fc, _) {
+      p.type = :codeblock; p.prop = if fc.captures[0].empty?
+          :nohighlight
+        else fc.captures[0]         end
+    },
+    [/\A~~$/, /^~~\z/] => ->(p, fc, _) { p.type = :codeblock; p.prop = :coq },
     [/\A<<$/, /^>>\z/] => ->(p, _, _) { p.type = :images },
 
     # MathJaX: put the markers back, since js needs it
@@ -180,7 +186,7 @@ module ClayText
   end
 
   def self.line_transforms!(paragraphs)
-    paragraphs.each do |p|
+    paragraphs.filter { |p| p.type == :plain }.each do |p|
       # Apply the PARAGRAPH_LINE_TRANSFORMS on all the paragraphs
       PARAGRAPH_LINE_TRANSFORMS.each do |regex, lambda_cb|
         lambda_cb.call(p, regex) if p.split("\n").all?(regex)
@@ -201,15 +207,15 @@ module ClayText
     line_transforms! paragraphs
 
     # at the end of both sets of transforms, htmlescape everything but mathjax
-    paragraphs.filter { |p| not(p.type == :mathjax) }.each do |p|
-      p.gsub!(/[<>&]/, ClayText::HTMLESCAPE_RULES)
+    paragraphs.select { |p| not(p.type == :mathjax) }.each do |p|
+      p.gsub! /[<>&]/, ClayText::HTMLESCAPE_RULES
     end
 
     # Insert HTML breaks in :plain paragraphs
     paragraphs.filter { |p| p.type == :plain }.each { |p| p.gsub! /\n/, "<br/>\n" }
 
-    # Insert <{mark, a}> in :plain, :olitems, and :footer paragraphs
-    paragraphs.filter { |p| p.type == :plain or p.type == :olitems or p.type == :exercise or p.type == :footer }.each do |p|
+    # Insert <{mark, a}> in certain paragraph kinds
+    paragraphs.select { |p| [:plain, :olitems, :exercise, :footer, :blurb].count(p.type) > 0 }.each do |p|
       p.gsub! /`([^`]+)`/, '<mark>\1</mark>'
       p.gsub! /\[([^\]]+)\]\(([^)]+)\)/, '<a href="\2">\1</a>'
     end
