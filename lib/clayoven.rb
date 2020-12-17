@@ -39,10 +39,7 @@ module Clayoven
   class IndexPage < Page
     def initialize(filename, git)
       super
-      # Special handling for 'index.clay': every other IndexFile is a '*.index.clay'
-      @permalink = if @filename == "index.clay"
-          "index"
-        else filename.split(".index.clay").first         end
+      @permalink = filename.split(".index.clay").first
       @topic = @permalink
       @target = "#{@permalink}.html"
     end
