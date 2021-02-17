@@ -122,17 +122,15 @@ module ClayText
           :nohighlight
         else fc.captures[0]         end
     },
-    [/\A~~$/, /^~~\z/] => ->(p, fc, _) { p.type = :codeblock; p.prop = :coq },
     [/\A<<$/, /^>>\z/] => ->(p, _, _) { p.type = :images },
 
-    # MathJaX: put the markers back, since js needs it
-    # Missing $ and ^ markers due to backward-compatibility
+    # MathJaX: put the markers back, since js needs it: $$ ... $$
     [/\A\$\$/, /\$\$\z/] => lambda do |p, _, _|
       p.type = :mathjax
       p.replace ["$$", p.to_s, "$$"].join("\n")
     end,
 
-    # Writing commutative diagrams using xypic
+    # Writing commutative diagrams using xypic: {{ ... }}
     [/\A\{\{$/, /^\}\}\z/] => lambda do |p, _, _|
       p.type = :mathjax
       p.replace ["$$", XYMATRIX_START, p.to_s, XYMATRIX_END, "$$"].join("\n")
@@ -143,7 +141,7 @@ module ClayText
   #
   # :content is a string that contains a fenced block (after merge_fenced!)
   # :type can be one of PARAGRAPH_TYPES
-  # :prop is auxiliary type-specific information (:a is for lettered-lists, :i is for numbered-lists, and :coq is for coq-code)
+  # :prop is auxiliary type-specific information (:a is for lettered-lists, :i is for numbered-lists)
   # :olstart is an auxiliary field for list-numbering
   # :bookmark is another auxiliary field that makes sense in :subheading
   # :children stores children paragraph, a field that makes sense in :exercise
