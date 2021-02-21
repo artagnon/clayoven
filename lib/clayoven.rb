@@ -37,22 +37,32 @@ module Clayoven
   end
 
   class IndexPage < Page
+    attr_accessor :subtopics
+
     def initialize(filename, git)
       super
       # Special handling for 'index.clay': every other IndexFile is a '*.index.clay'
       @permalink = if @filename == "index.clay"
           "index"
         else filename.split(".index.clay").first         end
-      @topic = @permalink
       @target = "#{@permalink}.html"
+    end
+
+    def fillindex(cps)
+      st = Struct.new(:title, :cps, :begints, :endts)
+      cps = cps.sort_by { |cp| cp.permalink }.reverse.sort_by { |cp| -cp.crdate.to_i }
+      @subtopics = cps.group_by { |cp| cp.subtopic }.map { |subtop, cps| st.new(subtop, cps, cps.last.crdate, cps.first.lastmod) }
     end
   end
 
-  class ContentPage < Page
+  class ContentPage < IndexPage
+    attr_accessor :subtopic
+
     def initialize(filename, git)
       super
       # There cannot be ContentPages nested under 'index'
-      @topic, _ = @filename.split "/", 2
+      @topic, @subtopic, _ = @filename.split "/", 3
+      @subtopic = nil if @subtopic.end_with?(".clay")
       @permalink = @filename.split(".clay").first
       @target = "#{@permalink}.html"
     end
@@ -95,13 +105,12 @@ module Clayoven
     # corresponding to a dirty index_page.
     # Additionally, reject hidden content_files from the corresponding indexfill
     dirty_index_pages.each do |dip|
-      dip.indexfill = content_files.reject do |cf|
+      cps = content_files.reject do |cf|
         @config.hidden.any? { |hidden_entry| "#{hidden_entry}.clay" == cf }
       end
-        .select { |cf| cf.split("/", 2).first == dip.topic }
+        .select { |cf| cf.split("/", 2).first == dip.permalink }
         .map { |cf| ContentPage.new cf, git }
-        .sort_by { |cp| cp.permalink }.reverse
-        .sort_by { |cp| -cp.crdate.to_i }
+      dip.fillindex cps
     end
     return dirty_index_pages + dirty_content_pages, git
   end
