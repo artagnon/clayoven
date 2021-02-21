@@ -50,7 +50,7 @@ module Clayoven
 
     def fillindex(cps)
       st = Struct.new(:title, :cps, :begints, :endts)
-      cps = cps.sort_by { |cp| cp.permalink }.reverse.sort_by { |cp| -cp.crdate.to_i }
+      cps = cps.sort_by { |cp| -cp.crdate.to_i }
       @subtopics = cps.group_by { |cp| cp.subtopic }.map { |subtop, cps| st.new(subtop, cps, cps.last.crdate, cps.first.lastmod) }
     end
   end
