@@ -149,7 +149,7 @@ module Clayoven
   def self.main(is_aggressive = false)
     # Only operate on git repositories
     toplevel = `git rev-parse --show-toplevel`.strip
-    abort "[#{"ERR".red}] Not a clayoven project" if toplevel.empty? or not File.directory? ".clayoven"
+    abort "[#{"ERR".red}] Not a clayoven project" if toplevel.empty? or not File.directory? "#{toplevel}/.clayoven"
     Dir.chdir(toplevel) do
       # Write out template files, if necessary
       @config = Config::Data.new

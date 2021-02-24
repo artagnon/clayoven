@@ -2,7 +2,7 @@
 
 [![Code Climate](https://codeclimate.com/github/artagnon/clayoven.png)](https://codeclimate.com/github/artagnon/clayoven)
 
-clayoven is a beautiful website generator with a carefully curated set of features. It has been built at a glacial pace, over a period of [seven years](https://github.com/artagnon/clayoven/commit/d4d40161e9f76dbe74078c669de9af698cf621d6), as [my website](https://artagnon.com) expanded in content. I have a spread of mathematical notes, software-related posts, and even some wider-audience [articles](https://artagnon.com/articles); it suffices to say that clayoven is good on all three fronts. The source files are written in "claytext", a custom format built for elegance and speed.
+clayoven is a beautiful website generator with a carefully curated set of features. It has been built at a glacial pace, over a period of [eight years](https://github.com/artagnon/clayoven/commit/d4d40161e9f76dbe74078c669de9af698cf621d6), as [my website](https://artagnon.com) expanded in content. I have a spread of mathematical notes, software-related posts, and even some wider-audience [articles](https://artagnon.com/articles); it suffices to say that clayoven is good on all three fronts. The source files are written in "claytext", a custom format built for elegance and speed.
 
 ## The claytext format
 
@@ -41,13 +41,14 @@ html
           = paragraph.to_s
     div id="sidebar"
       ul
-        - if topics
-          - topics.each do |topic|
+        - subtopics.each do |st|
+          h2 = "#{st.title}"
+          - st.cps.each do |cp|
             li
-              a href="/#{topic}" = topic
+              a href="/#{cp.permalink}" = cp.title
 ```
 
-The engine works closely with the git object store, and builds are incremental by default; it mostly Just Works, and when it doesn't, there's an option to force a full build. The engine also pulls out the created-timestamp (`Page#crdate`) and last-modified-timestamp (`Page#lastmod`) from git, respecting moves; as long as there is a significant correlation between old content and new content, `authdate` is calculated on the old content. `ContentPages` are sorted by `authdate`, reverse-chronologically, and `IndexPages` are sorted alphabetically.
+The engine works closely with the git object store, and builds are incremental by default; it mostly Just Works, and when it doesn't, there's an option to force a full build. The engine also pulls out the created-timestamp (`Page#crdate`) and last-modified-timestamp (`Page#lastmod`) from git, respecting moves; as long as there is a significant correlation between old content and new content, `crdate` is calculated on the old content. `ContentPages` are sorted by `crdate`, reverse-chronologically, and `IndexPages` are sorted alphabetically.
 
 ## Usage
 
@@ -57,7 +58,7 @@ Run `bundle` to install the required gems, and `clayoven` in a fresh git reposit
 - `clayoven aggressive` to regenerate the entire site along with a `sitemap.xml.gz`; run occassionally.
 - `clayoven httpd` to preview your website locally.
 
-Use [MathJax](https://www.mathjax.org) to render LaTeX, an [extension](https://github.com/sonoisa/XyJax) to render commutative diagrams, and [highlight.js](https://highlightjs.org) to do syntax highlighting.
+Use [MathJax](https://www.mathjax.org) to render LaTeX, an [extension](https://github.com/sonoisa/XyJax-v3) to render commutative diagrams, and [highlight.js](https://highlightjs.org) to do syntax highlighting.
 
 ## Configuration
 
@@ -79,12 +80,11 @@ Use [vsclay](https://github.com/artagnon/vsclay) for syntax highligting claytext
 
 ## The claytext processor
 
-The claytext processor is, at its core, a paragraph-processor; all content must be split up into paragraphs, decorated with optional first-and-last-line-markers. The function of `<< ... >>`, `$$ ... $$`, and `~~ ... ~~` markers should be evident from the [example](/README.md#the-claytext-format); the marker tokens must be in lines of their own. The first paragraph is optionally a header, and if so, markers `( ... )` must be used. The last paragraph is an optional footer, prefixed with `[^\d+]:` lines to enable the footer. In a paragraph with lists, each line must begin with the numeral or roman numeral, as shown. The format is strict, and the processor doesn't like files with paragraphs wrapped using hard line breaks, for instance.
+The claytext processor is, at its core, a paragraph-processor; all content must be split up into paragraphs, decorated with optional first-and-last-line-markers. The function of `<< ... >>`, `$$ ... $$`, `... [content] ...` markers should be evident from the [example](/README.md#the-claytext-format); the marker tokens must be in lines of their own. The last paragraph is an optional footer, prefixed with `*`, `†`, `‡`, `§`, or `¶` lines to enable the footer. In a paragraph with lists, each line must begin with the numeral or roman numeral, as shown. The format is strict, and the processor doesn't like files with paragraphs wrapped using hard line breaks, for instance.
 
-`PARAGRAPH_LINE_FILTERS` matches paragraphs where all lines begin with some regex, and `PARAGRAPH_START_END_FILTERS` match paragraphs that start and end with the specified tokens.
+`PARAGRAPH_LINE_TRANSFORMS` matches paragraphs where all lines begin with some regex, and `PARAGRAPH_FENCED_TRANSFORMS` match fences (could be multiple paragraphs) that start and end with the specified tokens.
 
 ## Planned features, and anti-features
 
 - Improve vsclay.
-- Port to [Crystal](https://crystal-lang.org/) once Crystal is mature enough.
 - Anti: extending claytext in ways that would necessitate an ugly implementation.

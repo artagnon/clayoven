@@ -100,7 +100,7 @@ module ClayText
 
     # If all the lines in a paragraph begin with certain unicode symbols, the
     # paragraph is marked as :footer.
-    /^(\*|†|‡|§|||¶) / => lambda do |paragraph, _|
+    /^(\*|†|‡|§|¶) / => lambda do |paragraph, _|
       paragraph.type = :footer
     end,
   }.freeze
