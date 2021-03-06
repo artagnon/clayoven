@@ -48,10 +48,12 @@ module Clayoven
       @target = "#{@permalink}.html"
     end
 
-    def fillindex(cps)
+    def fillindex(cps, stmap)
       st = Struct.new(:title, :cps, :begints, :endts)
       cps = cps.sort_by { |cp| -cp.crdate.to_i }
-      @subtopics = cps.group_by { |cp| cp.subtopic }.map { |subtop, cps| st.new(subtop, cps, cps.last.crdate, cps.first.lastmod) }
+      @subtopics = cps.group_by { |cp| cp.subtopic }.map do |subtop, cps|
+        st.new(stmap[subtop], cps, cps.last.crdate, cps.first.lastmod)
+      end
     end
   end
 
@@ -110,7 +112,7 @@ module Clayoven
       end
         .select { |cf| cf.split("/", 2).first == dip.permalink }
         .map { |cf| ContentPage.new cf, git }
-      dip.fillindex cps
+      dip.fillindex cps, @config.stmap
     end
     return dirty_index_pages + dirty_content_pages, git
   end

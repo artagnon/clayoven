@@ -30,8 +30,11 @@ module Config
   +0000 UTC
   EOF
 
+  SUBTOPIC_DEFAULT = <<-'EOF'
+  EOF
+
   class Data
-    attr_accessor :sitename, :hidden, :tzmap, :template
+    attr_accessor :sitename, :hidden, :tzmap, :stmap, :template
 
     # Creates file at path, if it doesn't exist, with template text
     def create_template(path, template)
@@ -51,6 +54,10 @@ module Config
       @sitename = create_template(".clayoven/sitename", "clayoven.io").first
       @hidden = create_template ".clayoven/hidden", ["404"].join("\n")
       @tzmap = (create_template ".clayoven/tz", TZ_DEFAULT).map { |l| l.split(" ", 2) }.to_h
+      @stmap = (create_template ".clayoven/subtopic", SUBTOPIC_DEFAULT).map { |l| l.split(" ", 2) }.to_h
+      @stmap.default_proc = proc do |h, k|
+        h[k] = k
+      end
       @template = (create_template "design/template.slim", SLIM_DEFAULT).join "\n"
       create_template "index.clay", INDEX_DEFAULT
     end
