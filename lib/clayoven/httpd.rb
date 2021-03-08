@@ -14,9 +14,9 @@ module Clayoven
         if %r{^/$} =~ req.path_info
           res.set_redirect WEBrick::HTTPStatus::Found, "index.html"
         elsif %r{(?<uri>.*)/$} =~ req.path_info
-          res.set_redirect WEBrick::HTTPStatus::Found, "#{URI.parse(URI.escape(uri))}.html"
+          res.set_redirect WEBrick::HTTPStatus::Found, "#{URI.parse(uri)}.html"
         elsif %r{^(?<page>(?!.*[.](html|css|js|ico|png|jpg|pdf|svg)$).*$)} =~ req.path_info
-          res.set_redirect WEBrick::HTTPStatus::Found, "#{URI.parse(URI.escape(page))}.html"
+          res.set_redirect WEBrick::HTTPStatus::Found, "#{URI.parse(page)}.html"
         end
       end
 

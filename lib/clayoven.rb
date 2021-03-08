@@ -169,7 +169,7 @@ module Clayoven
 
       # Finally, execute gulp and regenerate the sitemap conditionally
       is_aggressive = true if git.template_changed?
-      puts `gulp --color` if git.design_changed? or is_aggressive
+      puts `npm run minify` if git.design_changed? or is_aggressive
       generate_sitemap genpages if is_aggressive
     end
   end

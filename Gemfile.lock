@@ -10,6 +10,8 @@ GEM
       tilt (>= 2.0.6, < 2.1)
     temple (0.8.2)
     tilt (2.0.10)
+    uri (0.10.1)
+    webrick (1.7.0)
 
 PLATFORMS
   ruby
@@ -18,6 +20,8 @@ DEPENDENCIES
   colorize (>= 0.8.1)
   sitemap_generator (>= 6.1.2)
   slim (>= 4.1.0)
+  uri (>= 0.10.1)
+  webrick (>= 1.7.0)
 
 BUNDLED WITH
    2.2.3
