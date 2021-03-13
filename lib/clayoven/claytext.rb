@@ -124,8 +124,9 @@ module ClayText
     },
     [/\A<<$/, /^>>\z/] => ->(p, _, _) {
       p.type = :images
-      if p.to_s.split("\n").length == 1 and Dir.exist?(p.to_s)
-        p.replace Dir.glob("*.svg", base: p.to_s).map { |e| "/" + p.to_s + e }.join("\n")
+      basepath = Dir.getwd + p.to_s
+      if p.to_s.split("\n").length == 1 and Dir.exist?(basepath)
+        p.replace Dir.glob("*.svg", base: basepath).map { |e| p.to_s + e }.join("\n")
       end
     },
 
