@@ -52,7 +52,7 @@ module Clayoven
       st = Struct.new(:title, :cps, :begints, :endts)
       cps = cps.sort_by { |cp| -cp.crdate.to_i }
       @subtopics = cps.group_by { |cp| cp.subtopic }.map do |subtop, cps|
-        st.new(stmap[subtop], cps, cps.last.crdate, cps.first.lastmod)
+        st.new(stmap[subtop], cps, cps.last.crdate, cps.first.crdate)
       end
     end
   end
