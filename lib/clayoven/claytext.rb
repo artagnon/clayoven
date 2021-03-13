@@ -122,7 +122,12 @@ module ClayText
           :nohighlight
         else fc.captures[0]         end
     },
-    [/\A<<$/, /^>>\z/] => ->(p, _, _) { p.type = :images },
+    [/\A<<$/, /^>>\z/] => ->(p, _, _) {
+      p.type = :images
+      if p.to_s.split("\n").length == 1 and Dir.exist?(p.to_s)
+        p.replace Dir.glob("*.svg", base: p.to_s).map { |e| "/" + p.to_s + e }.join("\n")
+      end
+    },
 
     # MathJaX: put the markers back, since js needs it: $$ ... $$
     [/\A\$\$/, /\$\$\z/] => lambda do |p, _, _|
