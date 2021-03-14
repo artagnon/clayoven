@@ -3,6 +3,7 @@ GEM
   specs:
     builder (3.2.4)
     colorize (0.8.1)
+    progressbar (1.11.0)
     sitemap_generator (6.1.2)
       builder (~> 3.0)
     slim (4.1.0)
@@ -18,6 +19,7 @@ PLATFORMS
 
 DEPENDENCIES
   colorize (>= 0.8.1)
+  progressbar (>= 1.11.0)
   sitemap_generator (>= 6.1.2)
   slim (>= 4.1.0)
   uri (>= 0.10.1)

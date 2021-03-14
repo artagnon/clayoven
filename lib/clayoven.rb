@@ -1,5 +1,6 @@
 require "slim"
 require "colorize"
+require "progressbar"
 require "sitemap_generator"
 require_relative "clayoven/config"
 require_relative "clayoven/claytext"
@@ -22,16 +23,13 @@ module Clayoven
     end
 
     # Writes out HTML pages.  Takes a list of topics to render
-    #
-    # Prints a '[GEN]' line for every file it writes out.
     def render(topics, template)
       @topics = topics
       @paragraphs = if @body and not @body.empty? then ClayText.process @body else [] end
       Slim::Engine.set_options pretty: true, sort_attrs: false
       rendered = Slim::Template.new { template }.render self
       File.open(@target, _ = "w") do |targetio|
-        nbytes = targetio.write rendered
-        puts "[#{"GEN".green}] #{@target} (#{nbytes.to_s.red} bytes out)"
+        targetio.write rendered
       end
     end
   end
@@ -106,6 +104,7 @@ module Clayoven
   # content_files and index_files, because converting them to Page
   # objects prematurely will result in unnecessary log --follows
   def self.pages_to_regenerate(index_files, content_files, is_aggressive)
+    puts "[#{"GIT".green}]: Digging the git object store"
     dirty_index_pages, dirty_content_pages, git = dirty_pages index_files, content_files, is_aggressive
 
     # Now, set the indexfill for index_pages by looking at all the content_files
@@ -168,13 +167,19 @@ module Clayoven
       # From all_files, get the list of index_files, content_files, and topics
       index_files, content_files, topics = index_content_files all_files
 
-      # Get a list of pages to regenerate, and produce the final HTML using slim
+      # Get a list of pages to regenerate
       genpages, git = pages_to_regenerate index_files, content_files, is_aggressive
-      genpages.each { |page| page.render topics, @config.template }
+
+      # Produce the final HTML files using slim, with a fancy progressbar
+      progress = ProgressBar.create(:title => "[#{"HTML".green}]", :total => genpages.length) if genpages.any?
+      genpages.each { |page| page.render topics, @config.template; progress.increment }
 
       # Finally, execute gulp and regenerate the sitemap conditionally
       is_aggressive = true if git.template_changed?
-      puts `npm run minify` if git.design_changed? or is_aggressive
+      if git.design_changed? or is_aggressive
+        puts "[#{"NPM".green}]: Minifying js and css"
+        puts `npm run --silent minify`
+      end
       generate_sitemap genpages if is_aggressive
     end
   end
