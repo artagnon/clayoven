@@ -41,6 +41,7 @@ module Clayoven
 
     def initialize(filename, git)
       super
+
       # Special handling for 'index.clay': every other IndexFile is a '*.index.clay'
       @permalink = if @filename == "index.clay"
           "index"
@@ -54,6 +55,10 @@ module Clayoven
       @subtopics = cps.group_by { |cp| cp.subtopic }.map do |subtop, cps|
         st.new(stmap[subtop], cps, cps.last.crdate, cps.first.crdate)
       end
+
+      # crdate and lastmod are decided, not based on git metadata, but on cps
+      @crdate = cps.map { |cp| cp.crdate }.sort.first if cps.any?
+      @lastmod = cps.map { |cp| cp.lastmod }.sort.last if cps.any?
     end
   end
 
