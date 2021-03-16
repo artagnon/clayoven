@@ -20,7 +20,7 @@ module Git
     def any_added?(files) files.any? { |file| added? file } end
     def added_or_modified?(file) added?(file) || modified?(file) end
     def template_changed?; modified?("design/template.slim") || modified?(".clayoven/hidden") || modified?(".clayoven/tz") end
-    def design_changed?; modified? %r{design/.+\.(css|js)} end
+    def design_changed?; modified?("design/style.css") || modified?("design/script.js") end
 
     # Returns a #<Last updated date>|#<Creation date>|[#<Location string>]
     def metadata(file)

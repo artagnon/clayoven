@@ -218,8 +218,9 @@ module ClayText
     # Insert HTML breaks in :plain paragraphs
     paragraphs.filter { |p| p.type == :plain }.each { |p| p.gsub! /\n/, "<br/>\n" }
 
-    # Insert <{mark, a}> in certain paragraph kinds
+    # Insert <{span.mathjax, mark, a}> in certain paragraph kinds
     paragraphs.select { |p| [:plain, :olitems, :exercise, :footer, :blurb].count(p.type) > 0 }.each do |p|
+      p.gsub! /(\$[^\$]+\$)/, '<span class="mathjax">\1</span>'
       p.gsub! /`([^`]+)`/, '<mark>\1</mark>'
       p.gsub! /\[([^\]]+)\]\(([^)]+)\)/, '<a href="\2">\1</a>'
     end

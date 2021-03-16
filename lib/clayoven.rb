@@ -11,7 +11,7 @@ require_relative "clayoven/util"
 module Clayoven
   class Page
     attr_accessor :filename, :permalink, :title, :topic, :body, :lastmod, :crdate, :locations,
-                  :paragraphs, :target, :topics, :indexfill
+                  :paragraphs, :target, :topics, :indexfill, :target
 
     # Intialize with filename and authored dates from git
     # Expensive due to log --follow; avoid creating Page objects when not necessary.
@@ -170,15 +170,22 @@ module Clayoven
       # Get a list of pages to regenerate
       genpages, git = pages_to_regenerate index_files, content_files, is_aggressive
 
-      # Produce the final HTML files using slim, with a fancy progressbar
-      progress = ProgressBar.create(:title => "[#{"HTML".green}]", :total => genpages.length) if genpages.any?
-      genpages.each { |page| page.render topics, @config.template; progress.increment }
+      # Process with claytext first, and produce HTML files, to be consumed by MathJaX
+      if genpages.any?
+        progress = ProgressBar.create(:title => "[#{"HTML".green}]", :total => genpages.length)
+        genpages.each { |page| page.render topics, @config.template; progress.increment }
+
+        # Process the generated HTML files using MathJaX
+        puts "[#{"TeX".green}]: Rendering math"
+        targets = genpages.map { |page| page.target }.join " "
+        `npm run --silent jax -- #{targets}`
+      end
 
       # Finally, execute gulp and regenerate the sitemap conditionally
       is_aggressive = true if git.template_changed?
       if git.design_changed? or is_aggressive
         puts "[#{"NPM".green}]: Minifying js and css"
-        puts `npm run --silent minify`
+        `npm run --silent minify`
       end
       generate_sitemap genpages if is_aggressive
     end
