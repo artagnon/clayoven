@@ -122,11 +122,14 @@ module ClayText
           :nohighlight
         else fc.captures[0]         end
     },
-    [/\A<<$/, /^>>\z/] => ->(p, _, _) {
+    [/\A<< (\d+)x(\d+)$/, /^>>\z/] => ->(p, fc, _) {
       p.type = :images
+      dims = Struct.new(:width, :height)
+      p.prop = dims.new(fc.captures[0], fc.captures[1])
       basepath = Dir.getwd + p.to_s
       if p.to_s.split("\n").length == 1 and Dir.exist?(basepath)
-        p.replace Dir.glob("*.svg", base: basepath).map { |e| p.to_s + e }.join("\n")
+        p.replace Dir.glob("*.svg", base: basepath).sort_by { |e| e[..-4].to_i }
+                    .map { |e| p.to_s + e }.join("\n")
       end
     },
 
