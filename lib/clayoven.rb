@@ -93,30 +93,36 @@ module Clayoven
     [dirty_index_pages, dirty_content_pages]
   end
 
-  # Find the modified index_files and content_files from the git index
+  # Find the modified index_files and added_or_modified content_files from the git index
   def self.modified_files_from_gitidx(index_files, content_files)
+    # The case when index_files are added is handled in dirty_pages
     [index_files.select { |f| @git.modified? f }, content_files.select { |f| @git.added_or_modified? f }]
   end
 
-  def self.dirty_pages_from_mod(index_files, content_files)
-    # Create a progressbar based on information from the git index
-    modified_index_files, modified_content_files = modified_files_from_gitidx(index_files, content_files)
-    progress = ProgressBar.create(title: "[#{'GIT'.green} ]",
-                                  total: modified_index_files.count * 2 + modified_content_files.count)
-
-    # Find out the dirty content_pages
-    dirty_content_pages = modified_content_files.map { |filename| progress.increment; ContentPage.new filename, @git }
-
+  def self.find_dirty_index_pages(dirty_content_pages, modified_index_files, progress)
     # First, see which index_pages are forced dirty by corresponding content_pages;
     # then, add to the list the ones that are dirty by themselves; avoid adding the
     # index page twice when there are two dirty content_pages under the same index
     dirty_index_pages = dirty_content_pages.map { |dcp| "#{dcp.topic}.index.clay" }.uniq
                                            .map { |dif| progress.increment; IndexPage.new dif, @git }
     dirty_index_pages += modified_index_files.map { |filename| progress.increment; IndexPage.new filename, @git }
-    [dirty_index_pages, dirty_content_pages]
+    dirty_index_pages
+  end
+
+  def self.dirty_pages_from_mod(index_files, content_files)
+    # Create a progressbar based on information from the git index
+    modified_index_files, modified_content_files = modified_files_from_gitidx(index_files, content_files)
+    progress = ProgressBar.create(title: "[#{'GIT'.green} ]",
+                                  total: modified_index_files.count + modified_content_files.count * 2)
+
+    # Find out the dirty content_pages
+    dirty_content_pages = modified_content_files.map { |filename| progress.increment; ContentPage.new filename, @git }
+
+    [find_dirty_index_pages(dirty_content_pages, modified_index_files, progress), dirty_content_pages]
   end
 
   def self.dirty_pages(index_files, content_files, is_aggressive)
+    # Adding a new index file is equivalent to regenerating the entire site
     if @git.any_added?(index_files) || @git.template_changed? || is_aggressive
       dirty_pages_from_add(index_files, content_files)
     else
@@ -183,17 +189,7 @@ module Clayoven
   def self.generate_html(genpages, topics)
     progress = ProgressBar.create(title: "[#{'CLAY'.green}]", total: genpages.length)
     genpages.each { |page| page.render topics, @config.template; progress.increment }
-
-    # Process the generated HTML files using MathJaX
-    targets = genpages.map(&:target).join ' '
-    fork { exec "npm run --silent jax -- #{targets}" }
-    Process.waitall
-  end
-
-  def self.minify_design
-    puts "[#{'NPM'.green} ]: Minifying js and css"
-    fork { exec 'npm run --silent minify' }
-    Process.waitall
+    Util.render_math genpages.map(&:target).join(' ')
   end
 
   def self.generate_sitemap(all_pages)
@@ -218,7 +214,7 @@ module Clayoven
     generate_html genpages, topics if genpages.any?
 
     # Minify the design
-    minify_design if @git.design_changed? || is_aggressive
+    Util.minify_design if @git.design_changed? || is_aggressive
 
     # Regenerate the sitemap
     generate_sitemap genpages if is_aggressive

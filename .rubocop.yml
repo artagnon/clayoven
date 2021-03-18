@@ -15,8 +15,8 @@ Layout/EmptyLineBetweenDefs:
 Naming/HeredocDelimiterNaming:
   Enabled: false
 Metrics/AbcSize:
-  Max: 25
+  Max: 22
 Metrics/MethodLength:
-  Max: 16
+  Max: 15
 Metrics/ModuleLength:
   Max: 120

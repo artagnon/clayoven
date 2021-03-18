@@ -23,21 +23,24 @@ module Clayoven::ClayText
     end
   end
 
-  def self.merge_fenced!(arr, fregex, lregex)
+  def self.merge_fenced!(paragraphs, fregex, lregex)
     mb = Struct.new(:block, :fc, :lc)
     matched_blocks = []
-    arr.each_with_index do |p, pidx|
-      next unless fregex.match p
+    paragraphs.each_with_index do |p, pidx|
+      pmatch = fregex.match p
+      next unless pmatch
 
-      arr[pidx..].each_with_index do |q, idx|
-        qidx = pidx + idx # the real index
-        next unless lregex.match q
+      paragraphs[pidx..].each_with_index do |q, idx|
+        qmatch = lregex.match q
+        next unless qmatch
 
-        # strip out the delims at the beginning and end
-        matches = fregex.match(p), lregex.match(q)
-        p.replace(arr[pidx..qidx].join("\n\n")).sub!(fregex, '').sub!(lregex, '').strip!
-        matched_blocks << mb.new(p, matches[0], matches[1])
-        arr.slice! pidx + 1, idx
+        # Replace paragraph p with all the paragraphs from pidx to pidx + idx, after stripping out the delims.
+        # The final result, the "fenced paragraph" sits at pidx.
+        p.replace(Clayoven::Util.slice_strip_fences!(paragraphs, pidx, idx + 1))
+        matched_blocks << mb.new(p, pmatch, qmatch)
+
+        # The final result is at pidx; throw out all the idx paragraphs, starting at pidx + 1
+        paragraphs.slice! pidx + 1, idx
         break
       end
     end

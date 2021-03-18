@@ -6,16 +6,11 @@ module Clayoven::Httpd
   def self.start
     port = 8000
     callback = proc do |req, res|
-      # A couple of URL rewriting rules.  Not real URL rewriting
-      # like .htaccess; just a HTTP redirect. / is rewritten to
-      # index.html, and anything-that-doesn't-end-in-.html/css/js is
-      # rewritten to that-thing.html.
+      # A couple of URL rewriting rules; simple stuff
       if %r{^/$} =~ req.path_info
         res.set_redirect WEBrick::HTTPStatus::Found, 'index.html'
-      elsif %r{(?<uri>.*)/$} =~ req.path_info
+      elsif /^(?<uri>[^.]+)$/ =~ req.path_info
         res.set_redirect WEBrick::HTTPStatus::Found, "#{URI.parse(uri)}.html"
-      elsif /^?<page>(?!.*[.](html|css|js|ico|png|jpg|pdf|svg)$).*$/ =~ req.path_info
-        res.set_redirect WEBrick::HTTPStatus::Found, "#{URI.parse(page)}.html"
       end
     end
 
