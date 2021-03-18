@@ -29,7 +29,7 @@ module Clayoven
     # Writes out HTML pages.  Takes a list of topics to render
     def render(topics, template)
       @topics = topics
-      @paragraphs = @body.empty? ? [] : (ClayText.process @body)
+      @paragraphs = @body.empty? ? [] : (Claytext.process @body)
       Slim::Engine.set_options pretty: true, sort_attrs: false
       rendered = Slim::Template.new { template }.render self
       File.open(@target, _ = 'w') do |targetio|
@@ -103,10 +103,9 @@ module Clayoven
     # First, see which index_pages are forced dirty by corresponding content_pages;
     # then, add to the list the ones that are dirty by themselves; avoid adding the
     # index page twice when there are two dirty content_pages under the same index
-    dirty_index_pages = dirty_content_pages.map { |dcp| "#{dcp.topic}.index.clay" }.uniq
-                                           .map { |dif| progress.increment; IndexPage.new dif, @git }
-    dirty_index_pages += modified_index_files.map { |filename| progress.increment; IndexPage.new filename, @git }
-    dirty_index_pages
+    dirty_from_content = dirty_content_pages.map { |dcp| "#{dcp.topic}.index.clay" }.uniq
+                                            .map { |dif| progress.increment; IndexPage.new dif, @git }
+    dirty_from_content + modified_index_files.map { |filename| progress.increment; IndexPage.new filename, @git }
   end
 
   def self.dirty_pages_from_mod(index_files, content_files)

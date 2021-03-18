@@ -1,5 +1,5 @@
 # The claytext paragraph processor
-module Clayoven::ClayText
+module Clayoven::Claytext
   require_relative 'transforms'
 
   # These are the values that Paragraph.type can take
@@ -36,7 +36,7 @@ module Clayoven::ClayText
 
         # Replace paragraph p with all the paragraphs from pidx to pidx + idx, after stripping out the delims.
         # The final result, the "fenced paragraph" sits at pidx.
-        p.replace(Clayoven::Util.slice_strip_fences!(paragraphs, pidx, idx + 1))
+        p.replace(Util.slice_strip_fences!(paragraphs, pidx, idx + 1))
         matched_blocks << mb.new(p, pmatch, qmatch)
 
         # The final result is at pidx; throw out all the idx paragraphs, starting at pidx + 1

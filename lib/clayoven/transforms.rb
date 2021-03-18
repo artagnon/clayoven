@@ -1,24 +1,5 @@
 # The fenced and line transforms for Claytext
-module Clayoven::ClayText::Transforms
-  ROMAN_NUMERALS = {
-    10 => 'x',
-    9 => 'ix',
-    5 => 'v',
-    4 => 'iv',
-    1 => 'i'
-  }.freeze
-
-  def self.to_arabic(str)
-    result = 0
-    ROMAN_NUMERALS.each_value do |roman|
-      while str.start_with?(roman)
-        result += ROMAN_NUMERALS.invert[roman]
-        str = str.slice(roman.length, str.length)
-      end
-    end
-    result
-  end
-
+module Clayoven::Claytext::Transforms
   # Key is used to match each line in a paragraph, and value is the
   # lambda that'll act on the matched paragraph.
   LINE = {
@@ -38,7 +19,7 @@ module Clayoven::ClayText::Transforms
       paragraph.gsub! regex, ''
       paragraph.type = :olitems
       paragraph.prop = :i
-      paragraph.olstart = to_arabic(match[1]) if match
+      paragraph.olstart = Util.to_arabic(match[1]) if match
     end,
 
     # The alphabetic version of ol
