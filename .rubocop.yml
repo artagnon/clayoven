@@ -16,8 +16,6 @@ Naming/HeredocDelimiterNaming:
   Enabled: false
 Metrics/AbcSize:
   Max: 25
-Metrics/CyclomaticComplexity:
-  Max: 8
 Metrics/MethodLength:
   Max: 16
 Metrics/ModuleLength:

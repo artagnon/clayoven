@@ -67,6 +67,15 @@ module Clayoven::ClayText
     '>' => '&gt;'
   }.freeze
 
+  def self.process_inline_markdown(paragraphs)
+    # Insert <{mark, a}> in certain paragraph kinds
+    paragraphs.select { |p| %i[plain olitems exercise footer blurb].count(p.type).positive? }.each do |p|
+      p.gsub! /`([^`]+)`/, '<mark>\1</mark>'
+      p.gsub! /\[([^\]]+)\]\(([^)]+)\)/, '<a href="\2">\1</a>'
+    end
+    paragraphs
+  end
+
   # Takes a body of claytext, breaks it up into paragraphs, and
   # applies various rules on it.
   #
@@ -87,12 +96,7 @@ module Clayoven::ClayText
     # Insert HTML breaks in :plain paragraphs
     paragraphs.filter { |p| p.type == :plain }.each { |p| p.gsub! /\n/, "<br/>\n" }
 
-    # Insert <{mark, a}> in certain paragraph kinds
-    paragraphs.select { |p| %i[plain olitems exercise footer blurb].count(p.type).positive? }.each do |p|
-      p.gsub! /`([^`]+)`/, '<mark>\1</mark>'
-      p.gsub! /\[([^\]]+)\]\(([^)]+)\)/, '<a href="\2">\1</a>'
-    end
-
-    paragraphs
+    # Process `...` and `[...](...)`
+    process_inline_markdown paragraphs
   end
 end

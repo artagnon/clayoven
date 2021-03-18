@@ -54,16 +54,19 @@ module Clayoven
       @target = "#{@permalink}.html"
     end
 
-    def fillindex(cps, stmap)
-      st = Struct.new(:title, :cps, :begints, :endts)
-      cps = cps.sort_by { |cp| -cp.crdate.to_i }
-      @subtopics = cps.group_by(&:subtopic).map do |subtop, grp|
+    def update_crdate_lastmod(content_pages)
+      # crdate and lastmod are decided, not based on git metadata, but on content_pages
+      @crdate = content_pages.map(&:crdate).min
+      @lastmod = content_pages.map(&:lastmod).max
+    end
+
+    def fillindex(content_pages, stmap)
+      st = Struct.new(:title, :content_pages, :begints, :endts)
+      content_pages = content_pages.sort_by { |cp| -cp.crdate.to_i }
+      @subtopics = content_pages.group_by(&:subtopic).map do |subtop, grp|
         st.new(stmap[subtop], grp, grp.last.crdate, grp.first.crdate)
       end
-
-      # crdate and lastmod are decided, not based on git metadata, but on cps
-      @crdate = cps.map(&:crdate).min if cps.any?
-      @lastmod = cps.map(&:lastmod).max if cps.any?
+      update_crdate_lastmod content_pages if content_pages.any?
     end
   end
 
@@ -130,9 +133,9 @@ module Clayoven
     # corresponding to a dirty index_page.
     # Additionally, reject hidden content_files from the corresponding indexfill
     dirty_index_pages.each do |dip|
-      cps = unhidden_content_files(content_files).select { |cf| cf.split('/', 2).first == dip.permalink }
-                                                 .map { |cf| ContentPage.new cf, git }
-      dip.fillindex cps, @config.stmap
+      content_pages = unhidden_content_files(content_files).select { |cf| cf.split('/', 2).first == dip.permalink }
+                                                           .map { |cf| ContentPage.new cf, git }
+      dip.fillindex content_pages, @config.stmap
     end
     [dirty_index_pages + dirty_content_pages, git]
   end
@@ -179,6 +182,20 @@ module Clayoven
     `npm run --silent jax -- #{targets}`
   end
 
+  def self.minify_design
+    puts "[#{'NPM'.green}]: Minifying js and css"
+    `npm run --silent minify`
+  end
+
+  def self.generate_site(genpages, topics, is_aggressive)
+    # Generate the HTML
+    generate_html genpages, topics if genpages.any?
+
+    # Finally, minify the design, and regenerate the sitemap
+    minify_design if @git.design_changed? || is_aggressive
+    generate_sitemap genpages if is_aggressive
+  end
+
   def self.main(is_aggressive: false)
     # Only operate on git repositories
     toplevel = `git rev-parse --show-toplevel`.strip
@@ -194,18 +211,11 @@ module Clayoven
       index_files, content_files, topics = index_content_files all_files
 
       # Get a list of pages to regenerate
-      genpages, git = pages_to_regenerate index_files, content_files, is_aggressive
+      genpages, @git = pages_to_regenerate index_files, content_files, is_aggressive
 
-      # Generate the html pages
-      generate_html genpages, topics if genpages.any?
-
-      # Finally, execute gulp and regenerate the sitemap conditionally
-      is_aggressive = true if git.template_changed?
-      if git.design_changed? || is_aggressive
-        puts "[#{'NPM'.green}]: Minifying js and css"
-        `npm run --silent minify`
-      end
-      generate_sitemap genpages if is_aggressive
+      # Generate the entire site
+      is_aggressive = true if @git.template_changed?
+      generate_site genpages, topics, is_aggressive if genpages.any?
     end
   end
 end
