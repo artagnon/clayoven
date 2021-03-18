@@ -1,26 +1,25 @@
-# -*- coding: utf-8 -*-
-
-module ClayText
+# The claytext paragraph processor
+module Clayoven::ClayText
   # These are the values that Paragraph.type can take
-  # PARAGRAPH_TYPES = %i[plain olitems subheading exercise indent blurb footer codeblock images horizrule mathjax].freeze
+  # PARAGRAPH_TYPES = %i[plain olitems subheading exercise indent blurb footer codeblock images horizrule mathjax]
 
   HTMLESCAPE_RULES = {
-    "&" => "&amp;",
-    "<" => "&lt;",
-    ">" => "&gt;",
+    '&' => '&amp;',
+    '<' => '&lt;',
+    '>' => '&gt;'
   }.freeze
 
   ROMAN_NUMERALS = {
-    10 => "x",
-    9 => "ix",
-    5 => "v",
-    4 => "iv",
-    1 => "i",
+    10 => 'x',
+    9 => 'ix',
+    5 => 'v',
+    4 => 'iv',
+    1 => 'i'
   }.freeze
 
   def self.to_arabic(str)
     result = 0
-    ROMAN_NUMERALS.values.each do |roman|
+    ROMAN_NUMERALS.each_value do |roman|
       while str.start_with?(roman)
         result += ROMAN_NUMERALS.invert[roman]
         str = str.slice(roman.length, str.length)
@@ -37,7 +36,7 @@ module ClayText
     # marked as an :olitems,
     /^([0-9]+)\. / => lambda do |paragraph, regex|
       match = paragraph.match regex
-      paragraph.gsub! regex, ""
+      paragraph.gsub! regex, ''
       paragraph.type = :olitems
       paragraph.olstart = match[1] if match
     end,
@@ -45,7 +44,7 @@ module ClayText
     # The Roman-numeral version of ol
     /^\(([ivx]+)\) / => lambda do |paragraph, regex|
       match = paragraph.match regex
-      paragraph.gsub! regex, ""
+      paragraph.gsub! regex, ''
       paragraph.type = :olitems
       paragraph.prop = :i
       paragraph.olstart = to_arabic(match[1]) if match
@@ -54,21 +53,21 @@ module ClayText
     # The alphabetic version of ol
     /^\(([a-z])\) / => lambda do |paragraph, regex|
       match = paragraph.match regex
-      paragraph.gsub! regex, ""
+      paragraph.gsub! regex, ''
       paragraph.type = :olitems
       paragraph.prop = :a
-      paragraph.olstart = match[1].ord - "a".ord + 1 if match
+      paragraph.olstart = match[1].ord - 'a'.ord + 1 if match
     end,
 
     # Exercise blocks
     /^(\+|§) / => lambda do |paragraph, regex|
-      paragraph.gsub! regex, ""
+      paragraph.gsub! regex, ''
       paragraph.type = :exercise
     end,
 
     # Extending exercise blocks by indenting them
     /^- / => lambda do |paragraph, regex|
-      paragraph.gsub! regex, ""
+      paragraph.gsub! regex, ''
       paragraph.type = :indent
     end,
 
@@ -76,14 +75,14 @@ module ClayText
     # it is put into the :subheading type.
     /^(#+) / => lambda do |paragraph, regex|
       match = paragraph.match regex
-      paragraph.gsub! regex, ""
+      paragraph.gsub! regex, ''
       paragraph.type = :subheading
       paragraph.prop = match[1].length
       # See RFC 3986, reserved characters
       paragraph.bookmark = paragraph.downcase
-        .tr('!*\'();:@&=+$,/?#[]', "")
-        .gsub('\\', "").tr("{", "-").tr("}", "")
-        .tr(" ", "-")
+                                    .tr('!*\'();:@&=+$,/?#[]', '')
+                                    .gsub('\\', '').tr('{', '-').tr('}', '')
+                                    .tr(' ', '-')
     end,
 
     # Horizontal line, in a paragraph of its own
@@ -102,48 +101,49 @@ module ClayText
     # paragraph is marked as :footer.
     /^(\*|†|‡|§|¶) / => lambda do |paragraph, _|
       paragraph.type = :footer
-    end,
+    end
   }.freeze
 
   # Start and end markers, making it easy to write commutative diagrams
-  XYMATRIX_START = <<-'EOF'
-  \begin{xy}
-  \xymatrix{
+  XYMATRIX_START = <<-'EOF'.freeze
+    \begin{xy}
+    \xymatrix{
   EOF
-  XYMATRIX_END = <<-'EOF'
-  }
-  \end{xy}
+  XYMATRIX_END = <<-'EOF'.freeze
+    }
+    \end{xy}
   EOF
 
   PARAGRAPH_FENCED_TRANSFORMS = {
     [/\A\.\.\.$/, /^\.\.\.\z/] => ->(p, _, _) { p.type = :blurb },
-    [/\A```(\w*)$/, /^```\z/] => ->(p, fc, _) {
-      p.type = :codeblock; p.prop = if fc.captures[0].empty?
-          :nohighlight
-        else fc.captures[0]         end
+    [/\A```(\w*)$/, /^```\z/] => lambda { |p, fc, _|
+      p.type = :codeblock
+      p.prop = if fc.captures[0].empty?
+                 :nohighlight
+               else fc.captures[0] end
     },
-    [/\A<< (\d+)x(\d+)$/, /^>>\z/] => ->(p, fc, _) {
+    [/\A<< (\d+)x(\d+)$/, /^>>\z/] => lambda { |p, fc, _|
       p.type = :images
       dims = Struct.new(:width, :height)
       p.prop = dims.new(fc.captures[0], fc.captures[1])
       basepath = Dir.getwd + p.to_s
-      if p.to_s.split("\n").length == 1 and Dir.exist?(basepath)
-        p.replace Dir.glob("*.svg", base: basepath).sort_by { |e| e[..-4].to_i }
-                    .map { |e| p.to_s + e }.join("\n")
+      if (p.to_s.split("\n").length == 1) && Dir.exist?(basepath)
+        p.replace Dir.glob('*.svg', base: basepath).sort_by { |e| e[..-4].to_i }
+                     .map { |e| p.to_s + e }.join("\n")
       end
     },
 
     # MathJaX: put the markers back, since js needs it: $$ ... $$
     [/\A\$\$/, /\$\$\z/] => lambda do |p, _, _|
       p.type = :mathjax
-      p.replace ["$$", p.to_s, "$$"].join("\n")
+      p.replace ['$$', p.to_s, '$$'].join("\n")
     end,
 
     # Writing commutative diagrams using xypic: {{ ... }}
     [/\A\{\{$/, /^\}\}\z/] => lambda do |p, _, _|
       p.type = :mathjax
-      p.replace ["$$", XYMATRIX_START, p.to_s, XYMATRIX_END, "$$"].join("\n")
-    end,
+      p.replace ['$$', XYMATRIX_START, p.to_s, XYMATRIX_END, '$$'].join("\n")
+    end
   }.freeze
 
   # A paragraph of text
@@ -169,13 +169,15 @@ module ClayText
     mb = Struct.new(:block, :fc, :lc)
     matched_blocks = []
     arr.each_with_index do |p, pidx|
-      next if not fregex.match p
-      arr[pidx..-1].each_with_index do |q, idx|
+      next unless fregex.match p
+
+      arr[pidx..].each_with_index do |q, idx|
         qidx = pidx + idx # the real index
-        next if not lregex.match q
+        next unless lregex.match q
+
         # strip out the delims at the beginning and end
         matches = fregex.match(p), lregex.match(q)
-        p.replace(arr[pidx..qidx].join("\n\n")).sub!(fregex, "").sub!(lregex, "").strip!
+        p.replace(arr[pidx..qidx].join("\n\n")).sub!(fregex, '').sub!(lregex, '').strip!
         matched_blocks << mb.new(p, matches[0], matches[1])
         arr.slice! pidx + 1, idx
         break
@@ -214,15 +216,15 @@ module ClayText
     line_transforms! paragraphs
 
     # at the end of both sets of transforms, htmlescape everything but mathjax
-    paragraphs.select { |p| not(p.type == :mathjax) }.each do |p|
-      p.gsub! /[<>&]/, ClayText::HTMLESCAPE_RULES
+    paragraphs.reject { |p| p.type == :mathjax }.each do |p|
+      p.gsub! /[<>&]/, HTMLESCAPE_RULES
     end
 
     # Insert HTML breaks in :plain paragraphs
     paragraphs.filter { |p| p.type == :plain }.each { |p| p.gsub! /\n/, "<br/>\n" }
 
     # Insert <{mark, a}> in certain paragraph kinds
-    paragraphs.select { |p| [:plain, :olitems, :exercise, :footer, :blurb].count(p.type) > 0 }.each do |p|
+    paragraphs.select { |p| %i[plain olitems exercise footer blurb].count(p.type).positive? }.each do |p|
       p.gsub! /`([^`]+)`/, '<mark>\1</mark>'
       p.gsub! /\[([^\]]+)\]\(([^)]+)\)/, '<a href="\2">\1</a>'
     end

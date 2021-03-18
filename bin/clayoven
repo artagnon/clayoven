@@ -1,14 +1,14 @@
 #!/usr/bin/env ruby
 
-$:.unshift File.join(__dir__, *%w{ .. lib })
+$:.unshift File.join(__dir__, *%w[.. lib])
 
-require "clayoven"
+require 'clayoven'
 
 case ARGV[0]
-when "httpd"
+when 'httpd'
   Clayoven::Httpd.start
-when "aggressive"
-  Clayoven.main true
+when 'aggressive'
+  Clayoven.main(is_aggressive: true)
 else
   Clayoven.main
 end

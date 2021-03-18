@@ -1,33 +1,31 @@
-require "webrick"
-require "uri"
+require 'webrick'
+require 'uri'
 
-module Clayoven
-  module Httpd
-    def self.start
-      port = 8000
-      callback = proc do |req, res|
-
-        # A couple of URL rewriting rules.  Not real URL rewriting
-        # like .htaccess; just a HTTP redirect. / is rewritten to
-        # index.html, and anything-that-doesn't-end-in-.html/css/js is
-        # rewritten to that-thing.html.
-        if %r{^/$} =~ req.path_info
-          res.set_redirect WEBrick::HTTPStatus::Found, "index.html"
-        elsif %r{(?<uri>.*)/$} =~ req.path_info
-          res.set_redirect WEBrick::HTTPStatus::Found, "#{URI.parse(uri)}.html"
-        elsif %r{^(?<page>(?!.*[.](html|css|js|ico|png|jpg|pdf|svg)$).*$)} =~ req.path_info
-          res.set_redirect WEBrick::HTTPStatus::Found, "#{URI.parse(page)}.html"
-        end
+# Run a simple webrick http server to test on localhost:8000
+module Clayoven::Httpd
+  def self.start
+    port = 8000
+    callback = proc do |req, res|
+      # A couple of URL rewriting rules.  Not real URL rewriting
+      # like .htaccess; just a HTTP redirect. / is rewritten to
+      # index.html, and anything-that-doesn't-end-in-.html/css/js is
+      # rewritten to that-thing.html.
+      if %r{^/$} =~ req.path_info
+        res.set_redirect WEBrick::HTTPStatus::Found, 'index.html'
+      elsif %r{(?<uri>.*)/$} =~ req.path_info
+        res.set_redirect WEBrick::HTTPStatus::Found, "#{URI.parse(uri)}.html"
+      elsif /^?<page>(?!.*[.](html|css|js|ico|png|jpg|pdf|svg)$).*$/ =~ req.path_info
+        res.set_redirect WEBrick::HTTPStatus::Found, "#{URI.parse(page)}.html"
       end
-
-      server = WEBrick::HTTPServer.new(Port: port,
-                                       RequestCallback: callback,
-                                       DocumentRoot: Dir.pwd)
-
-      puts "clayoven serving at: http://localhost:#{port}"
-
-      trap(:INT) { server.shutdown }
-      server.start
     end
+
+    server = WEBrick::HTTPServer.new(Port: port,
+                                     RequestCallback: callback,
+                                     DocumentRoot: Dir.pwd)
+
+    puts "clayoven serving at: http://localhost:#{port}"
+
+    trap(:INT) { server.shutdown }
+    server.start
   end
 end

@@ -1,14 +1,15 @@
-module Git
+module Clayoven::Git
+  # Git metadata information for the clayoven repository
   class Info
     def initialize(tzmap)
       git_ns = `git diff --name-status @ 2>/dev/null`
       @tzmap = tzmap
       @untracked = `git ls-files --others --exclude-standard`.split "\n"
-      if not git_ns.empty?
+      if !git_ns.empty?
         git_index = git_ns.split("\n").map { |line| line.split("\t")[0..1] }
-        git_mod_index = git_index.select { |idx| idx.first == "M" }
-        @modified = git_mod_index.map &:last
-        @added = (git_index - git_mod_index).map &:last
+        git_mod_index = git_index.select { |idx| idx.first == 'M' }
+        @modified = git_mod_index.map(&:last)
+        @added = (git_index - git_mod_index).map(&:last)
       else
         @modified = []
         @added = []
@@ -19,17 +20,21 @@ module Git
     def added?(file) @added.any?(file) || @untracked.any?(file) end
     def any_added?(files) files.any? { |file| added? file } end
     def added_or_modified?(file) added?(file) || modified?(file) end
-    def template_changed?; modified?("design/template.slim") || modified?(".clayoven/hidden") || modified?(".clayoven/tz") end
-    def design_changed?; modified?("design/style.css") || modified?("design/script.js") end
+    def template_changed?
+      modified?('design/template.slim') || modified?('.clayoven/hidden') || modified?('.clayoven/tz')
+    end
+    def design_changed?; modified?('design/style.css') || modified?('design/script.js') end
 
     # Returns a #<Last updated date>|#<Creation date>|[#<Location string>]
     def metadata(file)
       dates = `git log --follow --format="%aD" --date=unix #{file} 2>/dev/null`.split("\n")
                                                                                .map { |d| Time.parse d }
-      locs = dates.map { |d| d.strftime("%z") }.map { |tz| @tzmap[tz] }.uniq
-      return Time.now, Time.now, locs if not dates.first
-      lastmod = added_or_modified?(file) ? Time.now : dates.first
-      return lastmod, dates.last, locs
+      locs = dates.map { |d| d.strftime('%z') }.map { |tz| @tzmap[tz] }.uniq
+      return Time.now, Time.now, locs unless dates.first
+
+      # Give the user 60 seconds to test and commit
+      lastmod = added_or_modified?(file) ? Time.now + 60 : dates.first
+      [lastmod, dates.last, locs]
     end
   end
 end

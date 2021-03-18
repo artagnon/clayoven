@@ -1,5 +1,5 @@
-module Config
-  SLIM_DEFAULT = <<-'EOF'
+module Clayoven::Config
+  SLIM_DEFAULT = <<-'EOF'.freeze
   doctype html
   html
     head
@@ -19,47 +19,46 @@ module Config
                 a href="/#{topic}" = topic
   EOF
 
-  INDEX_DEFAULT = <<-'EOF'
+  INDEX_DEFAULT = <<-'EOF'.freeze
   clayoven
 
   [README](https://github.com/artagnon/clayoven/blob/master/README.md) should have you covered.
   Enjoy using clayoven!
   EOF
 
-  TZ_DEFAULT = <<-'EOF'
+  TZ_DEFAULT = <<-'EOF'.freeze
   +0000 UTC
   EOF
 
-  SUBTOPIC_DEFAULT = <<-'EOF'
+  SUBTOPIC_DEFAULT = <<-'EOF'.freeze
   EOF
 
+  # The data from .clayoven/config
   class Data
     attr_accessor :sitename, :hidden, :tzmap, :stmap, :template
 
     # Creates file at path, if it doesn't exist, with template text
     def create_template(path, template)
-      components = path.split "/"
-      if components.length == 2
-        Dir.mkdir components[0] unless Dir.exists? components[0]
-      end
-      if File.exists?(path)
+      components = path.split '/'
+      Dir.mkdir components[0] if components.length == (2) && !(Dir.exist? components[0])
+      if File.exist?(path)
         IO.read(path).split "\n"
       else
-        File.open(path, "w") { |io| io.write template }
+        File.open(path, 'w') { |io| io.write template }
         [template]
       end
     end
 
     def initialize
-      @sitename = create_template(".clayoven/sitename", "clayoven.io").first
-      @hidden = create_template ".clayoven/hidden", ["404"].join("\n")
-      @tzmap = (create_template ".clayoven/tz", TZ_DEFAULT).map { |l| l.split(" ", 2) }.to_h
-      @stmap = (create_template ".clayoven/subtopic", SUBTOPIC_DEFAULT).map { |l| l.split(" ", 2) }.to_h
+      @sitename = create_template('.clayoven/sitename', 'clayoven.io').first
+      @hidden = create_template '.clayoven/hidden', ['404'].join("\n")
+      @tzmap = (create_template '.clayoven/tz', TZ_DEFAULT).map { |l| l.split(' ', 2) }.to_h
+      @stmap = (create_template '.clayoven/subtopic', SUBTOPIC_DEFAULT).map { |l| l.split(' ', 2) }.to_h
       @stmap.default_proc = proc do |h, k|
         h[k] = k
       end
-      @template = (create_template "design/template.slim", SLIM_DEFAULT).join "\n"
-      create_template "index.clay", INDEX_DEFAULT
+      @template = (create_template 'design/template.slim', SLIM_DEFAULT).join "\n"
+      create_template 'index.clay', INDEX_DEFAULT
     end
   end
 end
