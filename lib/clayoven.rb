@@ -170,20 +170,22 @@ module Clayoven
     genpages.each { |page| page.render topics, @config.template; progress.increment }
 
     # Process the generated HTML files using MathJaX
-    puts "[#{'TeX'.green}]: Rendering math"
     targets = genpages.map(&:target).join ' '
-    `npm run --silent jax -- #{targets}`
+    fork { exec "npm run --silent jax -- #{targets}" }
+    Process.waitall
   end
 
   def self.minify_design
     puts "[#{'NPM'.green}]: Minifying js and css"
-    `npm run --silent minify`
+    fork { exec 'npm run --silent minify' }
+    Process.waitall
   end
 
   def self.generate_sitemap(all_pages)
     puts "[#{'XML'.green}]: Generating sitemap"
     SitemapGenerator.verbose = false
     SitemapGenerator::Sitemap.include_root = false
+    SitemapGenerator::Sitemap.compress = false
     SitemapGenerator::Sitemap.default_host = "https://#{@config.sitename}"
     SitemapGenerator::Sitemap.public_path = '.'
     SitemapGenerator::Sitemap.create do
