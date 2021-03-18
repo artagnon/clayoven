@@ -1,5 +1,9 @@
 AllCops:
   TargetRubyVersion: 3.0.0
+FileName:
+  Exclude:
+    - Rakefile
+    - Gemfile
 Style/FrozenStringLiteralComment:
   Enabled: false
 Style/SingleLineMethods:

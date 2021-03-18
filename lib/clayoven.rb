@@ -1,5 +1,6 @@
 require 'slim'
 require 'colorize'
+require 'fileutils'
 require 'progressbar'
 require 'sitemap_generator'
 
@@ -178,7 +179,7 @@ module Clayoven
       .reject { |file| all_topics.include? file.split('/').first }
       .each do |stray|
       content_files -= [stray]
-      puts "[#{'WARN'.orange} ]: #{stray} is a stray file or directory; ignored"
+      puts "[#{'WARN'.yellow} ]: #{stray} is a stray file or directory; ignored"
     end
 
     [index_files, content_files, topics]
@@ -222,7 +223,7 @@ module Clayoven
   def self.main(is_aggressive: false)
     # Only operate on git repositories
     toplevel = `git rev-parse --show-toplevel`.strip
-    abort "[#{'ERR'.red} ] Not a clayoven project" if toplevel.empty? || (!File.directory? "#{toplevel}/.clayoven")
+    abort "[#{'ERR'.red} ]: Not a clayoven project" if toplevel.empty? || (!File.directory? "#{toplevel}/.clayoven")
     Dir.chdir(toplevel) do
       # Write out template files, if necessary
       @config = Config::Data.new

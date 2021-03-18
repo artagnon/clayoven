@@ -1,36 +1,13 @@
 module Clayoven::Config
-  SLIM_DEFAULT = <<-'EOF'.freeze
-  doctype html
-  html
-    head
-      title clayoven: #{permalink}
-    body
-      div id="main"
-        h1 = title
-        time = crdate.strftime("%F")
-        - paragraphs.each do |paragraph|
-          - if paragraph.type == :plain
-            = paragraph.to_s
-      div id="sidebar"
-        ul
-          - if topics
-            - topics.each do |topic|
-              li
-                a href="/#{topic}" = topic
-  EOF
-
-  INDEX_DEFAULT = <<-'EOF'.freeze
-  clayoven
-
-  [README](https://github.com/artagnon/clayoven/blob/master/README.md) should have you covered.
-  Enjoy using clayoven!
-  EOF
-
   TZ_DEFAULT = <<-'EOF'.freeze
   +0000 UTC
   EOF
 
   SUBTOPIC_DEFAULT = <<-'EOF'.freeze
+  [dirname] [displayalias]
+  EOF
+
+  SLIM_DEFAULT = <<-'EOF'.freeze
   EOF
 
   # The data from .clayoven/config
@@ -51,14 +28,11 @@ module Clayoven::Config
 
     def initialize
       @sitename = create_template('.clayoven/sitename', 'clayoven.io').first
-      @hidden = create_template '.clayoven/hidden', ['404'].join("\n")
+      @hidden = create_template '.clayoven/hidden', %w[404 scratch].join("\n")
       @tzmap = (create_template '.clayoven/tz', TZ_DEFAULT).map { |l| l.split(' ', 2) }.to_h
       @stmap = (create_template '.clayoven/subtopic', SUBTOPIC_DEFAULT).map { |l| l.split(' ', 2) }.to_h
-      @stmap.default_proc = proc do |h, k|
-        h[k] = k
-      end
+      @stmap.default_proc = proc { |h, k| h[k] = k }
       @template = (create_template 'design/template.slim', SLIM_DEFAULT).join "\n"
-      create_template 'index.clay', INDEX_DEFAULT
     end
   end
 end

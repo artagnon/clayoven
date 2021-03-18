@@ -73,8 +73,8 @@ module Clayoven::Claytext
   def self.process_inline_markdown(paragraphs)
     # Insert <{mark, a}> in certain paragraph kinds
     paragraphs.select { |p| %i[plain olitems exercise footer blurb].count(p.type).positive? }.each do |p|
-      p.gsub! /`([^`]+)`/, '<mark>\1</mark>'
-      p.gsub! /\[([^\]]+)\]\(([^)]+)\)/, '<a href="\2">\1</a>'
+      p.gsub!(/`([^`]+)`/, '<mark>\1</mark>')
+      p.gsub!(/\[([^\]]+)\]\(([^)]+)\)/, '<a href="\2">\1</a>')
     end
     paragraphs
   end
@@ -93,11 +93,11 @@ module Clayoven::Claytext
 
     # at the end of both sets of transforms, htmlescape everything but mathjax
     paragraphs.reject { |p| p.type == :mathjax }.each do |p|
-      p.gsub! /[<>&]/, HTMLESCAPE_RULES
+      p.gsub!(/[<>&]/, HTMLESCAPE_RULES)
     end
 
     # Insert HTML breaks in :plain paragraphs
-    paragraphs.filter { |p| p.type == :plain }.each { |p| p.gsub! /\n/, "<br/>\n" }
+    paragraphs.filter { |p| p.type == :plain }.each { |p| p.gsub!(/\n/, "<br/>\n") }
 
     # Process `...` and `[...](...)`
     process_inline_markdown paragraphs

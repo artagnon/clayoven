@@ -18,6 +18,18 @@ module Clayoven::Util
     fork { exec "npm run --silent jax -- #{htmlfiles}" }
     Process.waitall
   end
+
+  def self.init(destdir = '.')
+    puts "[#{'INIT'.yellow}]: Populating directory with clayoven starter project"
+    FileUtils.mkdir_p "#{destdir}/.clayoven"
+    FileUtils.cd destdir
+    FileUtils.cp_r "#{File.join(__dir__, *%w[.. .. dist])}/.", '.'
+    `git init 2>/dev/null`
+    fork { exec 'npm i >/dev/null' }
+    Process.waitall
+    Clayoven.main
+    puts "[#{'INIT'.green}]: Initialization finished. Run `clayoven httpd` to see your website"
+  end
 end
 
 # Utilities for ClayText

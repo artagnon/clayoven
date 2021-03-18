@@ -1,0 +1,45 @@
+claytext demo
+
+...
+This page serves to demonstrate the capabilities of the clayoven engine
+...
+
+$$
+  \Pi_{A : \mathscr{U}} \Pi_{x, y, z : A} (x = y) \rightarrow (y = z) \rightarrow (x = z)
+$$
+
+# Functors
+
+```coq
+Definition ap {A B : Type} (f : A -> B) {x y : A} (p : x = y) : f x = f y
+  := match p with idpath => idpath end.
+```
+
+```cpp
+template <size_t i, typename... Ts, typename CurTy>
+void recurseFillChildren(CurTy &E)
+{
+  using PackTy = std::variant<Ts...>;
+  using TyL = std::variant_alternative_t<i - 1, PackTy>;
+  static_assert(std::is_same_v<CurTy, TyL>);
+  using TyR = std::variant_alternative_t<i, PackTy>;
+
+  for (i32 j = 0; j < E.NChildren; ++j)
+  {
+    E.Children.push_back(miniParser<TyR>());
+    if constexpr (i + 1 < sizeof...(Ts))
+      recurseFillChildren<i + 1, Ts...>(E.Children.back());
+  }
+};
+```
+
+<< 317x390
+/dist/artagnon.com.svg
+>>
+
+(iii) $A/\mathfrak{N}$ is a field.
+
+(a) The Split dominates the Merge, in which case, the Split dominates everything on its outEdges leading to the Merge.
+
+† Thanks to [Chaitanya Leena Subramanium](https://sites.google.com/view/chaitanyals) for suggesting the exercises and pushing for the use of natural deductions in the last exercise.
+‡ Thanks to [Hugo Herbelin](http://pauillac.inria.fr/~herbelin/) for patiently going through many proofs and pointing out the errors.

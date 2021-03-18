@@ -1,0 +1,18 @@
+doctype html
+html lang="en"
+  head
+    title clayoven: #{permalink}
+    meta charset="utf-8"
+  body
+    div id="main"
+      h1 = title
+      time = crdate.strftime("%F")
+      - paragraphs.each do |paragraph|
+        - if paragraph.type == :plain
+          p == paragraph.to_s
+    div id="sidebar"
+      ul
+        - if topics
+          - topics.each do |topic|
+            li
+              a href="/#{topic}" = topic

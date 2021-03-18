@@ -9,6 +9,9 @@ when 'httpd'
   Clayoven::Httpd.start
 when 'aggressive'
   Clayoven.main(is_aggressive: true)
+when 'init'
+  destdir = ARGV.length > 1 ? ARGV[1] : '.'
+  Clayoven::Util.init destdir
 else
   Clayoven.main
 end
