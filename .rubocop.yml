@@ -21,4 +21,4 @@ Metrics/CyclomaticComplexity:
 Metrics/MethodLength:
   Max: 16
 Metrics/ModuleLength:
-  Max: 180
+  Max: 120
