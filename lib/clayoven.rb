@@ -84,7 +84,14 @@ module Clayoven
     end
   end
 
-  def self.dirty_pages_from_mod(index_files, content_files)
+  def self.dirty_pages_from_add(index_files, content_files, git)
+    # An index_file that is added (or deleted) should mark all index_files as dirty
+    dirty_index_pages = index_files.map { |filename| IndexPage.new filename, git }
+    dirty_content_pages = content_files.map { |filename| ContentPage.new filename, git }
+    [dirty_index_pages, dirty_content_pages, git]
+  end
+
+  def self.dirty_pages_from_mod(index_files, content_files, git)
     # Find out the dirty content_pages
     dirty_content_pages = content_files
                           .select { |filename| git.added_or_modified? filename }
@@ -98,22 +105,18 @@ module Clayoven
     dirty_index_pages += index_files
                          .select { |filename| git.modified? filename }
                          .map { |filename| IndexPage.new filename, git }
-    [dirty_index_pages, dirty_content_pages]
+    [dirty_index_pages, dirty_content_pages, git]
   end
 
   def self.dirty_pages(index_files, content_files, is_aggressive)
     # Check the git index exactly once to determine dirty files
     git = Git::Info.new @config.tzmap
 
-    # An index_file that is added (or deleted) should mark all index_files as dirty
     if git.any_added?(index_files) || git.template_changed? || is_aggressive
-      dirty_index_pages = index_files.map { |filename| IndexPage.new filename, git }
-      dirty_content_pages = content_files.map { |filename| ContentPage.new filename, git }
+      dirty_pages_from_add(index_files, content_files, git)
     else
-      dirty_index_pages, dirty_content_pages = dirty_pages_from_mod(index_files, content_files)
+      dirty_pages_from_mod(index_files, content_files, git)
     end
-
-    [dirty_index_pages, dirty_content_pages, git]
   end
 
   def self.unhidden_content_files(content_files)
@@ -138,16 +141,6 @@ module Clayoven
       dip.fillindex content_pages, @config.stmap
     end
     [dirty_index_pages + dirty_content_pages, git]
-  end
-
-  def self.generate_sitemap(all_pages)
-    SitemapGenerator::Sitemap.default_host = "https://#{@config.sitename}"
-    SitemapGenerator::Sitemap.public_path = '.'
-    SitemapGenerator::Sitemap.create do
-      all_pages.each do |page|
-        add page.permalink, lastmod: page.lastmod
-      end
-    end
   end
 
   def self.index_content_files(all_files)
@@ -187,13 +180,31 @@ module Clayoven
     `npm run --silent minify`
   end
 
+  def self.generate_sitemap(all_pages)
+    puts "[#{'XML'.green}]: Generating sitemap"
+    SitemapGenerator.verbose = false
+    SitemapGenerator::Sitemap.include_root = false
+    SitemapGenerator::Sitemap.default_host = "https://#{@config.sitename}"
+    SitemapGenerator::Sitemap.public_path = '.'
+    SitemapGenerator::Sitemap.create do
+      add '/', lastmod: all_pages.select { |p|
+                          p.instance_of? IndexPage
+                        }.map(&:lastmod).max, priority: 1.0, changefreq: 'always'
+      all_pages.each do |page|
+        add page.permalink, lastmod: page.lastmod
+      end
+    end
+  end
+
   def self.generate_site(genpages, topics, is_aggressive)
     # Generate the HTML
     generate_html genpages, topics if genpages.any?
 
-    # Finally, minify the design, and regenerate the sitemap
+    # Minify the design
     minify_design if @git.design_changed? || is_aggressive
-    generate_sitemap genpages if is_aggressive
+
+    # Regenerate the sitemap
+    generate_sitemap genpages if is_aggressive || genpages.any?
   end
 
   def self.main(is_aggressive: false)
