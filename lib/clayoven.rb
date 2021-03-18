@@ -84,38 +84,43 @@ module Clayoven
     end
   end
 
-  def self.dirty_pages_from_add(index_files, content_files, git)
-    # An index_file that is added (or deleted) should mark all index_files as dirty
-    dirty_index_pages = index_files.map { |filename| IndexPage.new filename, git }
-    dirty_content_pages = content_files.map { |filename| ContentPage.new filename, git }
-    [dirty_index_pages, dirty_content_pages, git]
+  def self.dirty_pages_from_add(index_files, content_files)
+    progress = ProgressBar.create(title: "[#{'GIT'.green} ]", total: index_files.count + content_files.count)
+
+    # Strightforward
+    dirty_index_pages = index_files.map { |filename| progress.increment; IndexPage.new filename, @git }
+    dirty_content_pages = content_files.map { |filename| progress.increment; ContentPage.new filename, @git }
+    [dirty_index_pages, dirty_content_pages]
   end
 
-  def self.dirty_pages_from_mod(index_files, content_files, git)
+  # Find the modified index_files and content_files from the git index
+  def self.modified_files_from_gitidx(index_files, content_files)
+    [index_files.select { |f| @git.modified? f }, content_files.select { |f| @git.added_or_modified? f }]
+  end
+
+  def self.dirty_pages_from_mod(index_files, content_files)
+    # Create a progressbar based on information from the git index
+    modified_index_files, modified_content_files = modified_files_from_gitidx(index_files, content_files)
+    progress = ProgressBar.create(title: "[#{'GIT'.green} ]",
+                                  total: modified_index_files.count * 2 + modified_content_files.count)
+
     # Find out the dirty content_pages
-    dirty_content_pages = content_files
-                          .select { |filename| git.added_or_modified? filename }
-                          .map { |filename| ContentPage.new filename, git }
+    dirty_content_pages = modified_content_files.map { |filename| progress.increment; ContentPage.new filename, @git }
 
     # First, see which index_pages are forced dirty by corresponding content_pages;
     # then, add to the list the ones that are dirty by themselves; avoid adding the
     # index page twice when there are two dirty content_pages under the same index
     dirty_index_pages = dirty_content_pages.map { |dcp| "#{dcp.topic}.index.clay" }.uniq
-                                           .map { |dif| IndexPage.new dif, git }
-    dirty_index_pages += index_files
-                         .select { |filename| git.modified? filename }
-                         .map { |filename| IndexPage.new filename, git }
-    [dirty_index_pages, dirty_content_pages, git]
+                                           .map { |dif| progress.increment; IndexPage.new dif, @git }
+    dirty_index_pages += modified_index_files.map { |filename| progress.increment; IndexPage.new filename, @git }
+    [dirty_index_pages, dirty_content_pages]
   end
 
   def self.dirty_pages(index_files, content_files, is_aggressive)
-    # Check the git index exactly once to determine dirty files
-    git = Git::Info.new @config.tzmap
-
-    if git.any_added?(index_files) || git.template_changed? || is_aggressive
-      dirty_pages_from_add(index_files, content_files, git)
+    if @git.any_added?(index_files) || @git.template_changed? || is_aggressive
+      dirty_pages_from_add(index_files, content_files)
     else
-      dirty_pages_from_mod(index_files, content_files, git)
+      dirty_pages_from_mod(index_files, content_files)
     end
   end
 
@@ -129,36 +134,46 @@ module Clayoven
   # content_files and index_files, because converting them to Page
   # objects prematurely will result in unnecessary log --follows
   def self.pages_to_regenerate(index_files, content_files, is_aggressive)
-    puts "[#{'GIT'.green}]:  Digging the git object store"
-    dirty_index_pages, dirty_content_pages, git = dirty_pages index_files, content_files, is_aggressive
+    dirty_index_pages, dirty_content_pages = dirty_pages index_files, content_files, is_aggressive
 
     # Now, set the indexfill for index_pages by looking at all the content_files
     # corresponding to a dirty index_page.
     # Additionally, reject hidden content_files from the corresponding indexfill
     dirty_index_pages.each do |dip|
       content_pages = unhidden_content_files(content_files).select { |cf| cf.split('/', 2).first == dip.permalink }
-                                                           .map { |cf| ContentPage.new cf, git }
+                                                           .map { |cf| ContentPage.new cf, @git }
       dip.fillindex content_pages, @config.stmap
     end
-    [dirty_index_pages + dirty_content_pages, git]
+    dirty_index_pages + dirty_content_pages
   end
 
-  def self.index_content_files(all_files)
-    # index_files are files ending in '.index.clay' and 'index.clay'
-    # content_files are all other files; topics is the list of topics: we need it for the sidebar
-    index_files = ['index.clay'] + all_files.select { |file| /\.index\.clay$/ =~ file }
-    content_files = all_files - index_files
+  def self.find_topics(index_files)
     all_topics = Util.lex_sort(index_files).map { |file| file.split('.index.clay').first }
     topics = all_topics.reject do |entry|
       @config.hidden.any? { |hidden_entry| hidden_entry == entry }
     end
+    [all_topics, topics]
+  end
+
+  def self.separate_index_content_files(all_files)
+    # index_files are files ending in '.index.clay' and 'index.clay'
+    # content_files are all other files; topics is the list of topics: we need it for the sidebar
+    index_files = ['index.clay'] + all_files.select { |file| /\.index\.clay$/ =~ file }
+    [index_files, all_files - index_files]
+  end
+
+  def self.index_content_files(all_files)
+    index_files, content_files = separate_index_content_files all_files
+    all_topics, topics = find_topics index_files
 
     # Look for stray files.  All content_files are nested within directories
+    # We look in all_topics, because we still want hidden content_files to be
+    # generated, just not shown
     content_files
       .reject { |file| all_topics.include? file.split('/').first }
       .each do |stray|
       content_files -= [stray]
-      puts "[#{'WARN'.red}] #{stray} is a stray file or directory; ignored"
+      puts "[#{'WARN'.orange} ]: #{stray} is a stray file or directory; ignored"
     end
 
     [index_files, content_files, topics]
@@ -176,13 +191,13 @@ module Clayoven
   end
 
   def self.minify_design
-    puts "[#{'NPM'.green}]:  Minifying js and css"
+    puts "[#{'NPM'.green} ]: Minifying js and css"
     fork { exec 'npm run --silent minify' }
     Process.waitall
   end
 
   def self.generate_sitemap(all_pages)
-    puts "[#{'XML'.green}]:  Generating sitemap"
+    puts "[#{'XML'.green} ]: Generating sitemap"
     SitemapGenerator.verbose = false
     SitemapGenerator::Sitemap.include_root = false
     SitemapGenerator::Sitemap.compress = false
@@ -212,10 +227,13 @@ module Clayoven
   def self.main(is_aggressive: false)
     # Only operate on git repositories
     toplevel = `git rev-parse --show-toplevel`.strip
-    abort "[#{'ERR'.red}] Not a clayoven project" if toplevel.empty? || (!File.directory? "#{toplevel}/.clayoven")
+    abort "[#{'ERR'.red} ] Not a clayoven project" if toplevel.empty? || (!File.directory? "#{toplevel}/.clayoven")
     Dir.chdir(toplevel) do
       # Write out template files, if necessary
       @config = Config::Data.new
+
+      # Initialize git
+      @git = Git::Info.new @config.tzmap
 
       # Collect the list of files from a directory listing
       all_files = Util.ls_files
@@ -224,10 +242,12 @@ module Clayoven
       index_files, content_files, topics = index_content_files all_files
 
       # Get a list of pages to regenerate
-      genpages, @git = pages_to_regenerate index_files, content_files, is_aggressive
+      genpages = pages_to_regenerate index_files, content_files, is_aggressive
+
+      # If the template changes, we're definitely in aggressive mode
+      is_aggressive ||= @git.template_changed?
 
       # Generate the entire site
-      is_aggressive = true if @git.template_changed?
       generate_site genpages, topics, is_aggressive if genpages.any?
     end
   end
