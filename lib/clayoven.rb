@@ -129,7 +129,7 @@ module Clayoven
   # content_files and index_files, because converting them to Page
   # objects prematurely will result in unnecessary log --follows
   def self.pages_to_regenerate(index_files, content_files, is_aggressive)
-    puts "[#{'GIT'.green}]: Digging the git object store"
+    puts "[#{'GIT'.green}]:  Digging the git object store"
     dirty_index_pages, dirty_content_pages, git = dirty_pages index_files, content_files, is_aggressive
 
     # Now, set the indexfill for index_pages by looking at all the content_files
@@ -166,7 +166,7 @@ module Clayoven
 
   # Process with claytext first, and produce HTML files, to be consumed by MathJaX
   def self.generate_html(genpages, topics)
-    progress = ProgressBar.create(title: "[#{'HTML'.green}]", total: genpages.length)
+    progress = ProgressBar.create(title: "[#{'CLAY'.green}]", total: genpages.length)
     genpages.each { |page| page.render topics, @config.template; progress.increment }
 
     # Process the generated HTML files using MathJaX
@@ -176,13 +176,13 @@ module Clayoven
   end
 
   def self.minify_design
-    puts "[#{'NPM'.green}]: Minifying js and css"
+    puts "[#{'NPM'.green}]:  Minifying js and css"
     fork { exec 'npm run --silent minify' }
     Process.waitall
   end
 
   def self.generate_sitemap(all_pages)
-    puts "[#{'XML'.green}]: Generating sitemap"
+    puts "[#{'XML'.green}]:  Generating sitemap"
     SitemapGenerator.verbose = false
     SitemapGenerator::Sitemap.include_root = false
     SitemapGenerator::Sitemap.compress = false
@@ -206,7 +206,7 @@ module Clayoven
     minify_design if @git.design_changed? || is_aggressive
 
     # Regenerate the sitemap
-    generate_sitemap genpages if is_aggressive || genpages.any?
+    generate_sitemap genpages if is_aggressive
   end
 
   def self.main(is_aggressive: false)
