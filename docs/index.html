@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+
+<html>
+<head>
+<meta charset="UTF-8">
+
+<title>clayoven documentation</title>
+
+<script type="text/javascript">
+  var rdoc_rel_prefix = "./";
+  var index_rel_prefix = "./";
+</script>
+
+<script src="./js/navigation.js" defer></script>
+<script src="./js/search.js" defer></script>
+<script src="./js/search_index.js" defer></script>
+<script src="./js/searcher.js" defer></script>
+<script src="./js/darkfish.js" defer></script>
+
+<link href="./css/fonts.css" rel="stylesheet">
+<link href="./css/rdoc.css" rel="stylesheet">
+
+
+<body id="top" role="document" class="file">
+<nav role="navigation">
+  <div id="project-navigation">
+    <div id="home-section" role="region" title="Quick navigation" class="nav-section">
+  <h2>
+    <a href="./index.html" rel="home">Home</a>
+  </h2>
+
+  <div id="table-of-contents-navigation">
+    <a href="./table_of_contents.html#pages">Pages</a>
+    <a href="./table_of_contents.html#classes">Classes</a>
+    <a href="./table_of_contents.html#methods">Methods</a>
+  </div>
+</div>
+
+
+    <div id="search-section" role="search" class="project-section initially-hidden">
+  <form action="#" method="get" accept-charset="utf-8">
+    <div id="search-field-wrapper">
+      <input id="search-field" role="combobox" aria-label="Search"
+             aria-autocomplete="list" aria-controls="search-results"
+             type="text" name="search" placeholder="Search (/) for a class, method, ..." spellcheck="false"
+             title="Type to search, Up and Down to navigate, Enter to load">
+    </div>
+
+    <ul id="search-results" aria-label="Search Results"
+        aria-busy="false" aria-expanded="false"
+        aria-atomic="false" class="initially-hidden"></ul>
+  </form>
+</div>
+
+  </div>
+
+  <div id="project-metadata">
+    
+<div id="fileindex-section" class="nav-section">
+  <h3>Pages</h3>
+
+  <ul class="link-list">
+    <li><a href="./LICENSE.html">LICENSE</a>
+    <li><a href="./README_md.html">README</a>
+  </ul>
+</div>
+
+    <div id="classindex-section" class="nav-section">
+  <h3>Class and Module Index</h3>
+
+  <ul class="link-list">
+  <li><details open><summary><code><a href="./Clayoven.html">Clayoven</a></code></summary>
+  <ul class="link-list">
+  <li><details><summary><code><a href="./Clayoven/Claytext.html">Claytext</a></code></summary>
+  <ul class="link-list">
+  <li><code><a href="./Clayoven/Claytext/Paragraph.html">Paragraph</a></code>
+  <li><details><summary><code><a href="./Clayoven/Claytext/Transforms.html">Transforms</a></code></summary>
+  <ul class="link-list">
+  <li><code><a href="./Clayoven/Claytext/Transforms/Util.html">Util</a></code>
+  </ul></details>
+  <li><code><a href="./Clayoven/Claytext/Util.html">Util</a></code>
+  </ul></details>
+  <li><code><a href="./Clayoven/Config.html">Config</a></code>
+  <li><code><a href="./Clayoven/Git.html">Git</a></code>
+  <li><code><a href="./Clayoven/Httpd.html">Httpd</a></code>
+  <li><code><a href="./Clayoven/Init.html">Init</a></code>
+  <li><details><summary><code><a href="./Clayoven/Toplevel.html">Toplevel</a></code></summary>
+  <ul class="link-list">
+  <li><code><a href="./Clayoven/Toplevel/ContentPage.html">ContentPage</a></code>
+  <li><code><a href="./Clayoven/Toplevel/IndexPage.html">IndexPage</a></code>
+  <li><code><a href="./Clayoven/Toplevel/Page.html">Page</a></code>
+  <li><code><a href="./Clayoven/Toplevel/Util.html">Util</a></code>
+  </ul></details>
+  </ul></details>
+</div>
+
+  </div>
+</nav>
+
+<main role="main">
+
+
+<h1 id="label-clayoven+rdoc-image-3Aassets-2Fclayoven.png">clayoven <img src="assets/clayoven.png"><span><a href="#label-clayoven+rdoc-image-3Aassets-2Fclayoven.png">&para;</a> <a href="#top">&uarr;</a></span></h1>
+
+<p><a href="https://codeclimate.com/github/artagnon/clayoven/maintainability"><img src="https://img.shields.io/codeclimate/maintainability/artagnon/clayoven?style=for-the-badge&amp;logo=code-climate&amp;labelColor=000000&amp;label=Maintainability"></a> <a href="https://codeclimate.com/github/artagnon/clayoven/test_coverage"><img src="https://img.shields.io/codeclimate/coverage/artagnon/clayoven?style=for-the-badge&amp;logo=code-climate&amp;labelColor=000000&amp;label=Test%20Coverage"></a></p>
+
+<p>clayoven is a beautiful static site generator with a carefully curated set of features. It has been built at a glacial pace, over a period of <a href="https://github.com/artagnon/clayoven/commit/d4d40161e9f76dbe74078c669de9af698cf621d6">nine years</a>, as <a href="https://artagnon.com">my website</a> expanded in content. I have a spread of mathematical notes, both typeset and handwritten, software-related posts, and some wider-audience articles; while clayoven is primarily aimed at math-heavy sites, it is good on all three fronts. The source files are written in “claytext”, a custom format built for elegance and speed.</p>
+
+<p>rdoc documentation is available <a href="http://artagnon.github.io/clayoven/">here</a>.</p>
+
+<h2 id="label-Unique+features">Unique features<span><a href="#label-Unique+features">&para;</a> <a href="#top">&uarr;</a></span></h2>
+<ul><li>
+<p>Small! ~700 lines of well-written and well-documented Ruby.</p>
+</li><li>
+<p>Beautiful and easily extensible markup, with a dedicated vscode plugin for it.</p>
+</li><li>
+<p>Automatically picks timestamps from git history, respecting moves.</p>
+</li><li>
+<p>Server-side rendering of math, including commutative diagrams, via MathJaX and XyJaX.</p>
+</li></ul>
+
+<h2 id="label-Demo">Demo<span><a href="#label-Demo">&para;</a> <a href="#top">&uarr;</a></span></h2>
+
+<p>A starter project is bundled with the following <code>scratch.index.clay</code>:</p>
+
+<p><img src="https://user-images.githubusercontent.com/37226/113478818-91a7f280-948b-11eb-87f0-3610f2aa3160.png"></p>
+
+<p>whose rendered output can be seen <a href="https://artagnon.com/scratch">here</a>.</p>
+
+<p>Here’s an excerpt of embedded MathJaX with IntelliSense powered by vsclay:</p>
+
+<p><img src="https://user-images.githubusercontent.com/37226/113474233-24866400-946f-11eb-8e72-b82460d16c71.mp4"></p>
+
+<h2 id="label-Getting+started">Getting started<span><a href="#label-Getting+started">&para;</a> <a href="#top">&uarr;</a></span></h2>
+
+<p>There is no published gem. To get started, clone, run <code>bundle</code> to install the required gems, and put <code>bin/clayoven</code> in <code>$PATH</code>. Then, run <code>clayoven init</code> in a fresh directory. To start writing, install <a href="https://marketplace.visualstudio.com/items?itemName=artagnon.vsclay">vsclay</a> for vscode, which will provide the necessary syntax highlighting, IntelliSense support for MathJaX, and trigger-[incremental build]-on-save functionality.</p>
+
+<h2 id="label-The+site-generation+engine">The site-generation engine<span><a href="#label-The+site-generation+engine">&para;</a> <a href="#top">&uarr;</a></span></h2>
+
+<p>All site content is split up into “topics”, to put in the sidebar, each of which can either serve as an index to a collection of <code>ContentPages</code> (as a bunch of <code>.clay</code> files in a subdirectory with the name <code>#{topic}</code>), or a single <code>IndexPage</code> (named <code>#{topic}.index.clay</code>). <code>index.clay</code> is special-cased to serve as the root of the site.</p>
+
+<p>So, if you have these files,</p>
+
+<pre>.vscode/...             # provided by `init`
+.htaccess               # provided by `init`
+lib/...                 # provided by `init`
+design/                 # provided by `init`
+index.clay              # provided by `init`
+scratch.index.clay      # provided by `init`
+404.index.clay          # provided by `init`
+blog.index.clay
+blog/personal/1.clay
+blog/math/1.clay
+colophon.index.clay</pre>
+
+<p>clayoven automatically builds a sidebar with <code>index</code>, <code>blog</code> and <code>colophon</code> (each of which are instances of <code>IndexPage</code>). <code>/blog</code> will have links to the posts <code>/blog/personal/1</code> and <code>/blog/math/1</code> (each of which are instances of <code>ContentPage</code>), under the titles <code>personal</code> and <code>math</code> (the “subtopics”). If there are multiple <code>ContentPage</code> entries under an <code>IndexPage</code>, the latter simply serves to give a introduction, with links to articles automatically appearing after the introduction. <code>IndexPage</code> and <code>ContentPage</code> are run through the same <code>design/template.slim</code>, and the template file has access to the accessors.</p>
+
+<p>The engine works closely with the git object store, and builds are incremental by default; it mostly Just Works, and when it doesn’t, there’s an option to force a full rebuild. The engine also pulls out the created-timestamp (<code>Page#crdate</code>) and last-modified-timestamp (<code>Page#lastmod</code>) from git, respecting moves. <code>ContentPages</code> are sorted by <code>crdate</code>, reverse-chronologically, and <code>IndexPages</code> are sorted alphabetically.</p>
+
+<h2 id="label-Usage">Usage<span><a href="#label-Usage">&para;</a> <a href="#top">&uarr;</a></span></h2>
+<ul><li>
+<p><code>clayoven init</code> to generate the necessary starter project.</p>
+</li><li>
+<p><code>clayoven</code> to generate HTML files incrementally based on the current git index.</p>
+</li><li>
+<p><code>clayoven aggressive</code> to regenerate the entire site; only requires to be run on occassion.</p>
+</li><li>
+<p><code>clayoven httpd</code> to preview your website locally.</p>
+</li></ul>
+
+<h2 id="label-Configuration">Configuration<span><a href="#label-Configuration">&para;</a> <a href="#top">&uarr;</a></span></h2>
+<ol><li>
+<p><code>.clayoven/sitename</code> is URL of the site, excluding the <code>https://</code> prefix.</p>
+</li><li>
+<p><code>.clayoven/hidden</code> is a list of <code>IndexFiles</code> that should be built, but not displayed in the sidebar. You would want to use it for your 404 page and drafts.</p>
+</li><li>
+<p><code>.clayoven/tz</code> is a timezone-to-location mapper, with lines of the form <code>+0000 London</code>. clayoven digs through the git history for locations, and exposes a <code>Page#locations</code>.</p>
+</li><li>
+<p><code>.clayoven/subtopic</code> is a [subtopic directory]-to-subtitle mapper, with lines of the form <code>inf ∞-categories</code>.</p>
+</li></ol>
+
+<h2 id="label-The+claytext+processor">The claytext processor<span><a href="#label-The+claytext+processor">&para;</a> <a href="#top">&uarr;</a></span></h2>
+
+<p>The claytext processor is, at its core, a paragraph-processor; all content must be split up into either plain paragraphs, or “fences” (multiple paragraphs delimited by start and end tokens). The function of most markers should be evident from the <code>scratch.html</code> produced by a <code>clayoven init</code>. The format is strict, and the processor doesn’t like files with paragraphs wrapped using hard line breaks.</p>
+
+<p><code>Clayoven::Claytext::Transforms::LINE</code> matches paragraphs where all lines begin with some regex, and <code>Clayoven::Claytext::Transforms::Fenced</code> match fences (could be multiple paragraphs) that start and end with the specified tokens. In addition to this, there are inline markdown markers <code>`...`</code> and <code>[...](...)</code>, for content that is to be put in <code>&lt;mark&gt;</code> and <code>&lt;a&gt;</code>, respectively.</p>
+
+<h2 id="label-Tips">Tips<span><a href="#label-Tips">&para;</a> <a href="#top">&uarr;</a></span></h2>
+<ul><li>
+<p>Check in the generated HTML to the site’s repository, so that eyeballing <code>git diff</code> can serve as a testing mechanism.</p>
+</li><li>
+<p>If you accidentally commit <code>.clay</code> files before running clayoven, running it afterward will do nothing, since it will see a clean git index; you’ll need to run the aggressive variant.</p>
+</li><li>
+<p>Importing historical content is easy; a <code>git commit --date=&quot;#{historical_date}&quot;</code> would give the post an appropriate creation date that will be respected in the sorting-order.</p>
+</li></ul>
+
+<h2 id="label-Planned+features-2C+and+anti-features">Planned features, and anti-features<span><a href="#label-Planned+features-2C+and+anti-features">&para;</a> <a href="#top">&uarr;</a></span></h2>
+<ul><li>
+<p>Have one unified dhall configuration.</p>
+</li><li>
+<p>Allow the user to extend claytext syntax with configuration.</p>
+</li><li>
+<p>Hit 100% test coverage.</p>
+</li><li>
+<p>Get vsclay to report syntax errors.</p>
+</li><li>
+<p>Anti: extend clayoven in ways that would necessitate an ugly implementation.</p>
+</li></ul>
+
+</main>
+
+
+<footer id="validator-badges" role="contentinfo">
+  <p><a href="https://validator.w3.org/check/referer">Validate</a>
+  <p>Generated by <a href="https://ruby.github.io/rdoc/">RDoc</a> 6.6.0.
+  <p>Based on <a href="http://deveiate.org/projects/Darkfish-RDoc/">Darkfish</a> by <a href="http://deveiate.org">Michael Granger</a>.
+</footer>
+

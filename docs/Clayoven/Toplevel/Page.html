@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+
+<html>
+<head>
+<meta charset="UTF-8">
+
+<title>class Clayoven::Toplevel::Page - clayoven documentation</title>
+
+<script type="text/javascript">
+  var rdoc_rel_prefix = "../../";
+  var index_rel_prefix = "../../";
+</script>
+
+<script src="../../js/navigation.js" defer></script>
+<script src="../../js/search.js" defer></script>
+<script src="../../js/search_index.js" defer></script>
+<script src="../../js/searcher.js" defer></script>
+<script src="../../js/darkfish.js" defer></script>
+
+<link href="../../css/fonts.css" rel="stylesheet">
+<link href="../../css/rdoc.css" rel="stylesheet">
+
+
+<body id="top" role="document" class="class">
+<nav role="navigation">
+  <div id="project-navigation">
+    <div id="home-section" role="region" title="Quick navigation" class="nav-section">
+  <h2>
+    <a href="../../index.html" rel="home">Home</a>
+  </h2>
+
+  <div id="table-of-contents-navigation">
+    <a href="../../table_of_contents.html#pages">Pages</a>
+    <a href="../../table_of_contents.html#classes">Classes</a>
+    <a href="../../table_of_contents.html#methods">Methods</a>
+  </div>
+</div>
+
+    <div id="search-section" role="search" class="project-section initially-hidden">
+  <form action="#" method="get" accept-charset="utf-8">
+    <div id="search-field-wrapper">
+      <input id="search-field" role="combobox" aria-label="Search"
+             aria-autocomplete="list" aria-controls="search-results"
+             type="text" name="search" placeholder="Search (/) for a class, method, ..." spellcheck="false"
+             title="Type to search, Up and Down to navigate, Enter to load">
+    </div>
+
+    <ul id="search-results" aria-label="Search Results"
+        aria-busy="false" aria-expanded="false"
+        aria-atomic="false" class="initially-hidden"></ul>
+  </form>
+</div>
+
+  </div>
+
+  
+
+  <div id="class-metadata">
+    
+    
+<div id="parent-class-section" class="nav-section">
+  <h3>Parent</h3>
+
+  <p class="link">Object
+</div>
+
+    
+    
+    
+<!-- Method Quickref -->
+<div id="method-list-section" class="nav-section">
+  <h3>Methods</h3>
+
+  <ul class="link-list" role="directory">
+    <li ><a href="#method-c-new">::new</a>
+    <li ><a href="#method-i-render">#render</a>
+  </ul>
+</div>
+
+  </div>
+</nav>
+
+<main role="main" aria-labelledby="class-Clayoven::Toplevel::Page">
+  <h1 id="class-Clayoven::Toplevel::Page" class="class">
+    class Clayoven::Toplevel::Page
+  </h1>
+
+  <section class="description">
+    
+<p>An abstract page class</p>
+
+<p><a href="IndexPage.html"><code>IndexPage</code></a> and <a href="ContentPage.html"><code>ContentPage</code></a> inherit from this class. Exposes accessors to various fields to be used in <code>design/template.slim</code>.</p>
+
+<p>Be careful when creating Page objects, because <a href="Page.html#method-c-new"><code>new</code></a> is expensive.</p>
+
+  </section>
+
+  <section id="5Buntitled-5D" class="documentation-section">
+
+
+
+    <section class="attribute-method-details" class="method-section">
+      <header>
+        <h3>Attributes</h3>
+      </header>
+
+      <div id="attribute-i-crdate" class="method-detail">
+        <div class="method-heading attribute-method-heading">
+          <span class="method-name">crdate</span><span
+            class="attribute-access-type">[RW]</span>
+        </div>
+
+        <div class="method-description">
+        <p>A <code>Time</code> object indicating the creation date of the post</p>
+        </div>
+      </div>
+      <div id="attribute-i-lastmod" class="method-detail">
+        <div class="method-heading attribute-method-heading">
+          <span class="method-name">lastmod</span><span
+            class="attribute-access-type">[RW]</span>
+        </div>
+
+        <div class="method-description">
+        <p>A <code>Time</code> object indicating the last-modified date of the post</p>
+        </div>
+      </div>
+      <div id="attribute-i-locations" class="method-detail">
+        <div class="method-heading attribute-method-heading">
+          <span class="method-name">locations</span><span
+            class="attribute-access-type">[RW]</span>
+        </div>
+
+        <div class="method-description">
+        <p>An <code>Array</code> of <code>String</code> of places where the post was written</p>
+        </div>
+      </div>
+      <div id="attribute-i-paragraphs" class="method-detail">
+        <div class="method-heading attribute-method-heading">
+          <span class="method-name">paragraphs</span><span
+            class="attribute-access-type">[RW]</span>
+        </div>
+
+        <div class="method-description">
+        <p>An <code>Array</code> of <a href="../Claytext/Paragraph.html"><code>Clayoven::Claytext::Paragraph</code></a> objects</p>
+        </div>
+      </div>
+      <div id="attribute-i-permalink" class="method-detail">
+        <div class="method-heading attribute-method-heading">
+          <span class="method-name">permalink</span><span
+            class="attribute-access-type">[RW]</span>
+        </div>
+
+        <div class="method-description">
+        <p>The permalink of the page of the form <code>blog</code> or <code>blog/1</code></p>
+        </div>
+      </div>
+      <div id="attribute-i-subtopics" class="method-detail">
+        <div class="method-heading attribute-method-heading">
+          <span class="method-name">subtopics</span><span
+            class="attribute-access-type">[RW]</span>
+        </div>
+
+        <div class="method-description">
+        <p>An <code>Array</code> of “subtopics” for the page, used to fill the <a href="IndexPage.html"><code>IndexPage</code></a> with subtopic headings, and <a href="ContentPage.html"><code>ContentPage</code></a> entries</p>
+        </div>
+      </div>
+      <div id="attribute-i-target" class="method-detail">
+        <div class="method-heading attribute-method-heading">
+          <span class="method-name">target</span><span
+            class="attribute-access-type">[RW]</span>
+        </div>
+
+        <div class="method-description">
+        <p>A <code>String</code> indicating the path to the HTML file on disk</p>
+        </div>
+      </div>
+      <div id="attribute-i-title" class="method-detail">
+        <div class="method-heading attribute-method-heading">
+          <span class="method-name">title</span><span
+            class="attribute-access-type">[RW]</span>
+        </div>
+
+        <div class="method-description">
+        <p>The first line in the .clay or .index.clay file serves as the title of the page</p>
+        </div>
+      </div>
+      <div id="attribute-i-topics" class="method-detail">
+        <div class="method-heading attribute-method-heading">
+          <span class="method-name">topics</span><span
+            class="attribute-access-type">[RW]</span>
+        </div>
+
+        <div class="method-description">
+        <p>An <code>Array</code> of “topics” (<code>String</code>) corresponding to <a href="IndexPage.html"><code>IndexPage</code></a> entries</p>
+        </div>
+      </div>
+    </section>
+
+
+     <section id="public-class-5Buntitled-5D-method-details" class="method-section">
+       <header>
+         <h3>Public Class Methods</h3>
+       </header>
+
+      <div id="method-c-new" class="method-detail ">
+        <div class="method-header">
+          <div class="method-heading">
+            <span class="method-name">new</span><span
+              class="method-args">(filename, git)</span>
+            <span class="method-click-advice">click to toggle source</span>
+          </div>
+        </div>
+
+        <div class="method-description">
+          <p>Initialize with filename and data from <a href="../Git.html#method-i-metadata"><code>Clayoven::Git#metadata</code></a></p>
+
+<p>Expensive due to <code>log --follow</code>; avoid creating <code>Page</code> objects when not necessary.</p>
+
+          <div class="method-source-code" id="new-source">
+            <pre><span class="ruby-comment"># File lib/clayoven/toplevel.rb, line 55</span>
+<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">initialize</span>(<span class="ruby-identifier">filename</span>, <span class="ruby-identifier">git</span>)
+  <span class="ruby-ivar">@filename</span> = <span class="ruby-identifier">filename</span>
+  <span class="ruby-comment"># If a file is in the git index, use `Time.now`; otherwise, log --follow it.</span>
+  <span class="ruby-ivar">@lastmod</span>, <span class="ruby-ivar">@crdate</span>, <span class="ruby-ivar">@locations</span> = <span class="ruby-identifier">git</span>.<span class="ruby-identifier">metadata</span> <span class="ruby-ivar">@filename</span>
+  <span class="ruby-ivar">@title</span>, <span class="ruby-ivar">@body</span> = <span class="ruby-constant">File</span>.<span class="ruby-identifier">read</span>(<span class="ruby-ivar">@filename</span>).<span class="ruby-identifier">split</span> <span class="ruby-string">&quot;\n\n&quot;</span>, <span class="ruby-value">2</span>
+<span class="ruby-keyword">end</span></pre>
+          </div>
+        </div>
+
+
+      </div>
+
+    </section>
+
+     <section id="public-instance-5Buntitled-5D-method-details" class="method-section">
+       <header>
+         <h3>Public Instance Methods</h3>
+       </header>
+
+      <div id="method-i-render" class="method-detail ">
+        <div class="method-header">
+          <div class="method-heading">
+            <span class="method-name">render</span><span
+              class="method-args">(topics, template)</span>
+            <span class="method-click-advice">click to toggle source</span>
+          </div>
+        </div>
+
+        <div class="method-description">
+          <p>Writes out HTML pages rendered by <a href="../Claytext.html#method-c-process"><code>Clayoven::Claytext::process</code></a> and <code>Slim::Template</code> Initializes <a href="Page.html#attribute-i-topics"><code>Page#topics</code></a>, and accepts a template.</p>
+
+          <div class="method-source-code" id="render-source">
+            <pre><span class="ruby-comment"># File lib/clayoven/toplevel.rb, line 64</span>
+<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">render</span>(<span class="ruby-identifier">topics</span>, <span class="ruby-identifier">template</span>)
+  <span class="ruby-ivar">@topics</span> = <span class="ruby-identifier">topics</span>
+  <span class="ruby-ivar">@paragraphs</span> = <span class="ruby-ivar">@body</span> <span class="ruby-operator">?</span> (<span class="ruby-constant">Clayoven</span><span class="ruby-operator">::</span><span class="ruby-constant">Claytext</span>.<span class="ruby-identifier">process</span> <span class="ruby-ivar">@body</span>) <span class="ruby-operator">:</span> []
+  <span class="ruby-constant">Slim</span><span class="ruby-operator">::</span><span class="ruby-constant">Engine</span>.<span class="ruby-identifier">set_options</span> <span class="ruby-value">pretty:</span> <span class="ruby-keyword">true</span>, <span class="ruby-value">sort_attrs:</span> <span class="ruby-keyword">false</span>
+  <span class="ruby-identifier">rendered</span> = <span class="ruby-constant">Slim</span><span class="ruby-operator">::</span><span class="ruby-constant">Template</span>.<span class="ruby-identifier">new</span> { <span class="ruby-identifier">template</span> }.<span class="ruby-identifier">render</span> <span class="ruby-keyword">self</span>
+  <span class="ruby-constant">File</span>.<span class="ruby-identifier">open</span>(<span class="ruby-ivar">@target</span>, <span class="ruby-identifier">_</span> = <span class="ruby-string">&quot;w&quot;</span>) { <span class="ruby-operator">|</span><span class="ruby-identifier">targetio</span><span class="ruby-operator">|</span> <span class="ruby-identifier">targetio</span>.<span class="ruby-identifier">write</span> <span class="ruby-identifier">rendered</span> }
+<span class="ruby-keyword">end</span></pre>
+          </div>
+        </div>
+
+
+      </div>
+
+    </section>
+
+  </section>
+</main>
+
+
+<footer id="validator-badges" role="contentinfo">
+  <p><a href="https://validator.w3.org/check/referer">Validate</a>
+  <p>Generated by <a href="https://ruby.github.io/rdoc/">RDoc</a> 6.6.0.
+  <p>Based on <a href="http://deveiate.org/projects/Darkfish-RDoc/">Darkfish</a> by <a href="http://deveiate.org">Michael Granger</a>.
+</footer>
+

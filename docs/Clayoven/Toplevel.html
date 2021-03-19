@@ -1,0 +1,628 @@
+<!DOCTYPE html>
+
+<html>
+<head>
+<meta charset="UTF-8">
+
+<title>module Clayoven::Toplevel - clayoven documentation</title>
+
+<script type="text/javascript">
+  var rdoc_rel_prefix = "../";
+  var index_rel_prefix = "../";
+</script>
+
+<script src="../js/navigation.js" defer></script>
+<script src="../js/search.js" defer></script>
+<script src="../js/search_index.js" defer></script>
+<script src="../js/searcher.js" defer></script>
+<script src="../js/darkfish.js" defer></script>
+
+<link href="../css/fonts.css" rel="stylesheet">
+<link href="../css/rdoc.css" rel="stylesheet">
+
+
+<body id="top" role="document" class="module">
+<nav role="navigation">
+  <div id="project-navigation">
+    <div id="home-section" role="region" title="Quick navigation" class="nav-section">
+  <h2>
+    <a href="../index.html" rel="home">Home</a>
+  </h2>
+
+  <div id="table-of-contents-navigation">
+    <a href="../table_of_contents.html#pages">Pages</a>
+    <a href="../table_of_contents.html#classes">Classes</a>
+    <a href="../table_of_contents.html#methods">Methods</a>
+  </div>
+</div>
+
+    <div id="search-section" role="search" class="project-section initially-hidden">
+  <form action="#" method="get" accept-charset="utf-8">
+    <div id="search-field-wrapper">
+      <input id="search-field" role="combobox" aria-label="Search"
+             aria-autocomplete="list" aria-controls="search-results"
+             type="text" name="search" placeholder="Search (/) for a class, method, ..." spellcheck="false"
+             title="Type to search, Up and Down to navigate, Enter to load">
+    </div>
+
+    <ul id="search-results" aria-label="Search Results"
+        aria-busy="false" aria-expanded="false"
+        aria-atomic="false" class="initially-hidden"></ul>
+  </form>
+</div>
+
+  </div>
+
+  
+
+  <div id="class-metadata">
+    
+    
+    
+    
+    
+<!-- Method Quickref -->
+<div id="method-list-section" class="nav-section">
+  <h3>Methods</h3>
+
+  <ul class="link-list" role="directory">
+    <li ><a href="#method-c-dirty_pages">::dirty_pages</a>
+    <li ><a href="#method-c-dirty_pages_from_add">::dirty_pages_from_add</a>
+    <li ><a href="#method-c-dirty_pages_from_mod">::dirty_pages_from_mod</a>
+    <li ><a href="#method-c-find_dirty_index_pages">::find_dirty_index_pages</a>
+    <li ><a href="#method-c-find_topics">::find_topics</a>
+    <li ><a href="#method-c-generate_html">::generate_html</a>
+    <li ><a href="#method-c-generate_site">::generate_site</a>
+    <li ><a href="#method-c-generate_sitemap">::generate_sitemap</a>
+    <li ><a href="#method-c-index_content_files">::index_content_files</a>
+    <li ><a href="#method-c-main">::main</a>
+    <li ><a href="#method-c-modified_files_from_gitidx">::modified_files_from_gitidx</a>
+    <li ><a href="#method-c-pages_to_render">::pages_to_render</a>
+    <li ><a href="#method-c-separate_index_content_files">::separate_index_content_files</a>
+    <li ><a href="#method-c-sitewide_lastmod">::sitewide_lastmod</a>
+    <li ><a href="#method-c-unhidden_content_files">::unhidden_content_files</a>
+  </ul>
+</div>
+
+  </div>
+</nav>
+
+<main role="main" aria-labelledby="module-Clayoven::Toplevel">
+  <h1 id="module-Clayoven::Toplevel" class="module">
+    module Clayoven::Toplevel
+  </h1>
+
+  <section class="description">
+    
+<p>The toplevel module for clayoven, which contains <a href="Toplevel.html#method-c-main"><code>main</code></a></p>
+
+  </section>
+
+  <section id="5Buntitled-5D" class="documentation-section">
+
+
+
+
+
+     <section id="public-class-5Buntitled-5D-method-details" class="method-section">
+       <header>
+         <h3>Public Class Methods</h3>
+       </header>
+
+      <div id="method-c-dirty_pages" class="method-detail ">
+        <div class="method-header">
+          <div class="method-heading">
+            <span class="method-name">dirty_pages</span><span
+              class="method-args">(index_files, content_files, is_aggressive)</span>
+            <span class="method-click-advice">click to toggle source</span>
+          </div>
+        </div>
+
+        <div class="method-description">
+          <p>Return <code>Array</code> of <a href="Toplevel/IndexPage.html"><code>IndexPage</code></a> and <a href="Toplevel/ContentPage.html"><code>ContentPage</code></a> entries to render</p>
+
+          <div class="method-source-code" id="dirty_pages-source">
+            <pre><span class="ruby-comment"># File lib/clayoven/toplevel.rb, line 234</span>
+<span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier ruby-title">dirty_pages</span>(<span class="ruby-identifier">index_files</span>, <span class="ruby-identifier">content_files</span>, <span class="ruby-identifier">is_aggressive</span>)
+  <span class="ruby-comment"># Adding a new index file is equivalent to re-rendering the entire site</span>
+  <span class="ruby-keyword">if</span> <span class="ruby-ivar">@git</span>.<span class="ruby-identifier">any_added?</span>(<span class="ruby-identifier">index_files</span>) <span class="ruby-operator">||</span> <span class="ruby-ivar">@git</span>.<span class="ruby-identifier">template_changed?</span> <span class="ruby-operator">||</span> <span class="ruby-identifier">is_aggressive</span>
+    <span class="ruby-identifier">dirty_pages_from_add</span>(<span class="ruby-identifier">index_files</span>, <span class="ruby-identifier">content_files</span>)
+  <span class="ruby-keyword">else</span>
+    <span class="ruby-identifier">dirty_pages_from_mod</span>(<span class="ruby-identifier">index_files</span>, <span class="ruby-identifier">content_files</span>)
+  <span class="ruby-keyword">end</span>
+<span class="ruby-keyword">end</span></pre>
+          </div>
+        </div>
+
+
+      </div>
+
+      <div id="method-c-dirty_pages_from_add" class="method-detail ">
+        <div class="method-header">
+          <div class="method-heading">
+            <span class="method-name">dirty_pages_from_add</span><span
+              class="method-args">(index_files, content_files)</span>
+            <span class="method-click-advice">click to toggle source</span>
+          </div>
+        </div>
+
+        <div class="method-description">
+          <p>Simply create <a href="Toplevel/IndexPage.html"><code>IndexPage</code></a> and <a href="Toplevel/ContentPage.html"><code>ContentPage</code></a> entries out of index_files and content_files.</p>
+
+          <div class="method-source-code" id="dirty_pages_from_add-source">
+            <pre><span class="ruby-comment"># File lib/clayoven/toplevel.rb, line 145</span>
+<span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier ruby-title">dirty_pages_from_add</span>(<span class="ruby-identifier">index_files</span>, <span class="ruby-identifier">content_files</span>)
+  <span class="ruby-identifier">progress</span> =
+    <span class="ruby-constant">ProgressBar</span>.<span class="ruby-identifier">create</span>(
+      <span class="ruby-value">title:</span> <span class="ruby-node">&quot;[#{&quot;GIT&quot;.green} ]&quot;</span>,
+      <span class="ruby-value">total:</span> <span class="ruby-identifier">index_files</span>.<span class="ruby-identifier">count</span> <span class="ruby-operator">+</span> <span class="ruby-identifier">content_files</span>.<span class="ruby-identifier">count</span>
+    )
+
+  <span class="ruby-comment"># Strightforward</span>
+  <span class="ruby-identifier">dirty_index_pages</span> =
+    <span class="ruby-identifier">index_files</span>.<span class="ruby-identifier">map</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">filename</span><span class="ruby-operator">|</span>
+      <span class="ruby-identifier">progress</span>.<span class="ruby-identifier">increment</span>
+      <span class="ruby-constant">IndexPage</span>.<span class="ruby-identifier">new</span> <span class="ruby-identifier">filename</span>, <span class="ruby-ivar">@git</span>
+    <span class="ruby-keyword">end</span>
+  <span class="ruby-identifier">dirty_content_pages</span> =
+    <span class="ruby-identifier">content_files</span>.<span class="ruby-identifier">map</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">filename</span><span class="ruby-operator">|</span>
+      <span class="ruby-identifier">progress</span>.<span class="ruby-identifier">increment</span>
+      <span class="ruby-constant">ContentPage</span>.<span class="ruby-identifier">new</span> <span class="ruby-identifier">filename</span>, <span class="ruby-ivar">@git</span>
+    <span class="ruby-keyword">end</span>
+  [<span class="ruby-identifier">dirty_index_pages</span>, <span class="ruby-identifier">dirty_content_pages</span>]
+<span class="ruby-keyword">end</span></pre>
+          </div>
+        </div>
+
+
+      </div>
+
+      <div id="method-c-dirty_pages_from_mod" class="method-detail ">
+        <div class="method-header">
+          <div class="method-heading">
+            <span class="method-name">dirty_pages_from_mod</span><span
+              class="method-args">(index_files, content_files)</span>
+            <span class="method-click-advice">click to toggle source</span>
+          </div>
+        </div>
+
+        <div class="method-description">
+          <p>Find the dirty <a href="Toplevel/IndexPage.html"><code>IndexPage</code></a> and <a href="Toplevel/ContentPage.html"><code>ContentPage</code></a> entries from some modification that occured in the git index, based on index_files, and content_files.</p>
+
+<p>Returns an <code>Array</code> of <a href="Toplevel/IndexPage.html"><code>IndexPage</code></a></p>
+
+          <div class="method-source-code" id="dirty_pages_from_mod-source">
+            <pre><span class="ruby-comment"># File lib/clayoven/toplevel.rb, line 206</span>
+<span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier ruby-title">dirty_pages_from_mod</span>(<span class="ruby-identifier">index_files</span>, <span class="ruby-identifier">content_files</span>)
+  <span class="ruby-comment"># Create a progressbar based on information from the git index</span>
+  <span class="ruby-identifier">modified_index_files</span>, <span class="ruby-identifier">modified_content_files</span> =
+    <span class="ruby-identifier">modified_files_from_gitidx</span>(<span class="ruby-identifier">index_files</span>, <span class="ruby-identifier">content_files</span>)
+  <span class="ruby-identifier">progress</span> =
+    <span class="ruby-constant">ProgressBar</span>.<span class="ruby-identifier">create</span>(
+      <span class="ruby-value">title:</span> <span class="ruby-node">&quot;[#{&quot;GIT&quot;.green} ]&quot;</span>,
+      <span class="ruby-value">total:</span> <span class="ruby-identifier">modified_index_files</span>.<span class="ruby-identifier">count</span> <span class="ruby-operator">+</span> <span class="ruby-identifier">modified_content_files</span>.<span class="ruby-identifier">count</span> <span class="ruby-operator">*</span> <span class="ruby-value">2</span>
+    )
+
+  <span class="ruby-comment"># Find out the dirty content_pages</span>
+  <span class="ruby-identifier">dirty_content_pages</span> =
+    <span class="ruby-identifier">modified_content_files</span>.<span class="ruby-identifier">map</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">filename</span><span class="ruby-operator">|</span>
+      <span class="ruby-identifier">progress</span>.<span class="ruby-identifier">increment</span>
+      <span class="ruby-constant">ContentPage</span>.<span class="ruby-identifier">new</span> <span class="ruby-identifier">filename</span>, <span class="ruby-ivar">@git</span>
+    <span class="ruby-keyword">end</span>
+
+  [
+    <span class="ruby-identifier">find_dirty_index_pages</span>(
+      <span class="ruby-identifier">dirty_content_pages</span>,
+      <span class="ruby-identifier">modified_index_files</span>,
+      <span class="ruby-identifier">progress</span>
+    ),
+    <span class="ruby-identifier">dirty_content_pages</span>
+  ]
+<span class="ruby-keyword">end</span></pre>
+          </div>
+        </div>
+
+
+      </div>
+
+      <div id="method-c-find_dirty_index_pages" class="method-detail ">
+        <div class="method-header">
+          <div class="method-heading">
+            <span class="method-name">find_dirty_index_pages</span><span
+              class="method-args">( dirty_content_pages, modified_index_files, progress )</span>
+            <span class="method-click-advice">click to toggle source</span>
+          </div>
+        </div>
+
+        <div class="method-description">
+          <p>Find the dirty <a href="Toplevel/IndexPage.html"><code>IndexPage</code></a> entries from dirty <a href="Toplevel/ContentPage.html"><code>ContentPage</code></a> entries and <code>modified_index_files</code>. First, see which modified_index_files are forced dirty by corresponding dirty_content_pages; then, add to the list the ones that are dirty by themselves.</p>
+
+<p>Returns an <code>Array</code> of <a href="Toplevel/IndexPage.html"><code>IndexPage</code></a></p>
+
+          <div class="method-source-code" id="find_dirty_index_pages-source">
+            <pre><span class="ruby-comment"># File lib/clayoven/toplevel.rb, line 180</span>
+<span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier ruby-title">find_dirty_index_pages</span>(
+  <span class="ruby-identifier">dirty_content_pages</span>,
+  <span class="ruby-identifier">modified_index_files</span>,
+  <span class="ruby-identifier">progress</span>
+)
+  <span class="ruby-comment"># Avoid adding the</span>
+  <span class="ruby-comment"># index page twice when there are two dirty content_pages under the same index</span>
+  <span class="ruby-identifier">dirty_from_content</span> =
+    <span class="ruby-identifier">dirty_content_pages</span>
+      .<span class="ruby-identifier">map</span> { <span class="ruby-operator">|</span><span class="ruby-identifier">dcp</span><span class="ruby-operator">|</span> <span class="ruby-node">&quot;#{dcp.topic}.index.clay&quot;</span> }
+      .<span class="ruby-identifier">uniq</span>
+      .<span class="ruby-identifier">map</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">dif</span><span class="ruby-operator">|</span>
+        <span class="ruby-identifier">progress</span>.<span class="ruby-identifier">increment</span>
+        <span class="ruby-constant">IndexPage</span>.<span class="ruby-identifier">new</span> <span class="ruby-identifier">dif</span>, <span class="ruby-ivar">@git</span>
+      <span class="ruby-keyword">end</span>
+  <span class="ruby-identifier">dirty_from_content</span> <span class="ruby-operator">+</span>
+    <span class="ruby-identifier">modified_index_files</span>.<span class="ruby-identifier">map</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">filename</span><span class="ruby-operator">|</span>
+      <span class="ruby-identifier">progress</span>.<span class="ruby-identifier">increment</span>
+      <span class="ruby-constant">IndexPage</span>.<span class="ruby-identifier">new</span> <span class="ruby-identifier">filename</span>, <span class="ruby-ivar">@git</span>
+    <span class="ruby-keyword">end</span>
+<span class="ruby-keyword">end</span></pre>
+          </div>
+        </div>
+
+
+      </div>
+
+      <div id="method-c-find_topics" class="method-detail ">
+        <div class="method-header">
+          <div class="method-heading">
+            <span class="method-name">find_topics</span><span
+              class="method-args">(index_files)</span>
+            <span class="method-click-advice">click to toggle source</span>
+          </div>
+        </div>
+
+        <div class="method-description">
+          <p>Find the list of topics to be exposed as <a href="Toplevel/Page.html#attribute-i-topics"><code>Page#topics</code></a>.</p>
+
+          <div class="method-source-code" id="find_topics-source">
+            <pre><span class="ruby-comment"># File lib/clayoven/toplevel.rb, line 268</span>
+<span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier ruby-title">find_topics</span>(<span class="ruby-identifier">index_files</span>)
+  <span class="ruby-identifier">all_topics</span> =
+    <span class="ruby-constant">Util</span>
+      .<span class="ruby-identifier">lex_sort</span>(<span class="ruby-identifier">index_files</span>)
+      .<span class="ruby-identifier">map</span> { <span class="ruby-operator">|</span><span class="ruby-identifier">file</span><span class="ruby-operator">|</span> <span class="ruby-identifier">file</span>.<span class="ruby-identifier">split</span>(<span class="ruby-string">&quot;.index.clay&quot;</span>).<span class="ruby-identifier">first</span> }
+  <span class="ruby-identifier">topics</span> =
+    <span class="ruby-identifier">all_topics</span>.<span class="ruby-identifier">reject</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">entry</span><span class="ruby-operator">|</span>
+      <span class="ruby-ivar">@config</span>.<span class="ruby-identifier">hidden</span>.<span class="ruby-identifier">any?</span> { <span class="ruby-operator">|</span><span class="ruby-identifier">hidden_entry</span><span class="ruby-operator">|</span> <span class="ruby-identifier">hidden_entry</span> <span class="ruby-operator">==</span> <span class="ruby-identifier">entry</span> }
+    <span class="ruby-keyword">end</span>
+  [<span class="ruby-identifier">all_topics</span>, <span class="ruby-identifier">topics</span>]
+<span class="ruby-keyword">end</span></pre>
+          </div>
+        </div>
+
+
+      </div>
+
+      <div id="method-c-generate_html" class="method-detail ">
+        <div class="method-header">
+          <div class="method-heading">
+            <span class="method-name">generate_html</span><span
+              class="method-args">(genpages, topics)</span>
+            <span class="method-click-advice">click to toggle source</span>
+          </div>
+        </div>
+
+        <div class="method-description">
+          <p>Produce HTML files, first using <a href="Toplevel/Page.html#method-i-render"><code>Page#render</code></a>, and then operating on the files produced in-place with MathJaX</p>
+
+          <div class="method-source-code" id="generate_html-source">
+            <pre><span class="ruby-comment"># File lib/clayoven/toplevel.rb, line 311</span>
+<span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier ruby-title">generate_html</span>(<span class="ruby-identifier">genpages</span>, <span class="ruby-identifier">topics</span>)
+  <span class="ruby-identifier">progress</span> =
+    <span class="ruby-constant">ProgressBar</span>.<span class="ruby-identifier">create</span>(<span class="ruby-value">title:</span> <span class="ruby-node">&quot;[#{&quot;CLAY&quot;.green}]&quot;</span>, <span class="ruby-value">total:</span> <span class="ruby-identifier">genpages</span>.<span class="ruby-identifier">length</span>)
+  <span class="ruby-identifier">genpages</span>.<span class="ruby-identifier">each</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">page</span><span class="ruby-operator">|</span>
+    <span class="ruby-identifier">page</span>.<span class="ruby-identifier">render</span> <span class="ruby-identifier">topics</span>, <span class="ruby-ivar">@config</span>.<span class="ruby-identifier">template</span>
+    <span class="ruby-identifier">progress</span>.<span class="ruby-identifier">increment</span>
+  <span class="ruby-keyword">end</span>
+  <span class="ruby-constant">Util</span>.<span class="ruby-identifier">render_math</span> <span class="ruby-identifier">genpages</span>.<span class="ruby-identifier">map</span>(<span class="ruby-operator">&amp;</span><span class="ruby-value">:target</span>).<span class="ruby-identifier">join</span>(<span class="ruby-string">&quot; &quot;</span>)
+<span class="ruby-keyword">end</span></pre>
+          </div>
+        </div>
+
+
+      </div>
+
+      <div id="method-c-generate_site" class="method-detail ">
+        <div class="method-header">
+          <div class="method-heading">
+            <span class="method-name">generate_site</span><span
+              class="method-args">(genpages, topics, is_aggressive)</span>
+            <span class="method-click-advice">click to toggle source</span>
+          </div>
+        </div>
+
+        <div class="method-description">
+          <p>Generate HTML, minify the design, and generate the sitemap.</p>
+
+          <div class="method-source-code" id="generate_site-source">
+            <pre><span class="ruby-comment"># File lib/clayoven/toplevel.rb, line 346</span>
+<span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier ruby-title">generate_site</span>(<span class="ruby-identifier">genpages</span>, <span class="ruby-identifier">topics</span>, <span class="ruby-identifier">is_aggressive</span>)
+  <span class="ruby-identifier">generate_html</span> <span class="ruby-identifier">genpages</span>, <span class="ruby-identifier">topics</span> <span class="ruby-keyword">if</span> <span class="ruby-identifier">genpages</span>.<span class="ruby-identifier">any?</span>
+  <span class="ruby-constant">Util</span>.<span class="ruby-identifier">minify_design</span> <span class="ruby-keyword">if</span> <span class="ruby-ivar">@git</span>.<span class="ruby-identifier">design_changed?</span> <span class="ruby-operator">||</span> <span class="ruby-identifier">is_aggressive</span>
+  <span class="ruby-identifier">generate_sitemap</span> <span class="ruby-identifier">genpages</span> <span class="ruby-keyword">if</span> <span class="ruby-identifier">is_aggressive</span>
+<span class="ruby-keyword">end</span></pre>
+          </div>
+        </div>
+
+
+      </div>
+
+      <div id="method-c-generate_sitemap" class="method-detail ">
+        <div class="method-header">
+          <div class="method-heading">
+            <span class="method-name">generate_sitemap</span><span
+              class="method-args">(all_pages)</span>
+            <span class="method-click-advice">click to toggle source</span>
+          </div>
+        </div>
+
+        <div class="method-description">
+          <p>Generate <code>sitemap.xml</code> from all_pages.</p>
+
+          <div class="method-source-code" id="generate_sitemap-source">
+            <pre><span class="ruby-comment"># File lib/clayoven/toplevel.rb, line 329</span>
+<span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier ruby-title">generate_sitemap</span>(<span class="ruby-identifier">all_pages</span>)
+  <span class="ruby-identifier">puts</span> <span class="ruby-node">&quot;[#{&quot;XML&quot;.green} ]: Generating sitemap&quot;</span>
+  <span class="ruby-constant">SitemapGenerator</span>.<span class="ruby-identifier">verbose</span> = <span class="ruby-keyword">false</span>
+  <span class="ruby-constant">SitemapGenerator</span><span class="ruby-operator">::</span><span class="ruby-constant">Sitemap</span>.<span class="ruby-identifier">include_root</span> = <span class="ruby-keyword">false</span>
+  <span class="ruby-constant">SitemapGenerator</span><span class="ruby-operator">::</span><span class="ruby-constant">Sitemap</span>.<span class="ruby-identifier">compress</span> = <span class="ruby-keyword">false</span>
+  <span class="ruby-constant">SitemapGenerator</span><span class="ruby-operator">::</span><span class="ruby-constant">Sitemap</span>.<span class="ruby-identifier">default_host</span> = <span class="ruby-node">&quot;https://#{@config.sitename}&quot;</span>
+  <span class="ruby-constant">SitemapGenerator</span><span class="ruby-operator">::</span><span class="ruby-constant">Sitemap</span>.<span class="ruby-identifier">public_path</span> = <span class="ruby-string">&quot;.&quot;</span>
+  <span class="ruby-constant">SitemapGenerator</span><span class="ruby-operator">::</span><span class="ruby-constant">Sitemap</span>.<span class="ruby-identifier">create</span> <span class="ruby-keyword">do</span>
+    <span class="ruby-identifier">add</span> <span class="ruby-string">&quot;/&quot;</span>,
+        <span class="ruby-value">lastmod:</span> <span class="ruby-constant">Clayoven</span><span class="ruby-operator">::</span><span class="ruby-constant">Toplevel</span>.<span class="ruby-identifier">sitewide_lastmod</span>(<span class="ruby-identifier">all_pages</span>),
+        <span class="ruby-value">priority:</span> <span class="ruby-value">1.0</span>,
+        <span class="ruby-value">changefreq:</span> <span class="ruby-string">&quot;always&quot;</span>
+    <span class="ruby-identifier">all_pages</span>.<span class="ruby-identifier">each</span> { <span class="ruby-operator">|</span><span class="ruby-identifier">p</span><span class="ruby-operator">|</span> <span class="ruby-identifier">add</span> <span class="ruby-identifier">p</span>.<span class="ruby-identifier">permalink</span>, <span class="ruby-value">lastmod:</span> <span class="ruby-identifier">p</span>.<span class="ruby-identifier">lastmod</span> }
+  <span class="ruby-keyword">end</span>
+<span class="ruby-keyword">end</span></pre>
+          </div>
+        </div>
+
+
+      </div>
+
+      <div id="method-c-index_content_files" class="method-detail ">
+        <div class="method-header">
+          <div class="method-heading">
+            <span class="method-name">index_content_files</span><span
+              class="method-args">(all_files)</span>
+            <span class="method-click-advice">click to toggle source</span>
+          </div>
+        </div>
+
+        <div class="method-description">
+          <p>From all_files, find out the list of <code>index_files</code>, <code>content_files</code>, and <code>topics</code>, and return them.</p>
+
+<p>Returns an <code>Array</code> of three different <code>Array</code> of <code>String</code>.</p>
+
+          <div class="method-source-code" id="index_content_files-source">
+            <pre><span class="ruby-comment"># File lib/clayoven/toplevel.rb, line 292</span>
+<span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier ruby-title">index_content_files</span>(<span class="ruby-identifier">all_files</span>)
+  <span class="ruby-identifier">index_files</span>, <span class="ruby-identifier">content_files</span> = <span class="ruby-identifier">separate_index_content_files</span> <span class="ruby-identifier">all_files</span>
+  <span class="ruby-identifier">all_topics</span>, <span class="ruby-identifier">topics</span> = <span class="ruby-identifier">find_topics</span> <span class="ruby-identifier">index_files</span>
+
+  <span class="ruby-comment"># Look for stray files.  All content_files are nested within directories</span>
+  <span class="ruby-comment"># We look in `all_topics`, because we still want hidden content_files to be</span>
+  <span class="ruby-comment"># generated, just not shown.</span>
+  <span class="ruby-identifier">content_files</span>
+    .<span class="ruby-identifier">reject</span> { <span class="ruby-operator">|</span><span class="ruby-identifier">file</span><span class="ruby-operator">|</span> <span class="ruby-identifier">all_topics</span>.<span class="ruby-identifier">include?</span> <span class="ruby-identifier">file</span>.<span class="ruby-identifier">split</span>(<span class="ruby-string">&quot;/&quot;</span>).<span class="ruby-identifier">first</span> }
+    .<span class="ruby-identifier">each</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">stray</span><span class="ruby-operator">|</span>
+      <span class="ruby-identifier">content_files</span> <span class="ruby-operator">-=</span> [<span class="ruby-identifier">stray</span>]
+      <span class="ruby-identifier">warn</span> <span class="ruby-node">&quot;[#{&quot;WARN&quot;.yellow} ]: #{stray} is a stray file or directory; ignored&quot;</span>
+    <span class="ruby-keyword">end</span>
+
+  [<span class="ruby-identifier">index_files</span>, <span class="ruby-identifier">content_files</span>, <span class="ruby-identifier">topics</span>]
+<span class="ruby-keyword">end</span></pre>
+          </div>
+        </div>
+
+
+      </div>
+
+      <div id="method-c-main" class="method-detail ">
+        <div class="method-header">
+          <div class="method-heading">
+            <span class="method-name">main</span><span
+              class="method-args">(is_aggressive: false)</span>
+            <span class="method-click-advice">click to toggle source</span>
+          </div>
+        </div>
+
+        <div class="method-description">
+          <p>The entry point for <code>clayoven</code>, and <code>clayoven aggressive</code>.</p>
+
+          <div class="method-source-code" id="main-source">
+            <pre><span class="ruby-comment"># File lib/clayoven/toplevel.rb, line 353</span>
+<span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier ruby-title">main</span>(<span class="ruby-value">is_aggressive:</span> <span class="ruby-keyword">false</span>)
+  <span class="ruby-comment"># Only operate on git repositories</span>
+  <span class="ruby-identifier">toplevel</span> = <span class="ruby-constant">Git</span>.<span class="ruby-identifier">toplevel</span>
+  <span class="ruby-keyword">if</span> <span class="ruby-identifier">$?</span> <span class="ruby-operator">!=</span> <span class="ruby-value">0</span> <span class="ruby-operator">||</span> <span class="ruby-identifier">toplevel</span>.<span class="ruby-identifier">empty?</span> <span class="ruby-operator">||</span>
+       (<span class="ruby-operator">!</span><span class="ruby-constant">File</span>.<span class="ruby-identifier">directory?</span> <span class="ruby-node">&quot;#{toplevel}/.clayoven&quot;</span>)
+    <span class="ruby-identifier">abort</span> <span class="ruby-node">&quot;[#{&quot;ERR&quot;.red} ]: Not a clayoven project (have you run `clayoven init`?)&quot;</span>
+  <span class="ruby-keyword">end</span>
+  <span class="ruby-constant">Dir</span>.<span class="ruby-identifier">chdir</span>(<span class="ruby-identifier">toplevel</span>) <span class="ruby-keyword">do</span>
+    <span class="ruby-comment"># Write out template files, if necessary</span>
+    <span class="ruby-ivar">@config</span> = <span class="ruby-constant">Clayoven</span><span class="ruby-operator">::</span><span class="ruby-constant">Config</span>.<span class="ruby-identifier">new</span>
+
+    <span class="ruby-comment"># Initialize git</span>
+    <span class="ruby-ivar">@git</span> = <span class="ruby-constant">Clayoven</span><span class="ruby-operator">::</span><span class="ruby-constant">Git</span>.<span class="ruby-identifier">new</span> <span class="ruby-ivar">@config</span>.<span class="ruby-identifier">tzmap</span>
+
+    <span class="ruby-comment"># Collect the list of files from a directory listing</span>
+    <span class="ruby-identifier">all_files</span> = <span class="ruby-constant">Util</span>.<span class="ruby-identifier">ls_files</span>
+
+    <span class="ruby-comment"># From all_files, get the list of index_files, content_files, and topics</span>
+    <span class="ruby-identifier">index_files</span>, <span class="ruby-identifier">content_files</span>, <span class="ruby-identifier">topics</span> = <span class="ruby-identifier">index_content_files</span> <span class="ruby-identifier">all_files</span>
+
+    <span class="ruby-comment"># If the template changes, we&#39;re definitely in aggressive mode</span>
+    <span class="ruby-identifier">is_aggressive</span> <span class="ruby-operator">||=</span> <span class="ruby-ivar">@git</span>.<span class="ruby-identifier">template_changed?</span>
+
+    <span class="ruby-comment"># Get a list of pages to render, genpages</span>
+    <span class="ruby-identifier">genpages</span> = <span class="ruby-identifier">pages_to_render</span> <span class="ruby-identifier">index_files</span>, <span class="ruby-identifier">content_files</span>, <span class="ruby-identifier">is_aggressive</span>
+
+    <span class="ruby-comment"># Generate the genpages</span>
+    <span class="ruby-identifier">generate_site</span> <span class="ruby-identifier">genpages</span>, <span class="ruby-identifier">topics</span>, <span class="ruby-identifier">is_aggressive</span>
+  <span class="ruby-keyword">end</span>
+<span class="ruby-keyword">end</span></pre>
+          </div>
+        </div>
+
+
+      </div>
+
+      <div id="method-c-modified_files_from_gitidx" class="method-detail ">
+        <div class="method-header">
+          <div class="method-heading">
+            <span class="method-name">modified_files_from_gitidx</span><span
+              class="method-args">(index_files, content_files)</span>
+            <span class="method-click-advice">click to toggle source</span>
+          </div>
+        </div>
+
+        <div class="method-description">
+          <p>Find the modified index_files and added_or_modified content_files from the git index</p>
+
+          <div class="method-source-code" id="modified_files_from_gitidx-source">
+            <pre><span class="ruby-comment"># File lib/clayoven/toplevel.rb, line 167</span>
+<span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier ruby-title">modified_files_from_gitidx</span>(<span class="ruby-identifier">index_files</span>, <span class="ruby-identifier">content_files</span>)
+  <span class="ruby-comment"># The case when index_files are added is handled in dirty_pages</span>
+  [
+    <span class="ruby-identifier">index_files</span>.<span class="ruby-identifier">select</span> { <span class="ruby-operator">|</span><span class="ruby-identifier">f</span><span class="ruby-operator">|</span> <span class="ruby-ivar">@git</span>.<span class="ruby-identifier">modified?</span> <span class="ruby-identifier">f</span> },
+    <span class="ruby-identifier">content_files</span>.<span class="ruby-identifier">select</span> { <span class="ruby-operator">|</span><span class="ruby-identifier">f</span><span class="ruby-operator">|</span> <span class="ruby-ivar">@git</span>.<span class="ruby-identifier">added_or_modified?</span> <span class="ruby-identifier">f</span> }
+  ]
+<span class="ruby-keyword">end</span></pre>
+          </div>
+        </div>
+
+
+      </div>
+
+      <div id="method-c-pages_to_render" class="method-detail ">
+        <div class="method-header">
+          <div class="method-heading">
+            <span class="method-name">pages_to_render</span><span
+              class="method-args">(index_files, content_files, is_aggressive)</span>
+            <span class="method-click-advice">click to toggle source</span>
+          </div>
+        </div>
+
+        <div class="method-description">
+          <p>Return <a href="Toplevel/IndexPage.html"><code>IndexPage</code></a> and <a href="Toplevel/ContentPage.html"><code>ContentPage</code></a> entries to render; we work with index_files and content_files, because converting them to <a href="Toplevel/Page.html"><code>Page</code></a> objects prematurely will result in unnecessary <code>log --follow</code> invocations</p>
+
+          <div class="method-source-code" id="pages_to_render-source">
+            <pre><span class="ruby-comment"># File lib/clayoven/toplevel.rb, line 252</span>
+<span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier ruby-title">pages_to_render</span>(<span class="ruby-identifier">index_files</span>, <span class="ruby-identifier">content_files</span>, <span class="ruby-identifier">is_aggressive</span>)
+  <span class="ruby-identifier">dirty_index_pages</span>, <span class="ruby-identifier">dirty_content_pages</span> =
+    <span class="ruby-identifier">dirty_pages</span> <span class="ruby-identifier">index_files</span>, <span class="ruby-identifier">content_files</span>, <span class="ruby-identifier">is_aggressive</span>
+
+  <span class="ruby-comment"># Reject hidden content_files</span>
+  <span class="ruby-identifier">dirty_index_pages</span>.<span class="ruby-identifier">each</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">dip</span><span class="ruby-operator">|</span>
+    <span class="ruby-identifier">content_pages</span> =
+      <span class="ruby-identifier">unhidden_content_files</span>(<span class="ruby-identifier">content_files</span>)
+        .<span class="ruby-identifier">select</span> { <span class="ruby-operator">|</span><span class="ruby-identifier">cf</span><span class="ruby-operator">|</span> <span class="ruby-identifier">cf</span>.<span class="ruby-identifier">split</span>(<span class="ruby-string">&quot;/&quot;</span>, <span class="ruby-value">2</span>).<span class="ruby-identifier">first</span> <span class="ruby-operator">==</span> <span class="ruby-identifier">dip</span>.<span class="ruby-identifier">permalink</span> }
+        .<span class="ruby-identifier">map</span> { <span class="ruby-operator">|</span><span class="ruby-identifier">cf</span><span class="ruby-operator">|</span> <span class="ruby-constant">ContentPage</span>.<span class="ruby-identifier">new</span> <span class="ruby-identifier">cf</span>, <span class="ruby-ivar">@git</span> }
+    <span class="ruby-identifier">dip</span>.<span class="ruby-identifier">fillindex</span> <span class="ruby-identifier">content_pages</span>, <span class="ruby-ivar">@config</span>.<span class="ruby-identifier">stmap</span>
+  <span class="ruby-keyword">end</span>
+  <span class="ruby-identifier">dirty_index_pages</span> <span class="ruby-operator">+</span> <span class="ruby-identifier">dirty_content_pages</span>
+<span class="ruby-keyword">end</span></pre>
+          </div>
+        </div>
+
+
+      </div>
+
+      <div id="method-c-separate_index_content_files" class="method-detail ">
+        <div class="method-header">
+          <div class="method-heading">
+            <span class="method-name">separate_index_content_files</span><span
+              class="method-args">(all_files)</span>
+            <span class="method-click-advice">click to toggle source</span>
+          </div>
+        </div>
+
+        <div class="method-description">
+          <p>Separate out <code>index_files</code> and <code>content_files</code> from <code>all_files</code> based on filename</p>
+
+          <div class="method-source-code" id="separate_index_content_files-source">
+            <pre><span class="ruby-comment"># File lib/clayoven/toplevel.rb, line 281</span>
+<span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier ruby-title">separate_index_content_files</span>(<span class="ruby-identifier">all_files</span>)
+  <span class="ruby-comment"># index_files are files ending in &#39;.index.clay&#39; and &#39;index.clay&#39;</span>
+  <span class="ruby-comment"># content_files are all other files; topics is the list of topics: we need it for the sidebar</span>
+  <span class="ruby-identifier">index_files</span> =
+    [<span class="ruby-string">&quot;index.clay&quot;</span>] <span class="ruby-operator">+</span> <span class="ruby-identifier">all_files</span>.<span class="ruby-identifier">select</span> { <span class="ruby-operator">|</span><span class="ruby-identifier">file</span><span class="ruby-operator">|</span> <span class="ruby-regexp">/\.index\.clay$/</span> <span class="ruby-operator">=~</span> <span class="ruby-identifier">file</span> }
+  [<span class="ruby-identifier">index_files</span>, <span class="ruby-identifier">all_files</span> <span class="ruby-operator">-</span> <span class="ruby-identifier">index_files</span>]
+<span class="ruby-keyword">end</span></pre>
+          </div>
+        </div>
+
+
+      </div>
+
+      <div id="method-c-sitewide_lastmod" class="method-detail ">
+        <div class="method-header">
+          <div class="method-heading">
+            <span class="method-name">sitewide_lastmod</span><span
+              class="method-args">(all_pages)</span>
+            <span class="method-click-advice">click to toggle source</span>
+          </div>
+        </div>
+
+        <div class="method-description">
+          <p>For the sitemap root entry, find the maximal <a href="Toplevel/Page.html#attribute-i-lastmod"><code>Page#lastmod</code></a> of <a href="Toplevel/IndexPage.html"><code>IndexPage</code></a> entries in all_pages.</p>
+
+<p>Returns a Time object.</p>
+
+          <div class="method-source-code" id="sitewide_lastmod-source">
+            <pre><span class="ruby-comment"># File lib/clayoven/toplevel.rb, line 324</span>
+<span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier ruby-title">sitewide_lastmod</span>(<span class="ruby-identifier">all_pages</span>)
+  <span class="ruby-identifier">all_pages</span>.<span class="ruby-identifier">select</span> { <span class="ruby-operator">|</span><span class="ruby-identifier">p</span><span class="ruby-operator">|</span> <span class="ruby-identifier">p</span>.<span class="ruby-identifier">instance_of?</span> <span class="ruby-constant">IndexPage</span> }.<span class="ruby-identifier">map</span>(<span class="ruby-operator">&amp;</span><span class="ruby-value">:lastmod</span>).<span class="ruby-identifier">max</span>
+<span class="ruby-keyword">end</span></pre>
+          </div>
+        </div>
+
+
+      </div>
+
+      <div id="method-c-unhidden_content_files" class="method-detail ">
+        <div class="method-header">
+          <div class="method-heading">
+            <span class="method-name">unhidden_content_files</span><span
+              class="method-args">(content_files)</span>
+            <span class="method-click-advice">click to toggle source</span>
+          </div>
+        </div>
+
+        <div class="method-description">
+          <p>Reject the <code>content_files</code> that match <a href="Config.html#attribute-i-hidden"><code>Clayoven::Config#hidden</code></a></p>
+
+          <div class="method-source-code" id="unhidden_content_files-source">
+            <pre><span class="ruby-comment"># File lib/clayoven/toplevel.rb, line 244</span>
+<span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier ruby-title">unhidden_content_files</span>(<span class="ruby-identifier">content_files</span>)
+  <span class="ruby-identifier">content_files</span>.<span class="ruby-identifier">reject</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">cf</span><span class="ruby-operator">|</span>
+    <span class="ruby-ivar">@config</span>.<span class="ruby-identifier">hidden</span>.<span class="ruby-identifier">any?</span> { <span class="ruby-operator">|</span><span class="ruby-identifier">hidden_entry</span><span class="ruby-operator">|</span> <span class="ruby-node">&quot;#{hidden_entry}.clay&quot;</span> <span class="ruby-operator">==</span> <span class="ruby-identifier">cf</span> }
+  <span class="ruby-keyword">end</span>
+<span class="ruby-keyword">end</span></pre>
+          </div>
+        </div>
+
+
+      </div>
+
+    </section>
+
+  </section>
+</main>
+
+
+<footer id="validator-badges" role="contentinfo">
+  <p><a href="https://validator.w3.org/check/referer">Validate</a>
+  <p>Generated by <a href="https://ruby.github.io/rdoc/">RDoc</a> 6.6.0.
+  <p>Based on <a href="http://deveiate.org/projects/Darkfish-RDoc/">Darkfish</a> by <a href="http://deveiate.org">Michael Granger</a>.
+</footer>
+
