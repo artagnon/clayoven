@@ -1,4 +1,5 @@
 require 'rake/testtask'
+require 'rdoc/task'
 require 'fileutils'
 require 'tmpdir'
 
@@ -19,6 +20,15 @@ task :cpdist do
       FileUtils.cp_r('src/lib/.', "#{dest}/lib")
     end
   end
+end
+
+RDoc::Task.new :doc do |rdoc|
+  rdoc.main = 'README.md'
+  rdoc.title = 'clayoven documentation'
+  rdoc.rdoc_dir = 'docs/'
+  rdoc.rdoc_files.include('README.md', 'lib/clayoven/*.rb')
+  rdoc.options << '--all'
+  rdoc.options << '--copy-files=assets'
 end
 
 task default: :test
