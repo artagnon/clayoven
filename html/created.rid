@@ -1,0 +1,12 @@
+Sun, 04 Apr 2021 08:23:31 +0200
+README.md	Sat, 03 Apr 2021 14:49:29 +0200
+LICENSE	Fri, 19 Mar 2021 19:55:07 +0100
+bin/clayoven	Sun, 21 Mar 2021 13:16:09 +0100
+lib/clayoven/claytext.rb	Sat, 03 Apr 2021 13:39:29 +0200
+lib/clayoven/config.rb	Sat, 03 Apr 2021 13:39:29 +0200
+lib/clayoven/git.rb	Sat, 03 Apr 2021 13:39:29 +0200
+lib/clayoven/httpd.rb	Sat, 03 Apr 2021 13:39:29 +0200
+lib/clayoven/init.rb	Sat, 03 Apr 2021 14:37:05 +0200
+lib/clayoven/toplevel.rb	Sat, 03 Apr 2021 14:37:05 +0200
+lib/clayoven/transforms.rb	Sat, 03 Apr 2021 13:39:29 +0200
+lib/clayoven/util.rb	Sat, 03 Apr 2021 13:39:29 +0200
