@@ -1,9 +1,7 @@
 AllCops:
   TargetRubyVersion: 3.0.0
-FileName:
-  Exclude:
-    - Rakefile
-    - Gemfile
+Naming/FileName:
+  Enabled: false
 Style/FrozenStringLiteralComment:
   Enabled: false
 Style/SingleLineMethods:
@@ -19,7 +17,7 @@ Layout/EmptyLineBetweenDefs:
 Naming/HeredocDelimiterNaming:
   Enabled: false
 Metrics/AbcSize:
-  Max: 22
+  Max: 21
 Metrics/MethodLength:
   Max: 15
 Metrics/ModuleLength:

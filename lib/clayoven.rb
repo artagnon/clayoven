@@ -192,6 +192,12 @@ module Clayoven
     Util.render_math genpages.map(&:target).join(' ')
   end
 
+  def self.sitewide_lastmod(all_pages)
+    all_pages.select do |p|
+      p.instance_of? IndexPage
+    end.map(&:lastmod).max
+  end
+
   def self.generate_sitemap(all_pages)
     puts "[#{'XML'.green} ]: Generating sitemap"
     SitemapGenerator.verbose = false
@@ -200,12 +206,8 @@ module Clayoven
     SitemapGenerator::Sitemap.default_host = "https://#{@config.sitename}"
     SitemapGenerator::Sitemap.public_path = '.'
     SitemapGenerator::Sitemap.create do
-      add '/', lastmod: all_pages.select { |p|
-                          p.instance_of? IndexPage
-                        }.map(&:lastmod).max, priority: 1.0, changefreq: 'always'
-      all_pages.each do |page|
-        add page.permalink, lastmod: page.lastmod
-      end
+      add '/', lastmod: Clayoven.sitewide_lastmod(all_pages), priority: 1.0, changefreq: 'always'
+      all_pages.each { |p| add p.permalink, lastmod: p.lastmod }
     end
   end
 

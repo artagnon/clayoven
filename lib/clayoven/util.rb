@@ -6,29 +6,36 @@ module Clayoven::Util
   # Fetch all .clay files, arbitrary directories deep
   def self.ls_files; Dir.glob('**/*.clay').reject { |entry| File.directory? entry } end
 
+  # Execute a process so that its output is displayed synchronously, but wait until it finishes
+  def self.fork_exec(command)
+    fork { exec command }
+    Process.waitall
+  end
+
   # Minify css and js files, by forking out to npm
   def self.minify_design
     puts "[#{'NPM'.green} ]: Minifying js and css"
-    fork { exec 'npm run --silent minify' }
-    Process.waitall
+    fork_exec 'npm run --silent minify'
   end
 
   # Fork out to npm to render math
   def self.render_math(htmlfiles)
-    fork { exec "npm run --silent jax -- #{htmlfiles}" }
-    Process.waitall
+    fork_exec "npm run --silent jax -- #{htmlfiles}"
   end
+
+  # Location of the dist directory
+  def self.dist_location; File.join(__dir__, *%w[.. .. dist]) end
 
   def self.init(destdir = '.')
     puts "[#{'INIT'.yellow}]: Populating directory with clayoven starter project"
     FileUtils.mkdir_p "#{destdir}/.clayoven"
-    FileUtils.cd destdir
-    FileUtils.cp_r "#{File.join(__dir__, *%w[.. .. dist])}/.", '.'
-    `git init 2>/dev/null`
-    fork { exec 'npm i >/dev/null' }
-    Process.waitall
-    Clayoven.main
-    puts "[#{'INIT'.green}]: Initialization finished. Run `clayoven httpd` to see your website"
+    Dir.chdir destdir do
+      FileUtils.cp_r "#{dist_location}/.", '.'
+      `git init 2>/dev/null`
+      fork_exec 'npm i >/dev/null'
+      Clayoven.main
+    end
+    puts "[#{'INIT'.green}]: Initialization finished. Run `clayoven httpd` in #{destdir} to see your website"
   end
 end
 
