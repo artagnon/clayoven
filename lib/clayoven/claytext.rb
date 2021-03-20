@@ -2,27 +2,23 @@
 module Clayoven::Claytext
   require_relative 'transforms'
 
-  # These are the values that Paragraph.type can take
-  # PARAGRAPH_TYPES = %i[plain olitems subheading exercise indent blurb footer codeblock images horizrule mathjax]
-  # A paragraph of text
-  #
-  # :content is a string that contains a fenced block (after merge_fenced!)
-  # :type can be one of PARAGRAPH_TYPES
-  # :prop is auxiliary type-specific information (:a is for lettered-lists, :i is for numbered-lists)
-  # :olstart is an auxiliary field for list-numbering
-  # :bookmark is another auxiliary field that makes sense in :subheading
-  # :children stores children paragraph, a field that makes sense in :exercise
+  # A paragraph of text; just a String with additional accessors
   class Paragraph < String
-    attr_accessor :type, :prop, :olstart, :bookmark, :children
+    ##
+    # `:type` can be one of PARAGRAPH_TYPES
+    # `:prop` is auxiliary type-specific information (:a is for lettered-lists, :i is for numbered-lists)
+    # `:olstart` is an auxiliary field for list-numbering
+    # `:bookmark` is another auxiliary field that makes sense in :subheading
+    attr_accessor :type, :prop, :olstart, :bookmark
 
     def initialize(contents)
       super
       @type = :plain
       @prop = :none
-      @children = nil
     end
   end
 
+  # Merge `Paragraph` entries with fences marked by the start regex `fregex` and end regex `lregex`
   def self.merge_fenced!(paragraphs, fregex, lregex)
     mb = Struct.new(:block, :fc, :lc)
     matched_blocks = []
@@ -47,6 +43,7 @@ module Clayoven::Claytext
     matched_blocks
   end
 
+  # Perform the transforms in `Transforms::FENCED` on `Paragraph` entries in-place
   def self.fenced_transforms!(paragraphs)
     # For MathJax, exercises, codeblocks, and other fenced content
     Transforms::FENCED.each do |delims, lambda_cb|
@@ -55,6 +52,7 @@ module Clayoven::Claytext
     end
   end
 
+  # Perform the transforms in `Transforms::LINE` on `Paragraph` entries in-place
   def self.line_transforms!(paragraphs)
     paragraphs.filter { |p| p.type == :plain }.each do |p|
       # Apply the Transforms::LINE on all the paragraphs
@@ -64,14 +62,15 @@ module Clayoven::Claytext
     end
   end
 
+  # We only HTML escape very few things, for simplicity
   HTMLESCAPE_RULES = {
     '&' => '&amp;',
     '<' => '&lt;',
     '>' => '&gt;'
   }.freeze
 
+  # Insert <{mark, a}> in certain paragraph kinds
   def self.process_inline_markdown(paragraphs)
-    # Insert <{mark, a}> in certain paragraph kinds
     paragraphs.select { |p| %i[plain olitems exercise footer blurb].count(p.type).positive? }.each do |p|
       p.gsub!(/`([^`]+)`/, '<mark>\1</mark>')
       p.gsub!(/\[([^\]]+)\]\(([^)]+)\)/, '<a href="\2">\1</a>')
@@ -79,6 +78,7 @@ module Clayoven::Claytext
     paragraphs
   end
 
+  ##
   # Takes a body of claytext, breaks it up into paragraphs, and
   # applies various rules on it.
   #

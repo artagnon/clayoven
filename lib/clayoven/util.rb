@@ -1,4 +1,4 @@
-# Utilities for Clayoven
+# Miscellanous utilities for Clayoven
 module Clayoven::Util
   # Sorts a list of filenames lexicographically, but for 'index.clay'
   def self.lex_sort(files) (files.reject { |f| f == 'index.clay' }).sort end
@@ -26,6 +26,7 @@ module Clayoven::Util
   # Location of the dist directory
   def self.dist_location; File.join(__dir__, *%w[.. .. dist]) end
 
+  # The entry point for 'clayoven init'. Does a 'cp -rv dist #{destdir}", 'git init', and 'npm i'.
   def self.init(destdir = '.')
     puts "[#{'INIT'.yellow}]: Populating directory with clayoven starter project"
     FileUtils.mkdir_p "#{destdir}/.clayoven"
@@ -39,7 +40,7 @@ module Clayoven::Util
   end
 end
 
-# Utilities for ClayText
+# Miscellanous utilities for ClayText
 module Clayoven::Claytext::Util
   # Slice a paragraph along index and length, strip out the first line of the first paragraph,
   # the last line of the last paragraph, and finally return the join of the slices with two
@@ -52,8 +53,9 @@ module Clayoven::Claytext::Util
   end
 end
 
-# Utilities for Transforms
+# Miscellanous utilities for Transforms
 module Clayoven::Claytext::Transforms::Util
+  # For roman-numeralized lists like (i), (ii)
   ROMAN_NUMERALS = {
     10 => 'x',
     9 => 'ix',
@@ -62,6 +64,7 @@ module Clayoven::Claytext::Transforms::Util
     1 => 'i'
   }.freeze
 
+  # Do a roman to arabic conversion
   def self.to_arabic(str)
     result = 0
     ROMAN_NUMERALS.each_value do |roman|

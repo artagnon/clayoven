@@ -1,8 +1,10 @@
+require 'colorize'
 require 'webrick'
 require 'uri'
 
 # Run a simple webrick http server to test on localhost:8000
 module Clayoven::Httpd
+  # Start the server, and shut it down on `:INT`
   def self.start
     port = 8000
     callback = proc do |req, res|
@@ -18,7 +20,7 @@ module Clayoven::Httpd
                                      RequestCallback: callback,
                                      DocumentRoot: Dir.pwd)
 
-    puts "clayoven serving at: http://localhost:#{port}"
+    puts "[#{'HTTP'.green}]: Serving at: http://localhost:#{port}"
 
     trap(:INT) { server.shutdown }
     server.start

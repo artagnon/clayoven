@@ -1,7 +1,7 @@
 # The fenced and line transforms for Claytext
 module Clayoven::Claytext::Transforms
-  # Key is used to match each line in a paragraph, and value is the
-  # lambda that'll act on the matched paragraph.
+  # Key is used to match each line in a `Paragraph`, and value is the
+  # lambda that'll act on the matched `Paragraph`.
   LINE = {
     # If all the lines in a paragraph begin with "\d+\. ", those
     # characters are stripped from the content, and the paragraph is
@@ -86,6 +86,8 @@ module Clayoven::Claytext::Transforms
   \end{xy}
   EOF
 
+  # Key is used to starting and ending fences in a `Paragraph`, and value is the
+  # lambda that'll act on the matched `Paragraph`.
   FENCED = {
     [/\A\.\.\.$/, /^\.\.\.\z/] => ->(p, _, _) { p.type = :blurb },
     [/\A```(\w*)$/, /^```\z/] => lambda { |p, fc, _|
