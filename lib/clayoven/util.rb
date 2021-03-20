@@ -1,5 +1,5 @@
-# Miscellanous utilities for Clayoven
-module Clayoven::Util
+# Miscellanous utilities for Clayoven::Toplevel
+module Clayoven::Toplevel::Util
   # Sorts a list of filenames lexicographically, but for 'index.clay'
   def self.lex_sort(files) (files.reject { |f| f == 'index.clay' }).sort end
 
@@ -21,22 +21,6 @@ module Clayoven::Util
   # Fork out to npm to render math
   def self.render_math(htmlfiles)
     fork_exec "npm run --silent jax -- #{htmlfiles}"
-  end
-
-  # Location of the dist directory
-  def self.dist_location; File.join(__dir__, *%w[.. .. dist]) end
-
-  # The entry point for 'clayoven init'. Does a 'cp -rv dist #{destdir}", 'git init', and 'npm i'.
-  def self.init(destdir = '.')
-    puts "[#{'INIT'.yellow}]: Populating directory with clayoven starter project"
-    FileUtils.mkdir_p "#{destdir}/.clayoven"
-    Dir.chdir destdir do
-      FileUtils.cp_r "#{dist_location}/.", '.'
-      `git init 2>/dev/null`
-      fork_exec 'npm i >/dev/null'
-      Clayoven.main
-    end
-    puts "[#{'INIT'.green}]: Initialization finished. Run `clayoven httpd` in #{destdir} to see your website"
   end
 end
 

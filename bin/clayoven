@@ -2,16 +2,21 @@
 
 $:.unshift File.join(__dir__, *%w[.. lib])
 
-require 'clayoven'
+# The main module, which requires everything else, and starts up clayoven
+module Clayoven
+  require 'clayoven/init'
+  require 'clayoven/httpd'
+  require 'clayoven/toplevel'
 
-case ARGV[0]
-when 'httpd'
-  Clayoven::Httpd.start
-when 'aggressive'
-  Clayoven.main(is_aggressive: true)
-when 'init'
-  destdir = ARGV.length > 1 ? ARGV[1] : '.'
-  Clayoven::Util.init destdir
-else
-  Clayoven.main
+  case ARGV[0]
+  when 'httpd'
+    Httpd.start
+  when 'aggressive'
+    Toplevel.main(is_aggressive: true)
+  when 'init'
+    destdir = ARGV.length > 1 ? ARGV[1] : '.'
+    Init.init destdir
+  else
+    Toplevel.main
+  end
 end

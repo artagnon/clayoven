@@ -4,13 +4,19 @@ module Clayoven::Claytext
 
   # A paragraph of text; just a String with additional accessors
   class Paragraph < String
-    ##
-    # `:type` can be one of PARAGRAPH_TYPES
-    # `:prop` is auxiliary type-specific information (:a is for lettered-lists, :i is for numbered-lists)
-    # `:olstart` is an auxiliary field for list-numbering
-    # `:bookmark` is another auxiliary field that makes sense in :subheading
-    attr_accessor :type, :prop, :olstart, :bookmark
+    # `:type` is a `Symbol` like `:plain` or `:mathjax`
+    attr_accessor :type
 
+    # `:prop` is auxiliary type-specific information; could be any type
+    attr_accessor :prop
+
+    # `:olstart` is an auxiliary field for list-numbering
+    attr_accessor :olstart
+
+    # `:bookmark` is another auxiliary field that makes sense in :subheading
+    attr_accessor :bookmark
+
+    # Initializes the superclass, and sets @type to :plain
     def initialize(contents)
       super
       @type = :plain

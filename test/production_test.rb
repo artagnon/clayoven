@@ -1,5 +1,5 @@
 require 'helper'
-require 'clayoven'
+require 'clayoven/toplevel'
 
 # Exercise Clayoven.main on artagnon.com
 class Production < Minitest::Test
@@ -9,7 +9,7 @@ class Production < Minitest::Test
       Dir.chdir("#{tmpdir}/artagnon.com") do
         `npm i`
         _, err = capture_io do
-          Clayoven.main(is_aggressive: true)
+          Clayoven::Toplevel.main(is_aggressive: true)
         end
         assert_empty err
       end

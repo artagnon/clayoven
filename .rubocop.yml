@@ -10,6 +10,8 @@ Style/Semicolon:
   Enabled: false
 Style/ClassAndModuleChildren:
   EnforcedStyle: compact
+Style/AsciiComments:
+  Enabled: false
 Style/SpecialGlobalVars:
   EnforcedStyle: use_perl_names
 Layout/EmptyLineBetweenDefs:

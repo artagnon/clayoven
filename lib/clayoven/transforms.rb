@@ -89,13 +89,18 @@ module Clayoven::Claytext::Transforms
   # Key is used to starting and ending fences in a `Paragraph`, and value is the
   # lambda that'll act on the matched `Paragraph`.
   FENCED = {
+    # For blurbs
     [/\A\.\.\.$/, /^\.\.\.\z/] => ->(p, _, _) { p.type = :blurb },
+
+    # For codeblocks
     [/\A```(\w*)$/, /^```\z/] => lambda { |p, fc, _|
       p.type = :codeblock
       p.prop = if fc.captures[0].empty?
                  :nohighlight
                else fc.captures[0] end
     },
+
+    # For images
     [/\A<< (\d+)x(\d+)$/, /^>>\z/] => lambda { |p, fc, _|
       p.type = :images
       dims = Struct.new(:width, :height)
