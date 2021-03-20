@@ -1,6 +1,9 @@
-# Git metadata information for the clayoven repository
+# = Git metadata information for the clayoven repository
+#
+# Information from the git index is cheap, but Clayoven::Git#metadata is expensive due to the `git log --follow`
+# invocation.
 class Clayoven::Git
-  # Look at the git index immediately; accepts a `Config#tzmap` hashtable
+  # Look at the git index immediately; accepts a Config#tzmap hashtable
   def initialize(tzmap)
     git_ns = `git diff --name-status @ 2>/dev/null`
     @tzmap = tzmap
@@ -34,7 +37,7 @@ class Clayoven::Git
       modified?('.clayoven/st') || modified?('.clayoven/sitename')
   end
 
-  # Indicates if 'design/style.css' or 'design/script.js' was changed
+  # Indicates if `design/style.css` or `design/script.js` was changed
   def design_changed?; modified?('design/style.css') || modified?('design/script.js') end
 
   # Returns a [#{Last modified date} # {Creation date} #{Location strings}]

@@ -2,7 +2,16 @@
 
 $:.unshift File.join(__dir__, *%w[.. lib])
 
-# The main module, which requires everything else, and starts up clayoven
+# = The main clayoven module
+#
+# `Clayoven::Toplevel`, `Clayoven::Httpd`, `Clayoven::Init`, and other modules required by them are nested under this.
+# Matches `ARGV[0]` against 'httpd', 'aggressive', 'init'; otherwise runs `clayoven` in the default
+# incremental-build mode.
+#
+# The incremental build relies on the git index, so if you committed files before running
+# `clayoven`, run `clayoven aggressive`.
+#
+# Only the aggressive variant generates the sitemap.
 module Clayoven
   require 'clayoven/init'
   require 'clayoven/httpd'

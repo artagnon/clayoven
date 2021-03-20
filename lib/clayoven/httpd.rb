@@ -2,6 +2,8 @@ require 'colorize'
 require 'webrick'
 require 'uri'
 
+# = The main entry point for `clayoven httpd`
+#
 # Run a simple webrick http server to test on localhost:8000
 module Clayoven::Httpd
   # Start the server, and shut it down on `:INT`

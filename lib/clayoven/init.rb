@@ -1,8 +1,10 @@
-# Used by init_test.rb
+# :nodoc:
 module Clayoven
   require_relative 'toplevel'
 
-  # For 'clayoven init'
+  # = Entry point for `clayoven init`
+  # It copies the `dist` directory from the source tree to the new project, invokes `git init`
+  # and `npm i`. Having node.js installed is a prerequisite.
   module Init
     # Location of the dist directory
     def self.dist_location; File.join(__dir__, *%w[.. .. dist]) end

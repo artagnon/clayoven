@@ -4,53 +4,59 @@ require 'fileutils'
 require 'progressbar'
 require 'sitemap_generator'
 
-# Used by production_test.rb
+# :nodoc:
 module Clayoven
   require_relative 'git'
   require_relative 'config'
   require_relative 'claytext'
 
-  # The toplevel module for clayoven
+  # = The toplevel module for clayoven, which contains Toplevel#main
   module Toplevel
     require_relative 'util'
 
-    # A general page: IndexPage and ContentPage inherit from Page
+    # :category: An abstract Page class
+    # IndexPage and ContentPage inherit from Page. Exposes accessors to various fields
+    # to be used in `design/template.slim`
     class Page
-      # The permalink of the page of the form '/blog' or '/blog/1'
+      # The permalink of the page of the form `/blog` or `/blog/1`
       attr_accessor :permalink
 
       # The title of the page
       attr_accessor :title
 
-      # A Time object indicating the last-modified date of the post
+      # A `Time` object indicating the last-modified date of the post
       attr_accessor :lastmod
 
-      # A Time object indicating the creation date of the post
+      # A `Time` object indicating the creation date of the post
       attr_accessor :crdate
 
       # An `Array` of `String` of locations where the post was written
       attr_accessor :locations
 
-      # An `Array` of `Paragraph` objects
+      # An `Array` of Clayoven::Claytext::Paragraph objects
       attr_accessor :paragraphs
 
-      # A string indicating the filename on disk
+      # A `String` indicating the filename on disk
       attr_accessor :target
 
-      # A list of "topics" corresponding to `IndexPage` entries
+      # An `Array` of "topics" (`String`) corresponding to `IndexPage` entries
       attr_accessor :topics
 
-      # Intialize with filename and authored dates from git
-      # Expensive due to log --follow; avoid creating Page objects when not necessary.
+      # A list of subtopics for the page, used to fill the IndexPage with "subtopic" headings,
+      # and ContentPage entries
+      attr_accessor :subtopics
+
+      # Intialize with filename and authored dates from git.
+      # Expensive due to `log --follow`; avoid creating `Page` objects when not necessary.
       def initialize(filename, git)
         @filename = filename
-        # If a file is in the git index, use Time.now; otherwise, log --follow it.
+        # If a file is in the git index, use `Time.now`; otherwise, log --follow it.
         @lastmod, @crdate, @locations = git.metadata @filename
         @title, @body = (IO.read @filename).split "\n\n", 2
       end
 
-      # Writes out HTML pages rendered by `Clayoven::Claytext.process` and `Slim::Template`
-      # Initializes `Page#topics`, and accepts a template.
+      # Writes out HTML pages rendered by Clayoven::Claytext.process and `Slim::Template`
+      # Initializes Page#topics, and accepts a template.
       def render(topics, template)
         @topics = topics
         @paragraphs = @body.empty? ? [] : (Clayoven::Claytext.process @body)
@@ -62,13 +68,13 @@ module Clayoven
       end
     end
 
-    # For index.clay and other .index.clay files
+    # An IndexPage
+    #
+    # Should be an `index.clay` in the toplevel directory, or `#{topic}.index.clay` files in the toplevel directory,
+    # or some subdirectory. The ContentPage entries corresponding to this IndexPage will have to be `.clay` files
+    # under the `#{topic}/[#{subtopic}/]` directory of `#{topic}.index.clay`
     class IndexPage < Page
-      # A list of subtopics for the page, used to fill the `IndexPage` with "subtopic" headings,
-      # and `ContentPage` entires
-      attr_accessor :subtopics
-
-      # Initialize `Page#Permalink` and `Page#target`
+      # Initialize Page#permalink and Page#target
       def initialize(filename, git)
         super
 
@@ -87,7 +93,7 @@ module Clayoven
         @lastmod = content_pages.map(&:lastmod).max
       end
 
-      # Initialize `IndexPage#subtopics`, and call `IndexPage#update_crdate_lastmod`.
+      # Initialize Page#subtopics, and call IndexPage#update_crdate_lastmod.
       def fillindex(content_pages, stmap)
         st = Struct.new(:title, :content_pages, :begints, :endts)
         content_pages = content_pages.sort_by { |cp| -cp.crdate.to_i }
@@ -98,10 +104,12 @@ module Clayoven
       end
     end
 
+    # A ContentPage
+    #
     # For .clay files nested within subdirectories, with a corresponding `#{subdirectory}.index.clay`
     # in the ancestor directory.
-    class ContentPage < IndexPage
-      # The specific subtopic under which this `ContentPage` sits
+    class ContentPage < Page
+      # The specific subtopic under which this ContentPage sits
       attr_accessor :subtopic
 
       def initialize(filename, git)
@@ -114,7 +122,7 @@ module Clayoven
       end
     end
 
-    # Simply create `IndexPage` and `ContentPage` entries out of `index_files` and `content_files`.
+    # Simply create IndexPage and ContentPage entries out of index_files and content_files.
     def self.dirty_pages_from_add(index_files, content_files)
       progress = ProgressBar.create(title: "[#{'GIT'.green} ]", total: index_files.count + content_files.count)
 
@@ -130,9 +138,11 @@ module Clayoven
       [index_files.select { |f| @git.modified? f }, content_files.select { |f| @git.added_or_modified? f }]
     end
 
-    # Find the dirty `IndexPage` entries from dirty `ContentPages` entires and `modified_index_files`.
-    # First, see which index_pages are forced dirty by corresponding content_pages;
-    # then, add to the list the ones that are dirty by themselves
+    # Find the dirty IndexPage entries from dirty ContentPage entries and `modified_index_files`.
+    # First, see which modified_index_files are forced dirty by corresponding dirty_content_pages;
+    # then, add to the list the ones that are dirty by themselves.
+    #
+    # Returns an `Array` of IndexPage
     def self.find_dirty_index_pages(dirty_content_pages, modified_index_files, progress)
       # Avoid adding the
       # index page twice when there are two dirty content_pages under the same index
@@ -141,8 +151,10 @@ module Clayoven
       dirty_from_content + modified_index_files.map { |filename| progress.increment; IndexPage.new filename, @git }
     end
 
-    # Find the dirty `IndexPage` and `ContentPage` entries from some modification that occured in the git index,
-    # based on `index_files`, and `content_files`.
+    # Find the dirty IndexPage and ContentPage entries from some modification that occured in the git index,
+    # based on index_files, and content_files.
+    #
+    # Returns an `Array` of IndexPage
     def self.dirty_pages_from_mod(index_files, content_files)
       # Create a progressbar based on information from the git index
       modified_index_files, modified_content_files = modified_files_from_gitidx(index_files, content_files)
@@ -155,7 +167,7 @@ module Clayoven
       [find_dirty_index_pages(dirty_content_pages, modified_index_files, progress), dirty_content_pages]
     end
 
-    # From `index_files` and `content_files`, prepare a list of dirty `IndexPage` and `ContentPage` entries
+    # Return an `Array` of [IndexPage] and [ContentPage] entries
     def self.dirty_pages(index_files, content_files, is_aggressive)
       # Adding a new index file is equivalent to re-rendering the entire site
       if @git.any_added?(index_files) || @git.template_changed? || is_aggressive
@@ -165,15 +177,15 @@ module Clayoven
       end
     end
 
-    # Reject the `content_files` that matches `@config.hidden`
+    # Reject the `content_files` that match Clayoven::config#hidden
     def self.unhidden_content_files(content_files)
       content_files.reject do |cf|
         @config.hidden.any? { |hidden_entry| "#{hidden_entry}.clay" == cf }
       end
     end
 
-    # Return `IndexPage` and `ContentPage` entries to render; we work with `index_files` and `content_files`, because
-    # converting them to `Page` objects prematurely will result in unnecessary `log --follow` invocations
+    # Return IndexPage and ContentPage entries to render; we work with index_files and content_files, because
+    # converting them to Page objects prematurely will result in unnecessary `log --follow` invocations
     def self.pages_to_render(index_files, content_files, is_aggressive)
       dirty_index_pages, dirty_content_pages = dirty_pages index_files, content_files, is_aggressive
 
@@ -186,7 +198,7 @@ module Clayoven
       dirty_index_pages + dirty_content_pages
     end
 
-    # Find the list of topics to be exposed as `Page#topics`.
+    # Find the list of topics to be exposed as Page#topics.
     def self.find_topics(index_files)
       all_topics = Util.lex_sort(index_files).map { |file| file.split('.index.clay').first }
       topics = all_topics.reject do |entry|
@@ -203,7 +215,9 @@ module Clayoven
       [index_files, all_files - index_files]
     end
 
-    # From `all_files`, find out the list of `index_files`, `content_files`, and `topics`, and return them.
+    # From all_files, find out the list of `index_files`, `content_files`, and `topics`, and return them.
+    #
+    # Returns an `Array` of three different `Array` of `String`.
     def self.index_content_files(all_files)
       index_files, content_files = separate_index_content_files all_files
       all_topics, topics = find_topics index_files
@@ -221,7 +235,7 @@ module Clayoven
       [index_files, content_files, topics]
     end
 
-    # Produce HTML files, first using `Page#render`, and then operating on the files produced
+    # Produce HTML files, first using Page#render, and then operating on the files produced
     # in-place with MathJaX
     def self.generate_html(genpages, topics)
       progress = ProgressBar.create(title: "[#{'CLAY'.green}]", total: genpages.length)
@@ -229,14 +243,16 @@ module Clayoven
       Util.render_math genpages.map(&:target).join(' ')
     end
 
-    # For the sitemap root entry, find the maximal `Page#lastmod` of `IndexPage` entries in `all_pages`.
+    # For the sitemap root entry, find the maximal Page#lastmod of IndexPage entries in all_pages.
+    #
+    # Returns a Time object.
     def self.sitewide_lastmod(all_pages)
       all_pages.select do |p|
         p.instance_of? IndexPage
       end.map(&:lastmod).max
     end
 
-    # Generate `sitemap.xml` from `all_pages`.
+    # Generate `sitemap.xml` from all_pages.
     def self.generate_sitemap(all_pages)
       puts "[#{'XML'.green} ]: Generating sitemap"
       SitemapGenerator.verbose = false
@@ -257,7 +273,7 @@ module Clayoven
       generate_sitemap genpages if is_aggressive
     end
 
-    # The main entry point for all clayoven subcommands except `clayoven init`.
+    # The main entry point for `clayoven`, and `clayoven aggressive`.
     def self.main(is_aggressive: false)
       # Only operate on git repositories
       toplevel = `git rev-parse --show-toplevel`.strip
@@ -275,13 +291,13 @@ module Clayoven
         # From all_files, get the list of index_files, content_files, and topics
         index_files, content_files, topics = index_content_files all_files
 
-        # Get a list of pages to render
+        # Get a list of pages to render, genpages
         genpages = pages_to_render index_files, content_files, is_aggressive
 
         # If the template changes, we're definitely in aggressive mode
         is_aggressive ||= @git.template_changed?
 
-        # Generate the entire site
+        # Generate the genpages
         generate_site genpages, topics, is_aggressive if genpages.any?
       end
     end

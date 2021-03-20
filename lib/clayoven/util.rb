@@ -1,4 +1,4 @@
-# Miscellanous utilities for Clayoven::Toplevel
+# Miscellanous utilities
 module Clayoven::Toplevel::Util
   # Sorts a list of filenames lexicographically, but for 'index.clay'
   def self.lex_sort(files) (files.reject { |f| f == 'index.clay' }).sort end
@@ -24,7 +24,7 @@ module Clayoven::Toplevel::Util
   end
 end
 
-# Miscellanous utilities for ClayText
+# Miscellanous utilities
 module Clayoven::Claytext::Util
   # Slice a paragraph along index and length, strip out the first line of the first paragraph,
   # the last line of the last paragraph, and finally return the join of the slices with two
@@ -37,7 +37,7 @@ module Clayoven::Claytext::Util
   end
 end
 
-# Miscellanous utilities for Transforms
+# Miscellanous utilities
 module Clayoven::Claytext::Transforms::Util
   # For roman-numeralized lists like (i), (ii)
   ROMAN_NUMERALS = {

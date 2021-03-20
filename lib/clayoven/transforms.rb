@@ -1,7 +1,11 @@
-# The fenced and line transforms for Claytext
+# = The transforms that act on a `Clayoven::Claytext#Paragraph`
+#
+# Extending the syntax of claytext is easy; just add an entry here.
 module Clayoven::Claytext::Transforms
-  # Key is used to match each line in a `Paragraph`, and value is the
-  # lambda that'll act on the matched `Paragraph`.
+  # Line Transforms
+  #
+  # The key is used to match each line in a Clayoven::Claytext#Paragraph, and value is the
+  # lambda that'll act on the matched Clayoven::Claytext#Paragraph.
   LINE = {
     # If all the lines in a paragraph begin with "\d+\. ", those
     # characters are stripped from the content, and the paragraph is
@@ -86,8 +90,10 @@ module Clayoven::Claytext::Transforms
   \end{xy}
   EOF
 
-  # Key is used to starting and ending fences in a `Paragraph`, and value is the
-  # lambda that'll act on the matched `Paragraph`.
+  # Fenced Transforms
+  #
+  # The key is used to starting and ending fences in a Clayoven::Claytext#Paragraph, and value is the
+  # lambda that'll act on the matched Clayoven::Claytext#Paragraph.
   FENCED = {
     # For blurbs
     [/\A\.\.\.$/, /^\.\.\.\z/] => ->(p, _, _) { p.type = :blurb },
