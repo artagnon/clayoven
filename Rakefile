@@ -18,6 +18,7 @@ task :cpdist do
       FileUtils.cp('src/.htaccess', dest)
       FileUtils.cp('src/package.json', dest)
       FileUtils.cp_r('src/lib/.', "#{dest}/lib")
+      FileUtils.cp_r('src/.vscode/.', "#{dest}/.vscode")
     end
   end
 end
