@@ -26,8 +26,7 @@ end
 RDoc::Task.new :doc do |rdoc|
   rdoc.main = 'README.md'
   rdoc.title = 'clayoven documentation'
-  rdoc.rdoc_dir = 'docs/'
-  rdoc.rdoc_files.include('README.md', 'lib/clayoven/*.rb')
+  rdoc.rdoc_files.include('README.md', 'LICENSE', 'lib/clayoven/*.rb')
   rdoc.options << '--all'
   rdoc.options << '--copy-files=assets'
 end
