@@ -1,4 +1,4 @@
-# = Clayoven configuration
+# Clayoven configuration
 #
 # Clayoven can be configured using files `.clayoven/{sitename, hidden, tz, subtopics}` at the toplevel directory.
 # If a certain configuration file doesn't exist, we automatically create a default one.

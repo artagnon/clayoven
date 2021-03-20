@@ -2,7 +2,7 @@
 
 $:.unshift File.join(__dir__, *%w[.. lib])
 
-# = The main clayoven module
+# The main clayoven module
 #
 # `Clayoven::Toplevel`, `Clayoven::Httpd`, `Clayoven::Init`, and other modules required by them are nested under this.
 # Matches `ARGV[0]` against 'httpd', 'aggressive', 'init'; otherwise runs `clayoven` in the default

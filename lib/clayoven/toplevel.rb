@@ -10,11 +10,12 @@ module Clayoven
   require_relative 'config'
   require_relative 'claytext'
 
-  # = The toplevel module for clayoven, which contains Toplevel#main
+  # The toplevel module for clayoven, which contains Toplevel.main
   module Toplevel
     require_relative 'util'
 
-    # :category: An abstract Page class
+    # An abstract Page class
+    #
     # IndexPage and ContentPage inherit from Page. Exposes accessors to various fields
     # to be used in `design/template.slim`
     class Page
@@ -39,7 +40,7 @@ module Clayoven
       # A `String` indicating the filename on disk
       attr_accessor :target
 
-      # An `Array` of "topics" (`String`) corresponding to `IndexPage` entries
+      # An `Array` of "topics" (`String`) corresponding to IndexPage entries
       attr_accessor :topics
 
       # A list of subtopics for the page, used to fill the IndexPage with "subtopic" headings,

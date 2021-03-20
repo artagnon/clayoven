@@ -1,4 +1,4 @@
-# = The claytext paragraph processor
+# The claytext paragraph processor
 #
 # The actual transformation rules are in Clayoven::Claytext::Transforms.
 module Clayoven::Claytext
@@ -26,7 +26,7 @@ module Clayoven::Claytext
     end
   end
 
-  # Merge Paragraph entries with fences marked by the start regex `fregex` and end regex `lregex`
+  # Merge Paragraph entries with fences marked by the start regex fregex and end regex lregex
   def self.merge_fenced!(paragraphs, fregex, lregex)
     mb = Struct.new(:block, :fc, :lc)
     matched_blocks = []

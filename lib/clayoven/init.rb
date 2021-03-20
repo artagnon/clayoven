@@ -2,7 +2,8 @@
 module Clayoven
   require_relative 'toplevel'
 
-  # = Entry point for `clayoven init`
+  # Entry point for `clayoven init`
+  #
   # It copies the `dist` directory from the source tree to the new project, invokes `git init`
   # and `npm i`. Having node.js installed is a prerequisite.
   module Init

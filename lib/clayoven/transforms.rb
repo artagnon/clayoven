@@ -1,4 +1,4 @@
-# = The transforms that act on a `Clayoven::Claytext#Paragraph`
+# The transforms that act on a Clayoven::Claytext#Paragraph
 #
 # Extending the syntax of claytext is easy; just add an entry here.
 module Clayoven::Claytext::Transforms
@@ -80,11 +80,13 @@ module Clayoven::Claytext::Transforms
     end
   }.freeze
 
-  # Start and end markers, making it easy to write commutative diagrams
+  # Start marker for commutative diagrams
   XYMATRIX_START = <<-'EOF'.freeze
   \begin{xy}
   \xymatrix{
   EOF
+
+  # End marker for commutative diagrams
   XYMATRIX_END = <<-'EOF'.freeze
   }
   \end{xy}
