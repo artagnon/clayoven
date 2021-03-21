@@ -1,5 +1,6 @@
 #!/usr/bin/env ruby
 
+# Append to $LOAD_PATH or $:
 $:.unshift File.join(__dir__, *%w[.. lib])
 
 # The main clayoven module
@@ -23,8 +24,7 @@ module Clayoven
   when 'aggressive'
     Toplevel.main(is_aggressive: true)
   when 'init'
-    destdir = ARGV.length > 1 ? ARGV[1] : '.'
-    Init.init destdir
+    Init.init(ARGV.length > 1 ? ARGV[1] : '.')
   else
     Toplevel.main
   end

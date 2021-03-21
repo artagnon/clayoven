@@ -108,7 +108,7 @@ module Clayoven::Claytext::Transforms
                else fc.captures[0] end
     },
 
-    # For images
+    # For images and notebooks of svgs
     [/\A<< (\d+)x(\d+)$/, /^>>\z/] => lambda { |p, fc, _|
       p.type = :images
       dims = Struct.new(:width, :height)

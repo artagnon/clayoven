@@ -3,7 +3,7 @@ module Clayoven::Toplevel::Util
   # Sorts a list of filenames lexicographically, but for 'index.clay'
   def self.lex_sort(files) (files.reject { |f| f == 'index.clay' }).sort end
 
-  # Fetch all .clay files, arbitrary directories deep
+  # Fetch all .clay files, ∞ directories deep
   def self.ls_files; Dir.glob('**/*.clay').reject { |entry| File.directory? entry } end
 
   # Execute a process so that its output is displayed synchronously, but wait until it finishes
@@ -18,7 +18,7 @@ module Clayoven::Toplevel::Util
     fork_exec 'npm run --silent minify'
   end
 
-  # Fork out to npm to render math
+  # Fork out to npm to render math, via MathJaX and XyJaX; very expensive if you have a lot of math on your site.
   def self.render_math(htmlfiles)
     fork_exec "npm run --silent jax -- #{htmlfiles}"
   end

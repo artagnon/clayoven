@@ -1,6 +1,6 @@
 # The claytext paragraph processor
 #
-# The actual transformation rules are in Clayoven::Claytext::Transforms.
+# The actual transformation rules are the constants in Clayoven::Claytext::Transforms.
 module Clayoven::Claytext
   require_relative 'transforms'
 
@@ -9,16 +9,16 @@ module Clayoven::Claytext
     # `Symbol` like `:plain` or `:mathjax`
     attr_accessor :type
 
-    # An auxiliary Paragraph#type-specific information; could be any \type
+    # An auxiliary type-specific information; could be any \type
     attr_accessor :prop
 
-    # An auxiliary field for list-numbering; makes sense when Paragraph#type is `:olitems`
+    # An auxiliary field for list-numbering; makes sense when type is `:olitems`
     attr_accessor :olstart
 
-    # Another auxiliary field that makes sense in when Paragraph#type is `:subheading`
+    # Another auxiliary field that makes sense in when type is `:subheading`
     attr_accessor :bookmark
 
-    # Initializes the superclass, and sets Paragraph#type to `:plain`
+    # Initializes the superclass, and sets type to `:plain`
     def initialize(contents)
       super
       @type = :plain
@@ -51,7 +51,7 @@ module Clayoven::Claytext
     matched_blocks
   end
 
-  # Perform the transforms in Transforms::FENCED on Paragraph entries in-place
+  # Perform the transforms in Clayoven::Claytext::Transforms::FENCED on Paragraph entries in-place
   def self.fenced_transforms!(paragraphs)
     # For MathJax, exercises, codeblocks, and other fenced content
     Transforms::FENCED.each do |delims, lambda_cb|
@@ -60,7 +60,7 @@ module Clayoven::Claytext
     end
   end
 
-  # Perform the transforms in Transforms::LINE on Paragraph entries in-place
+  # Perform the transforms in Clayoven::Claytext::Transforms::LINE on Paragraph entries in-place
   def self.line_transforms!(paragraphs)
     paragraphs.filter { |p| p.type == :plain }.each do |p|
       # Apply the Transforms::LINE on all the paragraphs

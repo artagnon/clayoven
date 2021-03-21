@@ -10,14 +10,16 @@ module Clayoven
   require_relative 'config'
   require_relative 'claytext'
 
-  # The toplevel module for clayoven, which contains Toplevel.main
+  # The toplevel module for clayoven, which contains main
   module Toplevel
     require_relative 'util'
 
     # An abstract page class
     #
     # IndexPage and ContentPage inherit from this class. Exposes accessors to various fields
-    # to be used in `design/template.slim`
+    # to be used in `design/template.slim`.
+    #
+    # Be careful when creating \Page objects, because new is expensive.
     class Page
       # The \permalink of the page of the form `/blog` or `/blog/1`
       attr_accessor :permalink
@@ -31,7 +33,7 @@ module Clayoven
       # A `Time` object indicating the creation date of the post
       attr_accessor :crdate
 
-      # An `Array` of `String` of \locations where the post was written
+      # An `Array` of `String` of places where the post was written
       attr_accessor :locations
 
       # An `Array` of Clayoven::Claytext::Paragraph objects
@@ -47,7 +49,8 @@ module Clayoven
       # and ContentPage entries
       attr_accessor :subtopics
 
-      # Intialize with filename and authored dates from git.
+      # Initialize with filename and data from Clayoven::Git#metadata
+      #
       # Expensive due to `log --follow`; avoid creating `Page` objects when not necessary.
       def initialize(filename, git)
         @filename = filename
@@ -75,11 +78,11 @@ module Clayoven
     # or some subdirectory. The ContentPage entries corresponding to this \IndexPage will have to be `.clay` files
     # under the `#{topic}/[#{subtopic}/]` directory of `#{topic}.index.clay`
     class IndexPage < Page
-      # Initialize Page#permalink and Page#target
+      # Initialize permalink and target, with special handling for 'index.clay';
+      # every other filename is a '*.index.clay'
       def initialize(filename, git)
         super
 
-        # Special handling for 'index.clay': every other IndexFile is a '*.index.clay'
         @permalink = if @filename == 'index.clay'
                        'index'
                      else
@@ -113,6 +116,7 @@ module Clayoven
       # The specific "subtopic" under which this ContentPage sits
       attr_accessor :subtopic
 
+      # Initialize Page#topic, Page#subtopic, Page#permalink, and Page#target
       def initialize(filename, git)
         super
         # There cannot be ContentPages nested under 'index'
