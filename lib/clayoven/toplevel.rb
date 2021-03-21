@@ -14,15 +14,15 @@ module Clayoven
   module Toplevel
     require_relative 'util'
 
-    # An abstract Page class
+    # An abstract page class
     #
-    # IndexPage and ContentPage inherit from Page. Exposes accessors to various fields
+    # IndexPage and ContentPage inherit from this class. Exposes accessors to various fields
     # to be used in `design/template.slim`
     class Page
-      # The permalink of the page of the form `/blog` or `/blog/1`
+      # The \permalink of the page of the form `/blog` or `/blog/1`
       attr_accessor :permalink
 
-      # The title of the page
+      # The first line in the .clay or .index.clay file serves as the \title of the page
       attr_accessor :title
 
       # A `Time` object indicating the last-modified date of the post
@@ -31,19 +31,19 @@ module Clayoven
       # A `Time` object indicating the creation date of the post
       attr_accessor :crdate
 
-      # An `Array` of `String` of locations where the post was written
+      # An `Array` of `String` of \locations where the post was written
       attr_accessor :locations
 
       # An `Array` of Clayoven::Claytext::Paragraph objects
       attr_accessor :paragraphs
 
-      # A `String` indicating the filename on disk
+      # A `String` indicating the path to the HTML file on disk
       attr_accessor :target
 
       # An `Array` of "topics" (`String`) corresponding to IndexPage entries
       attr_accessor :topics
 
-      # A list of subtopics for the page, used to fill the IndexPage with "subtopic" headings,
+      # An `Array` of "subtopics" for the page, used to fill the IndexPage with subtopic headings,
       # and ContentPage entries
       attr_accessor :subtopics
 
@@ -56,7 +56,7 @@ module Clayoven
         @title, @body = (IO.read @filename).split "\n\n", 2
       end
 
-      # Writes out HTML pages rendered by Clayoven::Claytext.process and `Slim::Template`
+      # Writes out HTML pages rendered by Clayoven::Claytext::process and `Slim::Template`
       # Initializes Page#topics, and accepts a template.
       def render(topics, template)
         @topics = topics
@@ -69,10 +69,10 @@ module Clayoven
       end
     end
 
-    # An IndexPage
+    # An "index page"
     #
     # Should be an `index.clay` in the toplevel directory, or `#{topic}.index.clay` files in the toplevel directory,
-    # or some subdirectory. The ContentPage entries corresponding to this IndexPage will have to be `.clay` files
+    # or some subdirectory. The ContentPage entries corresponding to this \IndexPage will have to be `.clay` files
     # under the `#{topic}/[#{subtopic}/]` directory of `#{topic}.index.clay`
     class IndexPage < Page
       # Initialize Page#permalink and Page#target
@@ -105,12 +105,12 @@ module Clayoven
       end
     end
 
-    # A ContentPage
+    # A "content page"
     #
     # For .clay files nested within subdirectories, with a corresponding `#{subdirectory}.index.clay`
     # in the ancestor directory.
     class ContentPage < Page
-      # The specific subtopic under which this ContentPage sits
+      # The specific "subtopic" under which this ContentPage sits
       attr_accessor :subtopic
 
       def initialize(filename, git)
@@ -168,7 +168,7 @@ module Clayoven
       [find_dirty_index_pages(dirty_content_pages, modified_index_files, progress), dirty_content_pages]
     end
 
-    # Return an `Array` of [IndexPage] and [ContentPage] entries
+    # Return `Array` of IndexPage and ContentPage entries to render
     def self.dirty_pages(index_files, content_files, is_aggressive)
       # Adding a new index file is equivalent to re-rendering the entire site
       if @git.any_added?(index_files) || @git.template_changed? || is_aggressive
@@ -178,7 +178,7 @@ module Clayoven
       end
     end
 
-    # Reject the `content_files` that match Clayoven::config#hidden
+    # Reject the `content_files` that match Clayoven::Config#hidden
     def self.unhidden_content_files(content_files)
       content_files.reject do |cf|
         @config.hidden.any? { |hidden_entry| "#{hidden_entry}.clay" == cf }
@@ -274,7 +274,7 @@ module Clayoven
       generate_sitemap genpages if is_aggressive
     end
 
-    # The main entry point for `clayoven`, and `clayoven aggressive`.
+    # The entry point for `clayoven`, and `clayoven aggressive`.
     def self.main(is_aggressive: false)
       # Only operate on git repositories
       toplevel = `git rev-parse --show-toplevel`.strip

@@ -1,11 +1,11 @@
-# The transforms that act on a Clayoven::Claytext#Paragraph
+# The transforms that act on a Clayoven::Claytext::Paragraph
 #
-# Extending the syntax of claytext is easy; just add an entry here.
+# Extending the syntax of claytext is easy: just add an entry here.
 module Clayoven::Claytext::Transforms
-  # Line Transforms
+  # Line transforms
   #
-  # The key is used to match each line in a Clayoven::Claytext#Paragraph, and value is the
-  # lambda that'll act on the matched Clayoven::Claytext#Paragraph.
+  # The key is used to match each line in a Clayoven::Claytext::Paragraph, and value is the
+  # lambda that'll act on the matched paragraph.
   LINE = {
     # If all the lines in a paragraph begin with "\d+\. ", those
     # characters are stripped from the content, and the paragraph is
@@ -80,22 +80,22 @@ module Clayoven::Claytext::Transforms
     end
   }.freeze
 
-  # Start marker for commutative diagrams
+  # Start marker for commutative diagrams, rendered using XyJaX
   XYMATRIX_START = <<-'EOF'.freeze
   \begin{xy}
   \xymatrix{
   EOF
 
-  # End marker for commutative diagrams
+  # End marker for commutative diagrams, rendered using XyJaX
   XYMATRIX_END = <<-'EOF'.freeze
   }
   \end{xy}
   EOF
 
-  # Fenced Transforms
+  # Fenced transforms
   #
-  # The key is used to starting and ending fences in a Clayoven::Claytext#Paragraph, and value is the
-  # lambda that'll act on the matched Clayoven::Claytext#Paragraph.
+  # The key is used to starting and ending fences in a Clayoven::Claytext::Paragraph, and value is the
+  # lambda that'll act on the matched paragraph.
   FENCED = {
     # For blurbs
     [/\A\.\.\.$/, /^\.\.\.\z/] => ->(p, _, _) { p.type = :blurb },
@@ -126,7 +126,7 @@ module Clayoven::Claytext::Transforms
       p.replace ['$$', p.to_s, '$$'].join("\n")
     end,
 
-    # Writing commutative diagrams using xypic: {{ ... }}
+    # Writing commutative diagrams using xypic: {{ ... }}, rendered using XyJaX
     [/\A\{\{$/, /^\}\}\z/] => lambda do |p, _, _|
       p.type = :mathjax
       p.replace ['$$', XYMATRIX_START, p.to_s, XYMATRIX_END, '$$'].join("\n")

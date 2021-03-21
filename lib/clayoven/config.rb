@@ -1,21 +1,22 @@
-# Clayoven configuration
+# \Clayoven Configuration
 #
-# Clayoven can be configured using files `.clayoven/{sitename, hidden, tz, subtopics}` at the toplevel directory.
+# \Clayoven can be configured using files `.clayoven/{sitename, hidden, tz, subtopics}` at the toplevel directory.
 # If a certain configuration file doesn't exist, we automatically create a default one.
 class Clayoven::Config
-  # The sitename excluding the 'https://' prefix
+  # The public URL of the website excluding the 'https://' prefix
   attr_accessor :sitename
 
-  # A list of hidden entries
+  # A list of Clayoven::Toplevel::ContentPage#permalink entries, not to be displayed when generating the corresponding
+  # Clayoven::Toplevel::IndexPage
   attr_accessor :hidden
 
-  # A timezone mapper of the form {'+0000' => 'London'}
+  # A timezone mapper of the form {'+0000' => 'London'}; exposed as Clayoven::Toplevel::Page#locations
   attr_accessor :tzmap
 
-  # A subtopic mapper of the form {'inf' => '∞-categories'}
+  # A subtopic mapper of the form {'inf' => '∞-categories'}; exposed as Clayoven::Toplevel::IndexPage#subtopics
   attr_accessor :stmap
 
-  # A template .slim file read out from disk
+  # A .slim file read out from disk; hard-coded to the contents of `design/template.slim`
   attr_accessor :template
 
   # Format: [(+|-)\d{4}] [String]

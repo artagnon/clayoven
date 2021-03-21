@@ -3,7 +3,7 @@
 # Information from the git index via initialize is cheap, but metadata is expensive due to the `git log --follow`
 # invocation.
 class Clayoven::Git
-  # Look at the git index immediately; accepts a Config#tzmap hashtable
+  # Look at the git index immediately; accepts a Clayoven::Config#tzmap hashtable
   def initialize(tzmap)
     git_ns = `git diff --name-status @ 2>/dev/null`
     @tzmap = tzmap

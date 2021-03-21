@@ -9,7 +9,7 @@ module Clayoven::Claytext
     # `Symbol` like `:plain` or `:mathjax`
     attr_accessor :type
 
-    # An auxiliary type-specific information; could be any type
+    # An auxiliary Paragraph#type-specific information; could be any \type
     attr_accessor :prop
 
     # An auxiliary field for list-numbering; makes sense when Paragraph#type is `:olitems`
