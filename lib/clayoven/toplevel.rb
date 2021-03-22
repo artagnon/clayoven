@@ -113,6 +113,9 @@ module Clayoven
     # For .clay files nested within subdirectories, with a corresponding `#{subdirectory}.index.clay`
     # in the ancestor directory.
     class ContentPage < Page
+      # The specific "topic" under which this ContentPage sits
+      attr_accessor :topic
+
       # The specific "subtopic" under which this ContentPage sits
       attr_accessor :subtopic
 
