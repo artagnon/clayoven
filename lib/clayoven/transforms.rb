@@ -41,8 +41,8 @@ module Clayoven::Claytext::Transforms
       paragraph.type = :exercise
     end,
 
-    # Extending exercise blocks by indenting them
-    /^- / => lambda do |paragraph, regex|
+    # Indenting a block
+    /^  / => lambda do |paragraph, regex|
       paragraph.gsub! regex, ''
       paragraph.type = :indent
     end,

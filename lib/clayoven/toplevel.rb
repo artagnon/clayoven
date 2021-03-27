@@ -306,7 +306,7 @@ module Clayoven
         is_aggressive ||= @git.template_changed?
 
         # Generate the genpages
-        generate_site genpages, topics, is_aggressive if genpages.any?
+        generate_site genpages, topics, is_aggressive
       end
     end
   end
