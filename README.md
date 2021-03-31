@@ -1,7 +1,7 @@
 # clayoven ![logo](assets/clayoven.png)
 
-[![Maintainability](https://api.codeclimate.com/v1/badges/f80781c50c7fb18e6130/maintainability)](https://codeclimate.com/github/artagnon/clayoven/maintainability)
-[![Test Coverage](https://api.codeclimate.com/v1/badges/f80781c50c7fb18e6130/test_coverage)](https://codeclimate.com/github/artagnon/clayoven/test_coverage)
+[![Maintainability](https://img.shields.io/codeclimate/maintainability/artagnon/clayoven?style=for-the-badge&logo=code-climate&labelColor=000000&label=Maintainability)](https://codeclimate.com/github/artagnon/clayoven/maintainability)
+[![Test Coverage](https://img.shields.io/codeclimate/coverage/artagnon/clayoven?style=for-the-badge&logo=code-climate&labelColor=000000&label=Test%20Coverage)](https://codeclimate.com/github/artagnon/clayoven/test_coverage)
 
 clayoven is a beautiful static site generator with a carefully curated set of features. It has been built at a glacial pace, over a period of [eight years](https://github.com/artagnon/clayoven/commit/d4d40161e9f76dbe74078c669de9af698cf621d6), as [my website](https://artagnon.com) expanded in content. I have a spread of mathematical notes, both typeset and handwritten, software-related posts, and some wider-audience articles; it suffices to say that clayoven is good on all three fronts. The source files are written in "claytext", a custom format built for elegance and speed.
 
