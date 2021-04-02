@@ -50,7 +50,7 @@ The engine works closely with the git object store, and builds are incremental b
 
 - `clayoven init` to generate the necessary template website.
 - `clayoven` to generate html files incrementally based on the current git index.
-- `clayoven aggressive` to regenerate the entire site along with a `sitemap.xml`; run occassionally.
+- `clayoven aggressive` to regenerate the entire site; run occassionally.
 - `clayoven httpd` to preview your website locally.
 
 ## Configuration
