@@ -39,7 +39,7 @@ void recurseFillChildren(CurTy &E)
 
 (iii) $A/\mathfrak{N}$ is a field.
 
-(a) The Split dominates the Merge, in which case, the Split dominates everything on its outEdges leading to the Merge.
+(a) The Split dominates the Merge.
 
 † Thanks to [Chaitanya Leena Subramanium](https://sites.google.com/view/chaitanyals) for suggesting the exercises and pushing for the use of natural deductions in the last exercise.
 ‡ Thanks to [Hugo Herbelin](http://pauillac.inria.fr/~herbelin/) for patiently going through many proofs and pointing out the errors.
