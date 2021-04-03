@@ -19,7 +19,7 @@ module Clayoven
         `git init 2>/dev/null`
         fork { exec 'npm i >/dev/null' }
         Process.waitall
-        Clayoven::Toplevel.main
+        Clayoven::Toplevel.main(is_aggressive: true)
       end
       puts "[#{'INIT'.green}]: Initialization finished. Run `clayoven httpd` in #{destdir} to see your website"
     end
