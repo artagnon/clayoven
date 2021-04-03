@@ -16,13 +16,17 @@ rdoc documentation is available at [clayoven.artagnon.com](https://clayoven.arta
 
 ## Getting started
 
-There is no published gem. To get started, clone, run `bundle` to install the required gems, and put `bin/clayoven` in `$PATH`. Then, run `clayoven init` in a fresh directory. To start writing, install [vsclay](https://marketplace.visualstudio.com/items?itemName=artagnon.vsclay) for vscode, which will provide the necessary syntax highlighting, and trigger-[incremental build]-on-save functionality.
+There is no published gem. To get started, clone, run `bundle` to install the required gems, and put `bin/clayoven` in `$PATH`. Then, run `clayoven init` in a fresh directory. To start writing, install [vsclay](https://marketplace.visualstudio.com/items?itemName=artagnon.vsclay) for vscode, which will provide the necessary syntax highlighting, IntelliSense support for MathJaX, and trigger-[incremental build]-on-save functionality.
 
-## The claytext format
+## The claytext format, and vsclay
 
 Here's an excerpt of claytext, illustrating the main features:
 
-![vsclay demo](assets/vsclay-demo.png)
+![syntax highlighting demo](assets/vsclay-demo.png)
+
+Here's an excerpt of embedded MathJaX with IntelliSense powered by vsclay:
+
+![IntelliSense demo](https://user-images.githubusercontent.com/37226/113474233-24866400-946f-11eb-8e72-b82460d16c71.mp4)
 
 ## The site-generation engine
 
@@ -64,7 +68,7 @@ The engine works closely with the git object store, and builds are incremental b
 
 The claytext processor is, at its core, a paragraph-processor; all content must be split up into either plain paragraphs, or "fences" (multiple paragraphs delimited by start and end tokens). The function of most markers should be evident from the `scratch.html` produced by a `clayoven init`. The format is strict, and the processor doesn't like files with paragraphs wrapped using hard line breaks.
 
-`Transforms::LINE` matches paragraphs where all lines begin with some regex, and `Transforms::Fenced` match fences (could be multiple paragraphs) that start and end with the specified tokens. In addition to this, there are inline markdown markers `` `...` `` and `[...](...)`, for content that is to be put in `<mark>` and `<a>`, respectively.
+`Clayoven::Claytext::Transforms::LINE` matches paragraphs where all lines begin with some regex, and `Clayoven::Claytext::Transforms::Fenced` match fences (could be multiple paragraphs) that start and end with the specified tokens. In addition to this, there are inline markdown markers `` `...` `` and `[...](...)`, for content that is to be put in `<mark>` and `<a>`, respectively.
 
 ## Tips
 
@@ -74,5 +78,5 @@ The claytext processor is, at its core, a paragraph-processor; all content must 
 
 ## Planned features, and anti-features
 
-- Intellisense support for MathJaX in vsclay.
+- Get vsclay to report syntax errors.
 - Anti: extending claytext in ways that would necessitate an ugly implementation.
