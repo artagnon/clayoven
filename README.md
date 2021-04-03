@@ -22,7 +22,7 @@ There is no published gem. To get started, clone, run `bundle` to install the re
 
 Here's an excerpt of claytext, illustrating the main features:
 
-![syntax highlighting demo](assets/vsclay-demo.png)
+![syntax highlighting demo](assets/syntax-demo.png)
 
 Here's an excerpt of embedded MathJaX with IntelliSense powered by vsclay:
 
@@ -54,7 +54,7 @@ The engine works closely with the git object store, and builds are incremental b
 
 - `clayoven init` to generate the necessary template website.
 - `clayoven` to generate html files incrementally based on the current git index.
-- `clayoven aggressive` to regenerate the entire site; run occassionally.
+- `clayoven aggressive` to regenerate the entire site; only requires to be run on occassion.
 - `clayoven httpd` to preview your website locally.
 
 ## Configuration
@@ -78,5 +78,8 @@ The claytext processor is, at its core, a paragraph-processor; all content must 
 
 ## Planned features, and anti-features
 
+- Have one unified dhall configuration.
+- Allow the user to extend claytext syntax with configuration.
+- Hit 100% test coverage.
 - Get vsclay to report syntax errors.
 - Anti: extending claytext in ways that would necessitate an ugly implementation.
