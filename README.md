@@ -22,7 +22,7 @@ There is no published gem. To get started, clone, run `bundle` to install the re
 
 Here's an excerpt of claytext, illustrating the main features:
 
-![syntax highlighting demo](assets/syntax-demo.png)
+![syntax highlighting demo](https://user-images.githubusercontent.com/37226/113476397-96fd4100-947b-11eb-8691-285509b1f686.png)
 
 Here's an excerpt of embedded MathJaX with IntelliSense powered by vsclay:
 
