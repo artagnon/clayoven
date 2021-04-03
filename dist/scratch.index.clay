@@ -33,13 +33,13 @@ void recurseFillChildren(CurTy &E)
 };
 ```
 
-<< 317x390
-/dist/artagnon.com.svg
+<< 1508x1782
+https://user-images.githubusercontent.com/37226/113476397-96fd4100-947b-11eb-8691-285509b1f686.png
 >>
 
 (iii) $A/\mathfrak{N}$ is a field.
 
 (a) The Split dominates the Merge.
 
-† Thanks to [Chaitanya Leena Subramanium](https://sites.google.com/view/chaitanyals) for suggesting the exercises and pushing for the use of natural deductions in the last exercise.
-‡ Thanks to [Hugo Herbelin](http://pauillac.inria.fr/~herbelin/) for patiently going through many proofs and pointing out the errors.
+† clayoven is licensed under the MIT license.
+‡ Contributions to clayoven are most welcome.

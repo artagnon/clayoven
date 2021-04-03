@@ -3,16 +3,55 @@ html lang="en"
   head
     title clayoven: #{permalink}
     meta charset="utf-8"
+
+    // our stylesheet and javascript
+    link rel="stylesheet" href="/dist/style.min.css"
+    script defer=true src="/dist/script.min.js"
+
+    // hljs
+    link rel="preload" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/10.2.0/styles/solarized-light.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'"
+    noscript
+      link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/10.2.0/styles/solarized-light.min.css"
+    script defer=true src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/10.2.0/highlight.min.js"
+    script defer=true src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/10.2.0/languages/coq.min.js"
+    script defer=true src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/10.2.0/languages/cpp.min.js"
   body
-    div id="main"
-      h1 = title
-      time = crdate.strftime("%F")
-      - paragraphs.each do |paragraph|
-        - if paragraph.type == :plain
-          p == paragraph.to_s
-    div id="sidebar"
-      ul
-        - if topics
+    nav
+      div
+        a href="/" = "Home"
+      div
+        ul
           - topics.each do |topic|
             li
               a href="/#{topic}" = topic
+    main
+      header
+        h1 == title
+        div id="metadata"
+          time = lastmod.strftime("%F")
+      article class="wrapper"
+        - paragraphs.each do |paragraph|
+          - case paragraph.type
+            - when :codeblock
+              pre
+                code class="hljs #{paragraph.prop}" == paragraph.to_s
+            - when :images
+              - for img in paragraph.split("\n")
+                img src=img alt=img width="#{paragraph.prop.width}" height="#{paragraph.prop.height}"
+            - when :olitems
+              ol class="olitems" type="#{paragraph.prop}" start="#{paragraph.olstart}"
+                - for item in paragraph.split "\n"
+                  li == item
+            - when :footer
+              footer
+                - for item in paragraph.split "\n"
+                  p == item
+            - else
+              p class="#{paragraph.type}" == paragraph.to_s
+        - if subtopics && subtopics.any?
+          ul id="indexfill"
+            - subtopics.each do |st|
+              h2 = "#{st.title} (#{st.begints.to_date.year})"
+              - st.content_pages.each do |cp|
+                li
+                  a href="/#{cp.permalink}" = cp.title
