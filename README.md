@@ -14,19 +14,21 @@ rdoc documentation is available at [clayoven.artagnon.com](https://clayoven.arta
 - Automatically picks timestamps from git history, respecting moves.
 - Server-side rendering of math, including commutative diagrams, via MathJaX and XyJaX.
 
-## Getting started
+## Demo
 
-There is no published gem. To get started, clone, run `bundle` to install the required gems, and put `bin/clayoven` in `$PATH`. Then, run `clayoven init` in a fresh directory. To start writing, install [vsclay](https://marketplace.visualstudio.com/items?itemName=artagnon.vsclay) for vscode, which will provide the necessary syntax highlighting, IntelliSense support for MathJaX, and trigger-[incremental build]-on-save functionality.
-
-## The claytext format, and vsclay
-
-Here's an excerpt of claytext, illustrating the main features:
+A starter project is bundled with the following `scratch.index.clay`:
 
 ![syntax highlighting demo](https://user-images.githubusercontent.com/37226/113476397-96fd4100-947b-11eb-8691-285509b1f686.png)
+
+whose rendered output can be seen [here](https://artagnon.com/scratch)).
 
 Here's an excerpt of embedded MathJaX with IntelliSense powered by vsclay:
 
 ![IntelliSense demo](https://user-images.githubusercontent.com/37226/113474233-24866400-946f-11eb-8e72-b82460d16c71.mp4)
+
+## Getting started
+
+There is no published gem. To get started, clone, run `bundle` to install the required gems, and put `bin/clayoven` in `$PATH`. Then, run `clayoven init` in a fresh directory. To start writing, install [vsclay](https://marketplace.visualstudio.com/items?itemName=artagnon.vsclay) for vscode, which will provide the necessary syntax highlighting, IntelliSense support for MathJaX, and trigger-[incremental build]-on-save functionality.
 
 ## The site-generation engine
 
@@ -37,7 +39,7 @@ So, if you have these files,
     .vscode/...             # provided by `init`
     .htaccess               # provided by `init`
     lib/...                 # provided by `init`
-    design/template.slim    # provided by `init`
+    design/                 # provided by `init`
     index.clay              # provided by `init`
     scratch.index.clay      # provided by `init`
     404.index.clay          # provided by `init`
@@ -52,7 +54,7 @@ The engine works closely with the git object store, and builds are incremental b
 
 ## Usage
 
-- `clayoven init` to generate the necessary template website.
+- `clayoven init` to generate the necessary starter project.
 - `clayoven` to generate html files incrementally based on the current git index.
 - `clayoven aggressive` to regenerate the entire site; only requires to be run on occassion.
 - `clayoven httpd` to preview your website locally.
