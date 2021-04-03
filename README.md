@@ -18,7 +18,7 @@ rdoc documentation is available at [clayoven.artagnon.com](https://clayoven.arta
 
 A starter project is bundled with the following `scratch.index.clay`:
 
-![syntax highlighting demo](https://user-images.githubusercontent.com/37226/113476397-96fd4100-947b-11eb-8691-285509b1f686.png)
+![syntax highlighting demo](https://user-images.githubusercontent.com/37226/113478818-91a7f280-948b-11eb-87f0-3610f2aa3160.png)
 
 whose rendered output can be seen [here](https://artagnon.com/scratch)).
 
