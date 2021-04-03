@@ -27,10 +27,9 @@ RDoc::Task.new :doc do |rdoc|
   rdoc.main = 'README.md'
   rdoc.markup = 'markdown'
   rdoc.title = 'clayoven documentation'
-  rdoc.rdoc_files.include('README.md', 'LICENSE', 'lib/clayoven/*.rb')
+  rdoc.rdoc_files.include('README.md', 'LICENSE', 'bin/clayoven', 'lib/clayoven/*.rb')
   rdoc.options << '--all'
   rdoc.options << '--hyperlink-all'
-  rdoc.options << '--copy-files=assets'
 end
 
 task default: :test
