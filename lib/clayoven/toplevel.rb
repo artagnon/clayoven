@@ -301,11 +301,11 @@ module Clayoven
         # From all_files, get the list of index_files, content_files, and topics
         index_files, content_files, topics = index_content_files all_files
 
-        # Get a list of pages to render, genpages
-        genpages = pages_to_render index_files, content_files, is_aggressive
-
         # If the template changes, we're definitely in aggressive mode
         is_aggressive ||= @git.template_changed?
+
+        # Get a list of pages to render, genpages
+        genpages = pages_to_render index_files, content_files, is_aggressive
 
         # Generate the genpages
         generate_site genpages, topics, is_aggressive

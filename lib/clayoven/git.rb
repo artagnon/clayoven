@@ -20,7 +20,7 @@ class Clayoven::Git
   end
 
   # Indicates if a file was modified, from git index
-  def modified?(file) @modified.any?(file) end
+  def modified?(file) @modified.any?(file) || @untracked.any?(file) end
 
   # Indicates if a file was added, from git index
   def added?(file) @added.any?(file) || @untracked.any?(file) end
@@ -33,8 +33,8 @@ class Clayoven::Git
 
   # Indicates if the config or the template was changed, in a way that requires a full rebuild
   def template_changed?
-    modified?('design/template.slim') || modified?('.clayoven/hidden') || modified?('.clayoven/tz') ||
-      modified?('.clayoven/subtopics')
+    modified?('design/template.slim') || modified?('.clayoven/hidden') ||
+      modified?('.clayoven/tz') || modified?('.clayoven/subtopics')
   end
 
   # Indicates if `design/style.css` or `design/script.js` was changed
