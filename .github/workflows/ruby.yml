@@ -10,6 +10,12 @@ name: Ruby
 on:
   push:
     branches: [master]
+    paths-ignore:
+      - "README.md"
+      - ".gitignore"
+      - ".mailmap"
+      - ".rubocop.yml"
+      - "assets/*"
   pull_request:
     branches: [master]
 
