@@ -1,5 +1,6 @@
 require 'helper'
 require 'tmpdir'
+require 'fileutils'
 require 'clayoven/toplevel'
 
 # Exercise Clayoven.main on artagnon.com
@@ -32,8 +33,24 @@ class Production < Minitest::Test
         `npm i`
         File.open('scratch.index.clay', 'a') { |io| io.write 'foo' }
         Clayoven::Toplevel.main
-        assert_equal modified_clay_html == ['scratch.html', 'scratch.index.clay'], true,
+        assert_equal modified_clay_html, ['scratch.html', 'scratch.index.clay'],
                      "modified files don't correspond to scratch: #{modified_clay_html}"
+      end
+    end
+  end
+
+  def test_incremental_full
+    Dir.mktmpdir do |tmpdir|
+      `git clone --depth 1 https://github.com/artagnon/artagnon.com #{tmpdir}/artagnon.com`
+      Dir.chdir("#{tmpdir}/artagnon.com") do
+        FileUtils.rm_rf '.git'
+        FileUtils.rm_rf Dir.glob('**/*.html')
+        `git init`
+        `npm i`
+        Clayoven::Toplevel.main
+        untracked_files = `git ls-files --others --exclude-standard`.split("\n")
+        untracked_html = untracked_files.filter { |f| f.end_with? '.html' }
+        assert_equal untracked_html.empty?, false, "clayoven incremental didn't build anything"
       end
     end
   end
