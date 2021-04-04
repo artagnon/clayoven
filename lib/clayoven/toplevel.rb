@@ -100,7 +100,7 @@ module Clayoven
       # Initialize Page#subtopics, and call IndexPage#update_crdate_lastmod.
       def fillindex(content_pages, stmap)
         st = Struct.new(:title, :content_pages, :begints, :endts)
-        content_pages = content_pages.sort_by { |cp| -cp.crdate.to_i }
+        content_pages = content_pages.sort
         @subtopics = content_pages.group_by(&:subtopic).map do |subtop, grp|
           st.new(stmap[subtop], grp, grp.last.crdate, grp.first.crdate)
         end
@@ -127,6 +127,15 @@ module Clayoven
         @subtopic = nil if @subtopic.end_with?('.clay')
         @permalink = @filename.split('.clay').first
         @target = "#{@permalink}.html"
+      end
+
+      # sort is unstable, and we resolve equality of crdate elegantly
+      def <=>(other)
+        if crdate.to_i == other.crdate.to_i
+          other.permalink <=> permalink
+        else
+          other.crdate.to_i <=> crdate.to_i
+        end
       end
     end
 
