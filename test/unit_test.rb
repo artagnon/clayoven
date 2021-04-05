@@ -25,8 +25,8 @@ class Unit < Minitest::Test
   def test_noinit
     Dir.mktmpdir do |dir|
       Dir.chdir dir do
-        pid = fork { Clayoven::Toplevel.main }
-        Process.wait pid
+        fork { Clayoven::Toplevel.main }
+        Process.waitall
         assert_equal $?.success?, false, 'clayoven did not abort with non-zero exit status'
       end
     end

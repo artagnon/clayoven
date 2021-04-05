@@ -14,11 +14,16 @@ class Production < Minitest::Test
     git_mod_index.map(&:last).select { |f| f.end_with?('.clay') || f.end_with?('.html') }
   end
 
-  def test_aggressive_clean_workdir
+  def test_clean_workdir
     Dir.mktmpdir do |tmpdir|
       `git clone https://github.com/artagnon/artagnon.com #{tmpdir}/artagnon.com`
       Dir.chdir("#{tmpdir}/artagnon.com") do
         `npm i`
+
+        _, err = capture_io { Clayoven::Toplevel.main }
+        assert_empty err.strip, "clayoven incremental returned an error: #{err.strip}"
+        assert_empty modified_clay_html, "git diff returned non-zero: #{modified_clay_html}"
+
         _, err = capture_io { Clayoven::Toplevel.main(is_aggressive: true) }
         assert_empty err.strip, "clayoven returned an error: #{err.strip}"
         assert_empty modified_clay_html, "git diff returned non-zero: #{modified_clay_html}"
