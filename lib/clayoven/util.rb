@@ -6,21 +6,15 @@ module Clayoven::Toplevel::Util
   # Fetch all .clay files, ∞ directories deep
   def self.ls_files; Dir.glob('**/*.clay').reject { |entry| File.directory? entry } end
 
-  # Execute a process so that its output is displayed synchronously, but wait until it finishes
-  def self.fork_exec(command)
-    fork { exec command }
-    Process.waitall
-  end
-
-  # Minify css and js files, by forking out to npm
+  # Minify css and js files, by shelling out to npm
   def self.minify_design
     puts "[#{'NPM'.green} ]: Minifying js and css"
-    fork_exec 'npm run --silent minify'
+    system 'npm run --silent minify'
   end
 
-  # Fork out to npm to render math, via MathJaX and XyJaX; very expensive if you have a lot of math on your site.
+  # Shell out to npm to render math, via MathJaX and XyJaX; very expensive if you have a lot of math on your site.
   def self.render_math(htmlfiles)
-    fork_exec "npm run --silent jax -- #{htmlfiles}"
+    system "npm run --silent jax -- #{htmlfiles}"
   end
 end
 

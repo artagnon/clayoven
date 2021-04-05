@@ -19,7 +19,7 @@ class Production < Minitest::Test
       `git clone https://github.com/artagnon/artagnon.com #{tmpdir}/artagnon.com`
       Dir.chdir("#{tmpdir}/artagnon.com") do
         `npm i`
-        _, err = capture_subprocess_io { Clayoven::Toplevel.main(is_aggressive: true) }
+        _, err = capture_io { Clayoven::Toplevel.main(is_aggressive: true) }
         assert_empty err.strip, "clayoven returned an error: #{err.strip}"
         assert_empty modified_clay_html, "git diff returned non-zero: #{modified_clay_html}"
       end
@@ -31,10 +31,13 @@ class Production < Minitest::Test
       `git clone https://github.com/artagnon/artagnon.com #{tmpdir}/artagnon.com`
       Dir.chdir("#{tmpdir}/artagnon.com") do
         `npm i`
-        File.open('scratch.index.clay', 'a') { |io| io.write 'foo' }
+        File.open('articles/zfc.clay', 'a') { |io| io.write 'foo' }
+        File.open('articles/ra.clay', 'a') { |io| io.write 'bar' }
         Clayoven::Toplevel.main
-        assert_equal modified_clay_html, ['scratch.html', 'scratch.index.clay'],
-                     "modified files don't correspond to scratch: #{modified_clay_html}"
+        assert_equal modified_clay_html,
+                     ['articles.html', 'articles/ra.clay', 'articles/ra.html', 'articles/zfc.clay',
+                      'articles/zfc.html'],
+                     "modified files don't correspond to articles, ra, and zfc: #{modified_clay_html}"
       end
     end
   end

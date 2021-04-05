@@ -63,7 +63,7 @@ module Clayoven
       # Initializes Page#topics, and accepts a template.
       def render(topics, template)
         @topics = topics
-        @paragraphs = @body.empty? ? [] : (Clayoven::Claytext.process @body)
+        @paragraphs = @body ? (Clayoven::Claytext.process @body) : []
         Slim::Engine.set_options pretty: true, sort_attrs: false
         rendered = Slim::Template.new { template }.render self
         File.open(@target, _ = 'w') do |targetio|
@@ -246,7 +246,7 @@ module Clayoven
         .reject { |file| all_topics.include? file.split('/').first }
         .each do |stray|
         content_files -= [stray]
-        puts "[#{'WARN'.yellow} ]: #{stray} is a stray file or directory; ignored"
+        warn "[#{'WARN'.yellow} ]: #{stray} is a stray file or directory; ignored"
       end
 
       [index_files, content_files, topics]
@@ -293,8 +293,8 @@ module Clayoven
     # The entry point for `clayoven`, and `clayoven aggressive`.
     def self.main(is_aggressive: false)
       # Only operate on git repositories
-      toplevel = `git rev-parse --show-toplevel`.strip
-      if toplevel.empty? || (!File.directory? "#{toplevel}/.clayoven")
+      toplevel = `git rev-parse --show-toplevel 2>/dev/null`.strip
+      if $? != 0 || toplevel.empty? || (!File.directory? "#{toplevel}/.clayoven")
         abort "[#{'ERR'.red} ]: Not a clayoven project (have you run `clayoven init`?)"
       end
       Dir.chdir(toplevel) do

@@ -17,7 +17,7 @@ module Clayoven
       Dir.chdir destdir do
         FileUtils.cp_r "#{dist_location}/.", '.'
         `git init 2>/dev/null`
-        fork { exec 'npm i >/dev/null' }
+        system 'npm i >/dev/null'
         Process.waitall
         Clayoven::Toplevel.main(is_aggressive: true)
       end
