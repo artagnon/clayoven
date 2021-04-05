@@ -6,6 +6,7 @@ require 'tmpdir'
 Rake::TestTask.new :test do |t|
   t.libs << 'test'
   t.libs << 'lib'
+  t.libs << 'minitest'
   t.test_files = FileList['test/*_test.rb']
 end
 

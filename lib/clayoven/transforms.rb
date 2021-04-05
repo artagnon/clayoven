@@ -14,7 +14,7 @@ module Clayoven::Claytext::Transforms
       match = paragraph.match regex
       paragraph.gsub! regex, ''
       paragraph.type = :olitems
-      paragraph.olstart = match[1] if match
+      paragraph.olstart = match[1]
     end,
 
     # The Roman-numeral version of ol
@@ -23,7 +23,7 @@ module Clayoven::Claytext::Transforms
       paragraph.gsub! regex, ''
       paragraph.type = :olitems
       paragraph.prop = :i
-      paragraph.olstart = Util.to_arabic(match[1]) if match
+      paragraph.olstart = Util.to_arabic(match[1])
     end,
 
     # The alphabetic version of ol
@@ -32,7 +32,7 @@ module Clayoven::Claytext::Transforms
       paragraph.gsub! regex, ''
       paragraph.type = :olitems
       paragraph.prop = :a
-      paragraph.olstart = match[1].ord - 'a'.ord + 1 if match
+      paragraph.olstart = match[1].ord - 'a'.ord + 1
     end,
 
     # Exercise blocks
