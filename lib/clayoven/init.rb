@@ -10,14 +10,14 @@ module Clayoven
     # Location of the dist directory
     def self.dist_location; File.join(__dir__, *%w[.. .. dist]) end
 
-    # The entry point for 'clayoven \init'. Does a 'cp -rv #{distdir} #{destdir}", 'git \init', and 'npm i'.
+    # The entry point for 'clayoven \init'. Does a 'cp -rv #{distdir} #{destdir}", 'git \init', and 'yarn install'.
     def self.init(destdir = '.')
       puts "[#{'INIT'.yellow}]: Populating directory with clayoven starter project"
       FileUtils.mkdir_p "#{destdir}/.clayoven"
       Dir.chdir destdir do
         FileUtils.cp_r "#{dist_location}/.", '.'
         `git init 2>/dev/null`
-        system 'npm i >/dev/null'
+        system 'yarn install >/dev/null'
         Process.waitall
         Clayoven::Toplevel.main(is_aggressive: true)
       end

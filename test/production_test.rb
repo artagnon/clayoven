@@ -18,7 +18,7 @@ class Production < Minitest::Test
     Dir.mktmpdir do |tmpdir|
       `git clone https://github.com/artagnon/artagnon.com #{tmpdir}/artagnon.com`
       Dir.chdir("#{tmpdir}/artagnon.com") do
-        `npm i`
+        `yarn install`
 
         _, err = capture_io { Clayoven::Toplevel.main }
         assert_empty err.strip, "clayoven incremental returned an error: #{err.strip}"
@@ -35,7 +35,7 @@ class Production < Minitest::Test
     Dir.mktmpdir do |tmpdir|
       `git clone https://github.com/artagnon/artagnon.com #{tmpdir}/artagnon.com`
       Dir.chdir("#{tmpdir}/artagnon.com") do
-        `npm i`
+        `yarn install`
         File.open('articles/zfc.clay', 'a') { |io| io.write 'foo' }
         File.open('articles/ra.clay', 'a') { |io| io.write 'bar' }
         Clayoven::Toplevel.main
@@ -54,7 +54,7 @@ class Production < Minitest::Test
         FileUtils.rm_rf '.git'
         FileUtils.rm_rf Dir.glob('**/*.html')
         `git init`
-        `npm i`
+        `yarn install`
         Clayoven::Toplevel.main
         untracked_files = `git ls-files --others --exclude-standard`.split("\n")
         untracked_html = untracked_files.filter { |f| f.end_with? '.html' }

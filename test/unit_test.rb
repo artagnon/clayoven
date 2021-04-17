@@ -16,8 +16,8 @@ class Unit < Minitest::Test
       Dir.chdir dir do
         Clayoven::Init.init
         out, = capture_subprocess_io { Clayoven::Toplevel.main }
-        # TeX message cannot be captured, because it's another shell-out to npm
-        msg_not_found(%w[GIT CLAY NPM XML], out)
+        # TeX message cannot be captured, because it's another shell-out to clay
+        msg_not_found(%w[GIT CLAY YARN XML], out)
       end
     end
   end
