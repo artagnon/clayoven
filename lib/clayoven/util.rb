@@ -8,13 +8,13 @@ module Clayoven::Toplevel::Util
 
   # Minify css and js files, by shelling out to npm
   def self.minify_design
-    puts "[#{'NPM'.green} ]: Minifying js and css"
-    system 'npm run --silent minify'
+    puts "[#{'YARN'.green}]: Minifying js and css"
+    system 'yarn minify'
   end
 
   # Shell out to npm to render math, via MathJaX and XyJaX; very expensive if you have a lot of math on your site.
   def self.render_math(htmlfiles)
-    system "npm run --silent jax -- #{htmlfiles}"
+    system "yarn jax -- #{htmlfiles}"
   end
 end
 
