@@ -93,8 +93,8 @@ module Clayoven
 
       # Page#crdate and Page#lastmod are decided, not based on git metadata, but on content_pages
       def update_crdate_lastmod(content_pages)
-        @crdate = content_pages.map(&:crdate).min
-        @lastmod = content_pages.map(&:lastmod).max
+        @crdate = content_pages.map(&:crdate).append(@crdate).min
+        @lastmod = content_pages.map(&:lastmod).append(@lastmod).max
       end
 
       # Initialize Page#subtopics, and call IndexPage#update_crdate_lastmod.
