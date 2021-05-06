@@ -22,7 +22,7 @@ GEM
       tilt (>= 2.0.6, < 2.1)
     temple (0.8.2)
     tilt (2.0.10)
-    tmpdir (0.1.1)
+    tmpdir (0.1.2)
       fileutils
     uri (0.10.1)
     webrick (1.7.0)
