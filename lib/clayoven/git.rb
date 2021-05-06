@@ -19,6 +19,9 @@ class Clayoven::Git
     end
   end
 
+  # Return the toplevel directory in the git tree, or an empty string
+  def self.toplevel; `git rev-parse --show-toplevel 2>/dev/null`.strip end
+
   # Indicates if a file was modified, from git index
   def modified?(file) @modified.any?(file) || @untracked.any?(file) end
 

@@ -39,6 +39,10 @@ module Clayoven
       # An `Array` of Clayoven::Claytext::Paragraph objects
       attr_accessor :paragraphs
 
+      # An `Array` of `String` for the path to the various images included with the Page
+      # Useful for computing timestamps
+      attr_accessor :additional_assets
+
       # A `String` indicating the path to the HTML file on disk
       attr_accessor :target
 
@@ -49,11 +53,15 @@ module Clayoven
       # and ContentPage entries
       attr_accessor :subtopics
 
+      # The git object
+      attr_accessor :git
+
       # Initialize with filename and data from Clayoven::Git#metadata
       #
       # Expensive due to `log --follow`; avoid creating `Page` objects when not necessary.
       def initialize(filename, git)
         @filename = filename
+        @git = git
         # If a file is in the git index, use `Time.now`; otherwise, log --follow it.
         @lastmod, @crdate, @locations = git.metadata @filename
         @title, @body = (IO.read @filename).split "\n\n", 2
@@ -63,7 +71,7 @@ module Clayoven
       # Initializes Page#topics, and accepts a template.
       def render(topics, template)
         @topics = topics
-        @paragraphs = @body ? (Clayoven::Claytext.process @body) : []
+        @paragraphs, @attached_assets = @body ? (Clayoven::Claytext.process @body) : []
         Slim::Engine.set_options pretty: true, sort_attrs: false
         rendered = Slim::Template.new { template }.render self
         File.open(@target, _ = 'w') do |targetio|
@@ -93,8 +101,11 @@ module Clayoven
 
       # Page#crdate and Page#lastmod are decided, not based on git metadata, but on content_pages
       def update_crdate_lastmod(content_pages)
-        @crdate = content_pages.map(&:crdate).append(@crdate).min
-        @lastmod = content_pages.map(&:lastmod).append(@lastmod).max
+        asset_metadata = content_pages.map { |cp| (@git.metadata cp.additional_assets) }
+        asset_crdates = asset_metadata.map { |m| m[1] }
+        asset_lastmods = asset_metadata.map { |m| m[0] }
+        @crdate = (content_pages.map(&:crdate).append(@crdate) + asset_crdates).min
+        @lastmod = (content_pages.map(&:lastmod).append(@lastmod) + asset_lastmods).max
       end
 
       # Initialize Page#subtopics, and call IndexPage#update_crdate_lastmod.
@@ -293,7 +304,7 @@ module Clayoven
     # The entry point for `clayoven`, and `clayoven aggressive`.
     def self.main(is_aggressive: false)
       # Only operate on git repositories
-      toplevel = `git rev-parse --show-toplevel 2>/dev/null`.strip
+      toplevel = Git.toplevel
       if $? != 0 || toplevel.empty? || (!File.directory? "#{toplevel}/.clayoven")
         abort "[#{'ERR'.red} ]: Not a clayoven project (have you run `clayoven init`?)"
       end
