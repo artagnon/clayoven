@@ -1,5 +1,3 @@
-require_relative 'git'
-
 # The transforms that act on a Clayoven::Claytext::Paragraph
 #
 # Extending the syntax of claytext is easy: just add an entry here.
@@ -96,12 +94,11 @@ module Clayoven::Claytext::Transforms
 
   # Fenced transforms
   #
-  # The key is used to starting and ending fences in a Clayoven::Claytext::Paragraph,
-  # and value is the lambda that'll act on the matched paragraph; each lambda returns
-  # an Array of attached assets
+  # The key is used to starting and ending fences in a Clayoven::Claytext::Paragraph, and value is the
+  # lambda that'll act on the matched paragraph.
   FENCED = {
     # For blurbs
-    [/\A\.\.\.$/, /^\.\.\.\z/] => ->(p, _, _) { p.type = :blurb; [] },
+    [/\A\.\.\.$/, /^\.\.\.\z/] => ->(p, _, _) { p.type = :blurb },
 
     # For codeblocks
     [/\A```(\w*)$/, /^```\z/] => lambda { |p, fc, _|
@@ -109,7 +106,6 @@ module Clayoven::Claytext::Transforms
       p.prop = if fc.captures[0].empty?
                  :nohighlight
                else fc.captures[0] end
-      []
     },
 
     # For images and notebooks of svgs
@@ -121,23 +117,20 @@ module Clayoven::Claytext::Transforms
         p.replace Dir.glob("#{p}/*.svg", base: Clayoven::Git.toplevel)
                      .sort_by { |e| e.split('/')[-1].split('.svg')[0].to_i }.join("\n")
       end
-      assets = p.split("\n")
-      p.replace assets.map { |e| File.join('/', e) }.join("\n")
-      assets
+      # Artificially make all paths start with /
+      p.replace p.split("\n").map { |e| File.join('/', e) }.join("\n")
     },
 
     # MathJaX: put the markers back, since js needs it: $$ ... $$
     [/\A\$\$/, /\$\$\z/] => lambda do |p, _, _|
       p.type = :mathjax
       p.replace ['$$', p.to_s, '$$'].join("\n")
-      []
     end,
 
     # Writing commutative diagrams using xypic: {{ ... }}, rendered using XyJaX
     [/\A\{\{$/, /^\}\}\z/] => lambda do |p, _, _|
       p.type = :mathjax
       p.replace ['$$', XYMATRIX_START, p.to_s, XYMATRIX_END, '$$'].join("\n")
-      []
     end
   }.freeze
 end

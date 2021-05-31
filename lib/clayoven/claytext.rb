@@ -56,7 +56,7 @@ module Clayoven::Claytext
     # For MathJax, exercises, codeblocks, and other fenced content
     Transforms::FENCED.each do |delims, lambda_cb|
       blocks = merge_fenced! paragraphs, delims[0], delims[1]
-      blocks.each { |blk| @attached_assets += lambda_cb.call blk.block, blk.fc, blk.lc }
+      blocks.each { |blk| lambda_cb.call blk.block, blk.fc, blk.lc }
     end
   end
 
@@ -91,9 +91,6 @@ module Clayoven::Claytext
   #
   # Returns an `Array` of Paragraph
   def self.process(body)
-    # Initialize attached_assets
-    @attached_assets = []
-
     # Split the body into Paragraphs
     paragraphs = body.split("\n\n").map { |p| Paragraph.new p.rstrip }
 
@@ -110,6 +107,6 @@ module Clayoven::Claytext
     paragraphs.filter { |p| p.type == :plain }.each { |p| p.gsub!(/\n/, "<br/>\n") }
 
     # Process `...` and `[...](...)`
-    [process_inline_markdown(paragraphs), @attached_assets]
+    process_inline_markdown paragraphs
   end
 end
