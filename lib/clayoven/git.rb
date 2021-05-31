@@ -40,8 +40,8 @@ class Clayoven::Git
       modified?('.clayoven/tz') || modified?('.clayoven/subtopics')
   end
 
-  # Indicates if `design/style.css` or `design/script.js` was changed
-  def design_changed?; modified?('design/style.css') || modified?('design/script.js') end
+  # Indicates if `design/style.sass` or `design/script.js` was changed
+  def design_changed?; modified?('design/style.sass') || modified?('design/script.js') end
 
   # Returns a `[#{Last modified timestamp} # {Creation timestamp} #{Location strings}]`
   # The timestamps default to `Time.now` if the file hasn't been committed.
