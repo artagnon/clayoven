@@ -21,7 +21,7 @@ module Clayoven
     #
     # Be careful when creating \Page objects, because new is expensive.
     class Page
-      # The \permalink of the page of the form `/blog` or `/blog/1`
+      # The \permalink of the page of the form `blog` or `blog/1`
       attr_accessor :permalink
 
       # The first line in the .clay or .index.clay file serves as the \title of the page
@@ -41,7 +41,7 @@ module Clayoven
 
       # An `Array` of `String` for the path to the various images included with the Page
       # Useful for computing timestamps
-      attr_accessor :additional_assets
+      attr_accessor :attached_assets
 
       # A `String` indicating the path to the HTML file on disk
       attr_accessor :target
@@ -101,11 +101,8 @@ module Clayoven
 
       # Page#crdate and Page#lastmod are decided, not based on git metadata, but on content_pages
       def update_crdate_lastmod(content_pages)
-        asset_metadata = content_pages.map { |cp| (@git.metadata cp.additional_assets) }
-        asset_crdates = asset_metadata.map { |m| m[1] }
-        asset_lastmods = asset_metadata.map { |m| m[0] }
-        @crdate = (content_pages.map(&:crdate).append(@crdate) + asset_crdates).min
-        @lastmod = (content_pages.map(&:lastmod).append(@lastmod) + asset_lastmods).max
+        @crdate = content_pages.map(&:crdate).min
+        @lastmod = content_pages.map(&:lastmod).max
       end
 
       # Initialize Page#subtopics, and call IndexPage#update_crdate_lastmod.
