@@ -52,8 +52,7 @@ class Clayoven::Git
     locs = dates.map { |d| d.strftime('%z') }.map { |tz| @tzmap[tz] }.uniq
     return Time.now, Time.now, locs unless dates.first
 
-    # Give the user 60 seconds to test and commit
-    lastmod = added_or_modified?(file) ? Time.now + 60 : dates.first
+    lastmod = added_or_modified?(file) ? Time.now : dates.first
     [lastmod, dates.last, locs]
   end
 end
