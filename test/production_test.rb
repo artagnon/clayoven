@@ -40,9 +40,9 @@ class Production < Minitest::Test
         File.open('articles/ra.clay', 'a') { |io| io.write 'bar' }
         Clayoven::Toplevel.main
         assert_equal modified_clay_html,
-                     ['articles.html', 'articles/ra.clay', 'articles/ra.html', 'articles/zfc.clay',
+                     ['articles/ra.clay', 'articles/ra.html', 'articles/zfc.clay',
                       'articles/zfc.html'],
-                     "modified files don't correspond to articles, ra, and zfc: #{modified_clay_html}"
+                     "modified files don't correspond to ra, and zfc: #{modified_clay_html}"
       end
     end
   end
