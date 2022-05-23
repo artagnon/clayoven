@@ -98,8 +98,8 @@ module Clayoven::Claytext
     fenced_transforms! paragraphs
     line_transforms! paragraphs
 
-    # At the end of both sets of transforms, htmlescape everything but `:mathjax`
-    paragraphs.reject { |p| p.type == :mathjax }.each do |p|
+    # At the end of both sets of transforms, htmlescape everything but `:mathjax` and `:codeblock`
+    paragraphs.reject { |p| p.type == :mathjax or p.type == :codeblock }.each do |p|
       p.gsub!(/[<>&]/, HTMLESCAPE_RULES)
     end
 

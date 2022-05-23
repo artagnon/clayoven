@@ -1,3 +1,5 @@
+require 'rouge'
+
 # The transforms that act on a Clayoven::Claytext::Paragraph
 #
 # Extending the syntax of claytext is easy: just add an entry here.
@@ -103,9 +105,14 @@ module Clayoven::Claytext::Transforms
     # For codeblocks
     [/\A```(\w*)$/, /^```\z/] => lambda { |p, fc, _|
       p.type = :codeblock
-      p.prop = if fc.captures[0].empty?
-                 :nohighlight
-               else fc.captures[0] end
+      if fc.captures[0].empty?
+        p.prop = ""
+      else
+        formatter = Rouge::Formatters::HTML.new()
+        lexer = (Util::ROUGE_LEXERS[fc.captures[0]]).new()
+        p.replace (formatter.format(lexer.lex p))
+        p.prop = Rouge::Themes::Base16::Solarized.mode(:light).render()
+      end
     },
 
     # For images and notebooks of svgs

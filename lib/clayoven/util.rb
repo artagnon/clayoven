@@ -1,3 +1,5 @@
+require 'rouge'
+
 # Miscellanous utilities
 module Clayoven::Toplevel::Util
   # Sorts a list of filenames lexicographically, but for 'index.clay'
@@ -40,6 +42,15 @@ module Clayoven::Claytext::Transforms::Util
     5 => 'v',
     4 => 'iv',
     1 => 'i'
+  }.freeze
+
+  # Lexers in Rouge
+  ROUGE_LEXERS = {
+    'hs' => Rouge::Lexers::Haskell,
+    'rs' => Rouge::Lexers::Rust,
+    'coq' => Rouge::Lexers::Coq,
+    'cpp' => Rouge::Lexers::Cpp,
+    'asm' => Rouge::Lexers::Nasm
   }.freeze
 
   # Do a roman to arabic conversion
