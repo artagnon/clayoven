@@ -7,7 +7,7 @@ GEM
     fileutils (1.6.0)
     minitest (5.15.0)
     progressbar (1.11.0)
-    psych (4.0.3)
+    psych (4.0.4)
       stringio
     rake (13.0.6)
     rdoc (6.4.0)
@@ -23,7 +23,7 @@ GEM
     slim (4.1.0)
       temple (>= 0.7.6, < 0.9)
       tilt (>= 2.0.6, < 2.1)
-    stringio (3.0.1)
+    stringio (3.0.2)
     temple (0.8.2)
     tilt (2.0.10)
     tmpdir (0.1.2)
