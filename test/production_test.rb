@@ -36,13 +36,13 @@ class Production < Minitest::Test
       `git clone https://github.com/artagnon/artagnon.com #{tmpdir}/artagnon.com`
       Dir.chdir("#{tmpdir}/artagnon.com") do
         `yarn install`
-        File.open('articles/zfc.clay', 'a') { |io| io.write 'foo' }
-        File.open('articles/ra.clay', 'a') { |io| io.write 'bar' }
+        File.open('articles/tech/zfc.clay', 'a') { |io| io.write 'foo' }
+        File.open('articles/art/ra.clay', 'a') { |io| io.write 'bar' }
         Clayoven::Toplevel.main
-        assert_equal modified_clay_html,
-                     ['articles/ra.clay', 'articles/ra.html', 'articles/zfc.clay',
-                      'articles/zfc.html'],
-                     "modified files don't correspond to ra, and zfc: #{modified_clay_html}"
+        assert_equal ['articles/art/ra.clay', 'articles/art/ra.html', 'articles/tech/zfc.clay',
+                      'articles/tech/zfc.html'],
+                     modified_clay_html,
+                     "modified files don't correspond to ra and zfc: #{modified_clay_html}"
       end
     end
   end

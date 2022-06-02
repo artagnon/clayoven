@@ -16,7 +16,7 @@ module Clayoven::Toplevel::Util
 
   # Shell out to npm to render math, via MathJaX and XyJaX; very expensive if you have a lot of math on your site.
   def self.render_math(htmlfiles)
-    system "yarn jax -- #{htmlfiles}"
+    system "yarn jax #{htmlfiles}"
   end
 end
 
