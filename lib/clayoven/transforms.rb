@@ -19,6 +19,13 @@ module Clayoven::Claytext::Transforms
       paragraph.olstart = match[1]
     end,
 
+    # The code for :ulitems is much simpler
+    /^(\- )/ => lambda do |paragraph, regex|
+      match = paragraph.match regex
+      paragraph.gsub! regex, ''
+      paragraph.type = :ulitems
+    end,
+
     # The Roman-numeral version of ol
     /^\(([ivx]+)\) / => lambda do |paragraph, regex|
       match = paragraph.match regex
@@ -41,12 +48,6 @@ module Clayoven::Claytext::Transforms
     /^(\+|§) / => lambda do |paragraph, regex|
       paragraph.gsub! regex, ''
       paragraph.type = :exercise
-    end,
-
-    # Indenting a block
-    /^  / => lambda do |paragraph, regex|
-      paragraph.gsub! regex, ''
-      paragraph.type = :indent
     end,
 
     # If the paragraph has exactly one line prefixed with hashes,

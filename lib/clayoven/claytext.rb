@@ -79,8 +79,10 @@ module Clayoven::Claytext
 
   # Insert <{mark, a}> in certain kinds of Paragraph#type
   def self.process_inline_markdown(paragraphs)
-    paragraphs.select { |p| %i[plain olitems exercise footer blurb].count(p.type).positive? }.each do |p|
+    paragraphs.select { |p| %i[plain olitems ulitems exercise footer blurb].count(p.type).positive? }.each do |p|
       p.gsub!(/`([^`]+)`/, '<mark>\1</mark>')
+      p.gsub!(/!\{([^\}]+)\}/, '<strong>\1</strong>')
+      p.gsub!(/!_\{([^\}]+)\}/, '<em>\1</em>')
       p.gsub!(/\[([^\[\]]+)\]\(([^)]+)\)/, '<a href="\2">\1</a>')
     end
     paragraphs
