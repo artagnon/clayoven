@@ -63,7 +63,7 @@ module Clayoven::Claytext
   # Perform the transforms in Clayoven::Claytext::Transforms::LINE on Paragraph entries in-place
   def self.line_transforms!(paragraphs)
     # Preprocess lines ending with ' \\'
-    paragraphs.each { |p| p.gsub! " \\\\\n", '!br!' }
+    paragraphs.each { |p| p.gsub! " \\\\\n", "\u{23CE}" }
     Transforms::LINE.each do |regex, lambda_cb|
       paragraphs.filter { |p| p.type == :plain and p.split("\n").all? regex }.each do |p|
         # Apply the Transforms::LINE on all the paragraphs
@@ -87,7 +87,7 @@ module Clayoven::Claytext
                                .gsub(/!\{([^\}]+)\}/, '<strong>\1</strong>')
                                .gsub(/!_\{([^\}]+)\}/, '<em>\1</em>')
                                .gsub(/\[([^\[\]]+)\]\(([^)]+)\)/, '<a href="\2">\1</a>')
-                               .gsub('!br!', "<br>")
+                               .gsub("\u{23CE}", "<br>")
 
   end
 
