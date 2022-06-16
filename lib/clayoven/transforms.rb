@@ -103,12 +103,15 @@ module Clayoven::Claytext::Transforms
       p.type = :images
       dims = Struct.new(:width, :height)
       p.prop = dims.new(fc.captures[0], fc.captures[1])
-      if (p.split("\n").length == 1) && File.directory?(p)
-        p.replace Dir.glob("#{p}/*.svg", base: Clayoven::Git.toplevel)
-                     .sort_by { |e| e.split('/')[-1].split('.svg')[0].to_i }.join("\n")
-      end
+
       # Artificially make all paths start with /
-      p.replace p.split("\n").map { |e| File.join('/', e) }.join("\n")
+      p.replace (p.split("\n").map { |e| File.join('/', e.strip) }.join("\n"))
+
+      if (p.split("\n").length == 1) && File.directory?(p[1..])
+        p.replace Dir.glob("#{p[1..]}/*.{svg,png,heic,jpg}", base: Clayoven::Git.toplevel)
+                     .sort_by { |e| e.split('/')[-1].split(/\.\w{1-4}$/)[0].to_i }
+                     .map { |e| File.join('/', e) }.join("\n")
+      end
     end,
 
     # MathJaX: put the markers back, since js needs it: $$ ... $$
