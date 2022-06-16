@@ -17,9 +17,6 @@ module Clayoven::Claytext::Transforms
       p.olstart = match[1]
     end,
 
-    # The code for :ulitems is much simpler
-    /^(\-) / => ->(p, _) { p.type = :ulitems },
-
     # The Roman-numeral version of ol
     /^\(([ivx]+)\) / => ->(p, match) do
       p.type = :olitems
@@ -34,11 +31,13 @@ module Clayoven::Claytext::Transforms
       p.olstart = match[1].ord - 'a'.ord + 1
     end,
 
+    # The code for :ulitems is much simpler
+    /^(\-) / => ->(p, _) { p.type = :ulitems },
+
     # Exercise blocks
     /^(\+|§) / => ->(p, _) { p.type = :exercise },
 
-    # If the p has exactly one line prefixed with hashes,
-    # it is put into the :subheading type.
+    # Subheading: (#|##) ...
     /^(#+) / => ->(p, match) do
       p.type = :subheading
       p.prop = match[1].length
@@ -61,7 +60,7 @@ module Clayoven::Claytext::Transforms
       p.prop = :ellipses
     end,
 
-    # Footer
+    # Footer, rendered as a ul
     /^(†|‡|§|¶) / => ->(p, _) { p.type = :footer }
   }.freeze
 
@@ -82,10 +81,10 @@ module Clayoven::Claytext::Transforms
   # The key is used to starting and ending fences in a Clayoven::Claytext::Paragraph,
   # and value is the lambda that'll act on the matched paragraph.
   FENCED = {
-    # For blurbs
+    # Blurbs: '... [...] ...'
     [/\A\.\.\.$/, /^\.\.\.\z/] => ->(p, _, _) { p.type = :blurb },
 
-    # For codeblocks
+    # Codeblocks; syntax highlighting with Rouge: ``` .... ```
     [/\A```(\w*)$/, /^```\z/] => ->(p, fc, _) do
       p.type = :codeblock
       if fc.captures[0].empty?
@@ -98,7 +97,7 @@ module Clayoven::Claytext::Transforms
       end
     end,
 
-    # For images and notebooks of svgs
+    # Images and notebooks of images: << [dims] ... >>
     [/\A<< (\d+)x(\d+)$/, /^>>\z/] => ->(p, fc, _) do
       p.type = :images
       dims = Struct.new(:width, :height)
@@ -107,6 +106,7 @@ module Clayoven::Claytext::Transforms
       # Artificially make all paths start with /
       p.replace (p.split("\n").map { |e| File.join('/', e.strip) }.join("\n"))
 
+      # For notebooks of images, all the images must be named [0-9]+.{svg,png,hiec,jpg}
       if (p.split("\n").length == 1) && File.directory?(p[1..])
         p.replace Dir.glob("#{p[1..]}/*.{svg,png,heic,jpg}", base: Clayoven::Git.toplevel)
                      .sort_by { |e| e.split('/')[-1].split(/\.\w{1-4}$/)[0].to_i }

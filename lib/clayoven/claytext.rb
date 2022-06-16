@@ -38,7 +38,8 @@ module Clayoven::Claytext
         qmatch = lregex.match q
         next unless qmatch
 
-        # Replace paragraph p with all the paragraphs from pidx to pidx + idx, after stripping out the delims.
+        # Replace paragraph p with all the paragraphs from pidx to pidx + idx,
+        # after stripping out the delims.
         # The final result, the "fenced paragraph" sits at pidx.
         p.replace(Util.slice_strip_fences!(paragraphs, pidx, idx + 1))
         matched_blocks << mb.new(p, pmatch, qmatch)
@@ -62,11 +63,13 @@ module Clayoven::Claytext
 
   # Perform the transforms in Clayoven::Claytext::Transforms::LINE on Paragraph entries in-place
   def self.line_transforms!(paragraphs)
-    # Preprocess lines ending with ' \\'
+    # Preprocess lines ending with ' \\' and insert a special unicode char for conversion to <br>
     paragraphs.each { |p| p.gsub! " \\\\\n", "\u{23CE}" }
+
+    # Now do the all the line transforms, never operating on a line more than once
     Transforms::LINE.each do |regex, lambda_cb|
       paragraphs.filter { |p| p.type == :plain and p.split("\n").all? regex }.each do |p|
-        # Apply the Transforms::LINE on all the paragraphs
+        # Strip the regex before calling the lambda
         match = p.match regex
         p.gsub! regex, ''
         lambda_cb.call p, match
@@ -81,14 +84,16 @@ module Clayoven::Claytext
     '>' => '&gt;'
   }.freeze
 
-  # Insert <{mark, strong, em, a, br}> into the paragraph
-  def self.inline_transforms!(paragraph)
-    paragraph.replace paragraph.gsub(/`([^`]+)`/, '<mark>\1</mark>')
-                               .gsub(/!\{([^\}]+)\}/, '<strong>\1</strong>')
-                               .gsub(/!_\{([^\}]+)\}/, '<em>\1</em>')
-                               .gsub(/\[([^\[\]]+)\]\(([^)]+)\)/, '<a href="\2">\1</a>')
-                               .gsub("\u{23CE}", "<br>")
-
+  # Insert <{mark, strong, em, a, br}> into the paragraph after escaping HTML
+  def self.inline_transforms!(paragraphs)
+    paragraphs.each do |p|
+      p.replace p.gsub(/[<>&]/, HTMLESCAPE_RULES)
+                  .gsub(/`([^`]+)`/, '<mark>\1</mark>')
+                  .gsub(/!\{([^\}]+)\}/, '<strong>\1</strong>')
+                  .gsub(/!_\{([^\}]+)\}/, '<em>\1</em>')
+                  .gsub(/\[([^\[\]]+)\]\(([^)]+)\)/, '<a href="\2">\1</a>')
+                  .gsub("\u{23CE}", "<br>")
+    end
   end
 
   # Takes a body of claytext (`String`), breaks it up into paragraphs, and
@@ -99,18 +104,17 @@ module Clayoven::Claytext
     # Split the body into Paragraphs
     paragraphs = body.split("\n\n").map { |p| Paragraph.new p.rstrip }
 
-    # Merge paragraphs along fences, and do the transforms
+    # First, do the fenced transforms on all paragraphs
     fenced_transforms! paragraphs
+
+    # Then, do the line transforms on paragraphs untouched by the fenced transforms
     line_transforms! (paragraphs.filter { |p| p.type == :plain })
 
-    # At the end of both sets of transforms, operate on non-fenced paragraphs
-    paragraphs.reject { |p| %i[codeblock images mathjax].count(p.type).positive? }.each do |p|
-      p.gsub!(/[<>&]/, HTMLESCAPE_RULES)
+    # Finally, do inline transforms on paragraphs untouched by the fenced transforms
+    inline_transforms! (paragraphs.reject {
+      |p| %i[codeblock images mathjax].count(p.type).positive? })
 
-      # Finally, do inline transforms
-      inline_transforms! p
-    end
-
+    # Result: paragraphs
     paragraphs
   end
 end
