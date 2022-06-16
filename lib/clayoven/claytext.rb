@@ -62,6 +62,8 @@ module Clayoven::Claytext
 
   # Perform the transforms in Clayoven::Claytext::Transforms::LINE on Paragraph entries in-place
   def self.line_transforms!(paragraphs)
+    # Preprocess lines ending with ' \\'
+    paragraphs.each { |p| p.gsub! " \\\\\n", '!br!' }
     Transforms::LINE.each do |regex, lambda_cb|
       paragraphs.filter { |p| p.type == :plain and p.split("\n").all? regex }.each do |p|
         # Apply the Transforms::LINE on all the paragraphs
@@ -79,15 +81,14 @@ module Clayoven::Claytext
     '>' => '&gt;'
   }.freeze
 
-  # Insert <{mark, a}> in certain kinds of Paragraph#type
-  def self.process_inline_markdown(paragraphs)
-    paragraphs.select { |p| %i[plain olitems ulitems exercise footer blurb].count(p.type).positive? }.each do |p|
-      p.gsub!(/`([^`]+)`/, '<mark>\1</mark>')
-      p.gsub!(/!\{([^\}]+)\}/, '<strong>\1</strong>')
-      p.gsub!(/!_\{([^\}]+)\}/, '<em>\1</em>')
-      p.gsub!(/\[([^\[\]]+)\]\(([^)]+)\)/, '<a href="\2">\1</a>')
-    end
-    paragraphs
+  # Insert <{mark, strong, em, a, br}> into the paragraph
+  def self.inline_transforms!(paragraph)
+    paragraph.replace paragraph.gsub(/`([^`]+)`/, '<mark>\1</mark>')
+                               .gsub(/!\{([^\}]+)\}/, '<strong>\1</strong>')
+                               .gsub(/!_\{([^\}]+)\}/, '<em>\1</em>')
+                               .gsub(/\[([^\[\]]+)\]\(([^)]+)\)/, '<a href="\2">\1</a>')
+                               .gsub('!br!', "<br>")
+
   end
 
   # Takes a body of claytext (`String`), breaks it up into paragraphs, and
@@ -100,17 +101,16 @@ module Clayoven::Claytext
 
     # Merge paragraphs along fences, and do the transforms
     fenced_transforms! paragraphs
-    line_transforms! paragraphs
+    line_transforms! (paragraphs.filter { |p| p.type == :plain })
 
-    # At the end of both sets of transforms, htmlescape everything but `:mathjax` and `:codeblock`
-    paragraphs.reject { |p| p.type == :mathjax or p.type == :codeblock }.each do |p|
+    # At the end of both sets of transforms, operate on non-fenced paragraphs
+    paragraphs.reject { |p| %i[codeblock images mathjax].count(p.type).positive? }.each do |p|
       p.gsub!(/[<>&]/, HTMLESCAPE_RULES)
+
+      # Finally, do inline transforms
+      inline_transforms! p
     end
 
-    # Insert HTML breaks in :plain paragraphs
-    paragraphs.filter { |p| p.type == :plain }.each { |p| p.gsub!(/\n/, "<br/>\n") }
-
-    # Process `...` and `[...](...)`
-    process_inline_markdown paragraphs
+    paragraphs
   end
 end

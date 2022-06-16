@@ -50,21 +50,19 @@ module Clayoven::Claytext::Transforms
     end,
 
     # Horizontal line, in a p of its own
-    /^(--)$/ => ->(p, _) do
+    /\A(--)\Z/ => ->(p, _) do
       p.type = :horizrule
       p.prop = :horizrule
     end,
 
     # Ellipses hr, in a p of its own
-    /^(\.\.)$/ => ->(p, _) do
+    /\A(\.\.)\Z/ => ->(p, _) do
       p.type = :horizrule
       p.prop = :ellipses
     end,
 
     # Footer
-    /^(†|‡|§|¶) / => ->(p, _) do
-      p.type = :footer
-    end
+    /^(†|‡|§|¶) / => ->(p, _) { p.type = :footer }
   }.freeze
 
   # Start marker for commutative diagrams, rendered using XyJaX
