@@ -62,10 +62,12 @@ module Clayoven::Claytext
 
   # Perform the transforms in Clayoven::Claytext::Transforms::LINE on Paragraph entries in-place
   def self.line_transforms!(paragraphs)
-    paragraphs.filter { |p| p.type == :plain }.each do |p|
-      # Apply the Transforms::LINE on all the paragraphs
-      Transforms::LINE.each do |regex, lambda_cb|
-        lambda_cb.call(p, regex) if p.split("\n").all?(regex)
+    Transforms::LINE.each do |regex, lambda_cb|
+      paragraphs.filter { |p| p.type == :plain and p.split("\n").all? regex }.each do |p|
+        # Apply the Transforms::LINE on all the paragraphs
+        match = p.match regex
+        p.gsub! regex, ''
+        lambda_cb.call p, match
       end
     end
   end

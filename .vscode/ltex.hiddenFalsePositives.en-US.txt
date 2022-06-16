@@ -1,0 +1,3 @@
+{"rule":"UPPERCASE_SENTENCE_START","sentence":"^\\Qclayoven logo\\E$"}
+{"rule":"EN_A_VS_AN","sentence":"^\\QIf there multiple \\E(?:Dummy|Ina|Jimmy-)[0-9]+\\Q entries under an \\E(?:Dummy|Ina|Jimmy-)[0-9]+\\Q, the latter simply serves to give a introduction, with links to articles automatically appearing after the introduction.\\E$"}
+{"rule":"EN_A_VS_AN","sentence":"^\\QIf there are multiple \\E(?:Dummy|Ina|Jimmy-)[0-9]+\\Q entries under an \\E(?:Dummy|Ina|Jimmy-)[0-9]+\\Q, the latter simply serves to give a introduction, with links to articles automatically appearing after the introduction.\\E$"}

@@ -1,85 +1,69 @@
 require 'rouge'
 
-# The transforms that act on a Clayoven::Claytext::Paragraph
+# The transforms that act on a Clayoven::Claytext::p
 #
 # Extending the syntax of claytext is easy: just add an entry here.
 module Clayoven::Claytext::Transforms
   # Line transforms
   #
-  # The key is used to match each line in a Clayoven::Claytext::Paragraph, and value is the
-  # lambda that'll act on the matched paragraph.
+  # The key is used to match each line in a Clayoven::Claytext::p, and value is the
+  # lambda that'll act on the matched p.
   LINE = {
     # If all the lines in a paragraph begin with "\d+\. ", those
     # characters are stripped from the content, and the paragraph is
     # marked as an :olitems,
-    /^([0-9]+)\. / => lambda do |paragraph, regex|
-      match = paragraph.match regex
-      paragraph.gsub! regex, ''
-      paragraph.type = :olitems
-      paragraph.olstart = match[1]
+    /^([0-9]+)\. / => ->(p, match) do
+      p.type = :olitems
+      p.olstart = match[1]
     end,
 
     # The code for :ulitems is much simpler
-    /^(\- )/ => lambda do |paragraph, regex|
-      match = paragraph.match regex
-      paragraph.gsub! regex, ''
-      paragraph.type = :ulitems
-    end,
+    /^(\-) / => ->(p, _) { p.type = :ulitems },
 
     # The Roman-numeral version of ol
-    /^\(([ivx]+)\) / => lambda do |paragraph, regex|
-      match = paragraph.match regex
-      paragraph.gsub! regex, ''
-      paragraph.type = :olitems
-      paragraph.prop = :i
-      paragraph.olstart = Util.to_arabic(match[1])
+    /^\(([ivx]+)\) / => ->(p, match) do
+      p.type = :olitems
+      p.prop = :i
+      p.olstart = Util.to_arabic match[1]
     end,
 
     # The alphabetic version of ol
-    /^\(([a-z])\) / => lambda do |paragraph, regex|
-      match = paragraph.match regex
-      paragraph.gsub! regex, ''
-      paragraph.type = :olitems
-      paragraph.prop = :a
-      paragraph.olstart = match[1].ord - 'a'.ord + 1
+    /^\(([a-z])\) / => ->(p, match) do
+      p.type = :olitems
+      p.prop = :a
+      p.olstart = match[1].ord - 'a'.ord + 1
     end,
 
     # Exercise blocks
-    /^(\+|§) / => lambda do |paragraph, regex|
-      paragraph.gsub! regex, ''
-      paragraph.type = :exercise
-    end,
+    /^(\+|§) / => ->(p, _) { p.type = :exercise },
 
-    # If the paragraph has exactly one line prefixed with hashes,
+    # If the p has exactly one line prefixed with hashes,
     # it is put into the :subheading type.
-    /^(#+) / => lambda do |paragraph, regex|
-      match = paragraph.match regex
-      paragraph.gsub! regex, ''
-      paragraph.type = :subheading
-      paragraph.prop = match[1].length
+    /^(#+) / => ->(p, match) do
+      p.type = :subheading
+      p.prop = match[1].length
       # See RFC 3986, reserved characters
-      paragraph.bookmark = paragraph.downcase
+      p.bookmark = p.downcase
                                     .tr('!*\'();:@&=+$,/?#[]', '')
                                     .gsub('\\', '').tr('{', '-').tr('}', '')
                                     .tr(' ', '-')
     end,
 
-    # Horizontal line, in a paragraph of its own
-    /^--$/ => lambda do |paragraph, _|
-      paragraph.type = :horizrule
-      paragraph.prop = :horizrule
+    # Horizontal line, in a p of its own
+    /^(--)$/ => ->(p, _) do
+      p.type = :horizrule
+      p.prop = :horizrule
     end,
 
-    # Ellipses hr, in a paragraph of its own
-    /^\.\.$/ => lambda do |paragraph, _|
-      paragraph.type = :horizrule
-      paragraph.prop = :ellipses
+    # Ellipses hr, in a p of its own
+    /^(\.\.)$/ => ->(p, _) do
+      p.type = :horizrule
+      p.prop = :ellipses
     end,
 
-    # If all the lines in a paragraph begin with certain unicode symbols, the
-    # paragraph is marked as :footer.
-    /^(\*|†|‡|§|¶) / => lambda do |paragraph, _|
-      paragraph.type = :footer
+    # Footer
+    /^(†|‡|§|¶) / => ->(p, _) do
+      p.type = :footer
     end
   }.freeze
 
@@ -97,14 +81,14 @@ module Clayoven::Claytext::Transforms
 
   # Fenced transforms
   #
-  # The key is used to starting and ending fences in a Clayoven::Claytext::Paragraph, and value is the
-  # lambda that'll act on the matched paragraph.
+  # The key is used to starting and ending fences in a Clayoven::Claytext::Paragraph,
+  # and value is the lambda that'll act on the matched paragraph.
   FENCED = {
     # For blurbs
     [/\A\.\.\.$/, /^\.\.\.\z/] => ->(p, _, _) { p.type = :blurb },
 
     # For codeblocks
-    [/\A```(\w*)$/, /^```\z/] => lambda { |p, fc, _|
+    [/\A```(\w*)$/, /^```\z/] => ->(p, fc, _) do
       p.type = :codeblock
       if fc.captures[0].empty?
         p.prop = ""
@@ -114,10 +98,10 @@ module Clayoven::Claytext::Transforms
         p.replace (formatter.format(lexer.lex p))
         p.prop = Rouge::Themes::Base16::Solarized.mode(:light).render()
       end
-    },
+    end,
 
     # For images and notebooks of svgs
-    [/\A<< (\d+)x(\d+)$/, /^>>\z/] => lambda { |p, fc, _|
+    [/\A<< (\d+)x(\d+)$/, /^>>\z/] => ->(p, fc, _) do
       p.type = :images
       dims = Struct.new(:width, :height)
       p.prop = dims.new(fc.captures[0], fc.captures[1])
@@ -127,16 +111,16 @@ module Clayoven::Claytext::Transforms
       end
       # Artificially make all paths start with /
       p.replace p.split("\n").map { |e| File.join('/', e) }.join("\n")
-    },
+    end,
 
     # MathJaX: put the markers back, since js needs it: $$ ... $$
-    [/\A\$\$/, /\$\$\z/] => lambda do |p, _, _|
+    [/\A\$\$/, /\$\$\z/] => ->(p, _, _) do
       p.type = :mathjax
       p.replace ['$$', p.to_s, '$$'].join("\n")
     end,
 
     # Writing commutative diagrams using xypic: {{ ... }}, rendered using XyJaX
-    [/\A\{\{$/, /^\}\}\z/] => lambda do |p, _, _|
+    [/\A\{\{$/, /^\}\}\z/] => ->(p, _, _) do
       p.type = :mathjax
       p.replace ['$$', XYMATRIX_START, p.to_s, XYMATRIX_END, '$$'].join("\n")
     end

@@ -20,7 +20,7 @@ A starter project is bundled with the following `scratch.index.clay`:
 
 ![syntax highlighting demo](https://user-images.githubusercontent.com/37226/113478818-91a7f280-948b-11eb-87f0-3610f2aa3160.png)
 
-whose rendered output can be seen [here](https://artagnon.com/scratch)).
+whose rendered output can be seen [here](https://artagnon.com/scratch).
 
 Here's an excerpt of embedded MathJaX with IntelliSense powered by vsclay:
 
@@ -48,14 +48,14 @@ So, if you have these files,
     blog/math/1.clay
     colophon.index.clay
 
-clayoven automatically builds a sidebar with `index`, `blog` and `colophon` (each of which are instances of `IndexPage`). `/blog` will have links to the posts `/blog/personal/1` and `/blog/math/1` (each of which are instances of `ContentPage`), under the titles `personal` and `math` (the "subtopics"). If there multiple `ContentPage` entries under an `IndexPage`, the latter simply serves to give a introduction, with links to articles automatically appearing after the introduction. `IndexPage` and `ContentPage` are run through the same `design/template.slim`, and the template file has access to the accessors.
+clayoven automatically builds a sidebar with `index`, `blog` and `colophon` (each of which are instances of `IndexPage`). `/blog` will have links to the posts `/blog/personal/1` and `/blog/math/1` (each of which are instances of `ContentPage`), under the titles `personal` and `math` (the "subtopics"). If there are multiple `ContentPage` entries under an `IndexPage`, the latter simply serves to give a introduction, with links to articles automatically appearing after the introduction. `IndexPage` and `ContentPage` are run through the same `design/template.slim`, and the template file has access to the accessors.
 
 The engine works closely with the git object store, and builds are incremental by default; it mostly Just Works, and when it doesn't, there's an option to force a full rebuild. The engine also pulls out the created-timestamp (`Page#crdate`) and last-modified-timestamp (`Page#lastmod`) from git, respecting moves. `ContentPages` are sorted by `crdate`, reverse-chronologically, and `IndexPages` are sorted alphabetically.
 
 ## Usage
 
 - `clayoven init` to generate the necessary starter project.
-- `clayoven` to generate html files incrementally based on the current git index.
+- `clayoven` to generate HTML files incrementally based on the current git index.
 - `clayoven aggressive` to regenerate the entire site; only requires to be run on occassion.
 - `clayoven httpd` to preview your website locally.
 
@@ -74,7 +74,7 @@ The claytext processor is, at its core, a paragraph-processor; all content must 
 
 ## Tips
 
-- Check in the generated html to the site's repository, so that eyeballing `git diff` can serve as a testing mechanism.
+- Check in the generated HTML to the site's repository, so that eyeballing `git diff` can serve as a testing mechanism.
 - If you accidentally commit `.clay` files before running clayoven, running it afterward will do nothing, since it will see a clean git index; you'll need to run the aggressive variant.
 - Importing historical content is easy; a `git commit --date="#{historical_date}"` would give the post an appropriate creation date that will be respected in the sorting-order.
 

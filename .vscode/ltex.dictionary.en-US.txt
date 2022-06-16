@@ -1,0 +1,10 @@
+clayoven
+vscode
+claytext
+MathJaX
+XyJaX
+IntelliSense
+vsclay
+accessors
+occassion
+dhall
