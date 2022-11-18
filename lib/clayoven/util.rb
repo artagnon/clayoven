@@ -8,13 +8,14 @@ module Clayoven::Toplevel::Util
   # Fetch all .clay files, ∞ directories deep
   def self.ls_files; Dir.glob('**/*.clay').reject { |entry| File.directory? entry } end
 
-  # Minify css and js files, by shelling out to npm
+  # Minify css and js files, by shelling out to yarn
   def self.minify_design
     puts "[#{'YARN'.green}]: Minifying js and css"
     system 'yarn minify'
   end
 
-  # Shell out to npm to render math, via MathJaX and XyJaX; very expensive if you have a lot of math on your site.
+  # Shell out to yarn to render math, via MathJaX and XyJaX
+  # Very expensive if you have a lot of math on your site.
   def self.render_math(htmlfiles)
     system "yarn jax #{htmlfiles}"
   end

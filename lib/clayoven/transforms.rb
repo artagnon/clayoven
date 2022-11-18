@@ -1,17 +1,17 @@
 require 'rouge'
 
-# The transforms that act on a Clayoven::Claytext::p
+# The transforms that act on a Clayoven::Claytext::Paragraph
 #
 # Extending the syntax of claytext is easy: just add an entry here.
 module Clayoven::Claytext::Transforms
   # Line transforms
   #
-  # The key is used to match each line in a Clayoven::Claytext::p, and value is the
-  # lambda that'll act on the matched p.
+  # The key is used to match each line in a Clayoven::Claytext::Paragraph
+  # and value is the lambda that'll act on the matched p.
   LINE = {
-    # If all the lines in a paragraph begin with "\d+\. ", those
-    # characters are stripped from the content, and the paragraph is
-    # marked as an :olitems,
+    # If all the lines in a paragraph begin with "\d+\. ",
+    # those characters are stripped from the content,
+    # and the paragraph is marked as an :olitems,
     /^([0-9]+)\. / => ->(p, match) do
       p.type = :olitems
       p.olstart = match[1]
