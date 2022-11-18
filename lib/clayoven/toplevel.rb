@@ -287,7 +287,7 @@ module Clayoven
     def self.generate_site(genpages, topics, is_aggressive)
       generate_html genpages, topics if genpages.any?
       Util.minify_design if @git.design_changed? || is_aggressive
-      generate_sitemap genpages if genpages.none? || is_aggressive
+      generate_sitemap genpages if is_aggressive
     end
 
     # The entry point for `clayoven`, and `clayoven aggressive`.
