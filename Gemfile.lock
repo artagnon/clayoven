@@ -5,7 +5,9 @@ GEM
     colorize (0.8.1)
     docile (1.4.0)
     fileutils (1.6.0)
+    language_server-protocol (3.17.0.1)
     minitest (5.16.3)
+    prettier_print (1.1.0)
     progressbar (1.11.0)
     psych (4.0.6)
       stringio
@@ -13,6 +15,10 @@ GEM
     rdoc (6.4.0)
       psych (>= 4.0.0)
     rouge (3.30.0)
+    ruby-lsp (0.3.6)
+      language_server-protocol (~> 3.17.0)
+      sorbet-runtime
+      syntax_tree (>= 4.0.2, < 5.0.0)
     simplecov (0.21.2)
       docile (~> 1.1)
       simplecov-html (~> 0.11)
@@ -24,7 +30,10 @@ GEM
     slim (4.1.0)
       temple (>= 0.7.6, < 0.9)
       tilt (>= 2.0.6, < 2.1)
+    sorbet-runtime (0.5.10564)
     stringio (3.0.2)
+    syntax_tree (4.3.0)
+      prettier_print (>= 1.0.2)
     temple (0.8.2)
     tilt (2.0.11)
     tmpdir (0.1.2)
@@ -43,6 +52,7 @@ DEPENDENCIES
   rake
   rdoc
   rouge (~> 3.28)
+  ruby-lsp (~> 0.3.6)
   simplecov
   sitemap_generator
   slim
