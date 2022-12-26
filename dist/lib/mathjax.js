@@ -20,17 +20,23 @@ mathjax
       inlineMath: [["$", "$"]],
     },
     chtml: {
-      fontURL: "https://cdn.jsdelivr.net/npm/mathjax@3/es5/output/chtml/fonts/woff-v2",
+      fontURL:
+        "https://cdn.jsdelivr.net/npm/mathjax@3/es5/output/chtml/fonts/woff-v2",
     },
   })
   .then((MathJax) => {
-    let progress = new ProgressBar(`[${"TeX".green} ]: |:bar| :current/:total`, {
-      total: argv._.length,
-      incomplete: " ",
-    });
+    let progress = new ProgressBar(
+      `[${"TeX".green} ]: |:bar| :current/:total`,
+      {
+        total: argv._.length,
+        incomplete: " ",
+      }
+    );
     argv._.forEach((r) => {
       // Read in the HTML file
-      const html = (MathJax.startup.document = MathJax.startup.getDocument(readFileSync(r, "utf8")));
+      const html = (MathJax.startup.document = MathJax.startup.getDocument(
+        readFileSync(r, "utf8")
+      ));
 
       // xypic has used the adaptor
       const adaptor = MathJax.startup.adaptor;
@@ -42,7 +48,11 @@ mathjax
       html.clear().render();
 
       // Output the resulting HTML in-place
-      writeFileSync(r, adaptor.doctype(html.document) + adaptor.outerHTML(adaptor.root(html.document)));
+      writeFileSync(
+        r,
+        adaptor.doctype(html.document) +
+          adaptor.outerHTML(adaptor.root(html.document))
+      );
       progress.tick();
     });
   })

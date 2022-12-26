@@ -1,17 +1,15 @@
-import minify from '@node-minify/core';
-import babelMin from '@node-minify/babel-minify';
-import cleanCSS from '@node-minify/clean-css';
+import minify from "@node-minify/core";
+import terser from "@node-minify/terser";
+import sass from "sass";
+import { writeFileSync } from "fs";
 
 minify({
-  compressor: babelMin,
-  input: 'design/script.js',
-  output: 'dist/script.min.js',
-  callback: (err, _) => { if (err) console.log(err); }
+  compressor: terser,
+  input: "design/script.js",
+  output: "dist/script.min.js",
+  callback: (err, _) => {
+    if (err) console.log(err);
+  },
 });
 
-minify({
-  compressor: cleanCSS,
-  input: ['design/style.css'],
-  output: 'dist/style.min.css',
-  callback: (err, _) => { if (err) console.log(err); }
-});
+writeFileSync("dist/style.min.css", sass.renderSync({ file: "design/style.sass" }).css.toString());
