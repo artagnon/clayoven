@@ -56,7 +56,7 @@ module Clayoven
         @filename = filename
         # If a file is in the git index, use `Time.now`; otherwise, log --follow it.
         @lastmod, @crdate, @locations = git.metadata @filename
-        @title, @body = (IO.read @filename).split "\n\n", 2
+        @title, @body = File.read(@filename).split "\n\n", 2
       end
 
       # Writes out HTML pages rendered by Clayoven::Claytext::process and `Slim::Template`

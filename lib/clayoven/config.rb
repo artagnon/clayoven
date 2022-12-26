@@ -59,7 +59,7 @@ class Clayoven::Config
     components = path.split '/'
     Dir.mkdir components[0] if components.length == (2) && !(Dir.exist? components[0])
     if File.exist?(path)
-      IO.read(path).split "\n"
+      File.read(path).split "\n"
     else
       File.open(path, 'w') { |io| io.write default }
       [default]
