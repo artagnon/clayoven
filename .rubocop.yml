@@ -1,5 +1,5 @@
 AllCops:
-  TargetRubyVersion: 3.0.0
+  TargetRubyVersion: 3.2.0
 Naming/FileName:
   Enabled: false
 Style/FrozenStringLiteralComment:

@@ -1,13 +1,13 @@
-require 'helper'
-require 'tmpdir'
-require 'clayoven/init'
+require "helper"
+require "tmpdir"
+require "clayoven/init"
 
 # Exercise Clayoven::Init.init
 class Init < Minitest::Test
   def assert_paths(names)
-    names.map { |name| "#{name}.html" }.each do |file|
-      assert_path_exists file, "#{file} was not generated"
-    end
+    names
+      .map { |name| "#{name}.html" }
+      .each { |file| assert_path_exists file, "#{file} was not generated" }
   end
 
   def test_noarg

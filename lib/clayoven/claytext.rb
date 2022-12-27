@@ -2,7 +2,7 @@
 #
 # The actual transformation rules are the constants in Clayoven::Claytext::Transforms.
 module Clayoven::Claytext
-  require_relative 'transforms'
+  require_relative "transforms"
 
   # A paragraph of text; just a `String` with additional accessors
   class Paragraph < String
@@ -68,26 +68,25 @@ module Clayoven::Claytext
 
     # Now do the all the line transforms, never operating on a line more than once
     Transforms::LINE.each do |regex, lambda_cb|
-      paragraphs.filter { |p| p.type == :plain and p.split("\n").all? regex }.each do |p|
-        # Strip the regex before calling the lambda
-        match = p.match regex
-        p.gsub! regex, ''
-        lambda_cb.call p, match
-      end
+      paragraphs
+        .filter { |p| p.type == :plain and p.split("\n").all? regex }
+        .each do |p|
+          # Strip the regex before calling the lambda
+          match = p.match regex
+          p.gsub! regex, ""
+          lambda_cb.call p, match
+        end
     end
   end
 
   # We only HTML escape very few things, for simplicity
-  HTMLESCAPE_RULES = {
-    '&' => '&amp;',
-    '<' => '&lt;',
-    '>' => '&gt;'
-  }.freeze
+  HTMLESCAPE_RULES = { "&" => "&amp;", "<" => "&lt;", ">" => "&gt;" }.freeze
 
   # Insert <{mark, strong, em, a, br}> into the paragraph after escaping HTML
   def self.inline_transforms!(paragraphs)
     paragraphs.each do |p|
-      p.replace p.gsub(/[<>&]/, HTMLESCAPE_RULES)
+      p.replace p
+                  .gsub(/[<>&]/, HTMLESCAPE_RULES)
                   .gsub(/`([^`]+)`/, '<mark>\1</mark>')
                   .gsub(/!\{([^\}]+)\}/, '<strong>\1</strong>')
                   .gsub(/!_\{([^\}]+)\}/, '<em>\1</em>')
@@ -111,8 +110,11 @@ module Clayoven::Claytext
     line_transforms! (paragraphs.filter { |p| p.type == :plain })
 
     # Finally, do inline transforms on paragraphs untouched by the fenced transforms
-    inline_transforms! (paragraphs.reject {
-      |p| %i[codeblock images mathjax].count(p.type).positive? })
+    inline_transforms! (
+                         paragraphs.reject { |p|
+                           %i[codeblock images mathjax].count(p.type).positive?
+                         }
+                       )
 
     # Result: paragraphs
     paragraphs

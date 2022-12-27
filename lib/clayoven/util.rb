@@ -1,17 +1,21 @@
-require 'rouge'
+require "rouge"
 
 # Miscellanous utilities
 module Clayoven::Toplevel::Util
   # Sorts a list of filenames lexicographically, but for 'index.clay'
-  def self.lex_sort(files) (files.reject { |f| f == 'index.clay' }).sort end
+  def self.lex_sort(files)
+    (files.reject { |f| f == "index.clay" }).sort
+  end
 
   # Fetch all .clay files, ∞ directories deep
-  def self.ls_files; Dir.glob('**/*.clay').reject { |entry| File.directory? entry } end
+  def self.ls_files
+    Dir.glob("**/*.clay").reject { |entry| File.directory? entry }
+  end
 
   # Minify css and js files, by shelling out to yarn
   def self.minify_design
-    puts "[#{'YARN'.green}]: Minifying js and css"
-    system 'yarn minify'
+    puts "[#{"YARN".green}]: Minifying js and css"
+    system "yarn minify"
   end
 
   # Shell out to yarn to render math, via MathJaX and XyJaX
@@ -38,20 +42,20 @@ end
 module Clayoven::Claytext::Transforms::Util
   # For roman-numeralized lists like (i), (ii)
   ROMAN_NUMERALS = {
-    10 => 'x',
-    9 => 'ix',
-    5 => 'v',
-    4 => 'iv',
-    1 => 'i'
+    10 => "x",
+    9 => "ix",
+    5 => "v",
+    4 => "iv",
+    1 => "i"
   }.freeze
 
   # Lexers in Rouge
   ROUGE_LEXERS = {
-    'hs' => Rouge::Lexers::Haskell,
-    'rs' => Rouge::Lexers::Rust,
-    'coq' => Rouge::Lexers::Coq,
-    'cpp' => Rouge::Lexers::Cpp,
-    'asm' => Rouge::Lexers::Nasm
+    "hs" => Rouge::Lexers::Haskell,
+    "rs" => Rouge::Lexers::Rust,
+    "coq" => Rouge::Lexers::Coq,
+    "cpp" => Rouge::Lexers::Cpp,
+    "asm" => Rouge::Lexers::Nasm
   }.freeze
 
   # Do a roman to arabic conversion

@@ -56,23 +56,31 @@ class Clayoven::Config
 
   # Creates file at path, if it doesn't exist, initializes with default
   def create_template(path, default)
-    components = path.split '/'
-    Dir.mkdir components[0] if components.length == (2) && !(Dir.exist? components[0])
+    components = path.split "/"
+    if components.length == (2) && !(Dir.exist? components[0])
+      Dir.mkdir components[0]
+    end
     if File.exist?(path)
       File.read(path).split "\n"
     else
-      File.open(path, 'w') { |io| io.write default }
+      File.open(path, "w") { |io| io.write default }
       [default]
     end
   end
 
   # Initialize our config strings and hashtables based on some sane defaults
   def initialize
-    @sitename = create_template('.clayoven/sitename', 'clayoven.io').first
-    @hidden = create_template '.clayoven/hidden', %w[404 scratch].join("\n")
-    @tzmap = (create_template '.clayoven/tz', TZ_DEFAULT).map { |l| l.split(' ', 2) }.to_h
-    @stmap = (create_template '.clayoven/subtopic', SUBTOPIC_DEFAULT).map { |l| l.split(' ', 2) }.to_h
+    @sitename = create_template(".clayoven/sitename", "clayoven.io").first
+    @hidden = create_template ".clayoven/hidden", %w[404 scratch].join("\n")
+    @tzmap =
+      (create_template ".clayoven/tz", TZ_DEFAULT)
+        .map { |l| l.split(" ", 2) }
+        .to_h
+    @stmap =
+      (create_template ".clayoven/subtopic", SUBTOPIC_DEFAULT)
+        .map { |l| l.split(" ", 2) }
+        .to_h
     @stmap.default_proc = proc { |h, k| h[k] = k }
-    @template = (create_template 'design/template.slim', SLIM_DEFAULT).join "\n"
+    @template = (create_template "design/template.slim", SLIM_DEFAULT).join "\n"
   end
 end

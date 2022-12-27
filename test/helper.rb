@@ -1,2 +1,2 @@
-require 'simplecov'
-require 'minitest/autorun'
+require "simplecov"
+require "minitest/autorun"
