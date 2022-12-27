@@ -15,13 +15,15 @@ module Clayoven::Toplevel::Util
   # Minify css and js files, by shelling out to yarn
   def self.minify_design
     puts "[#{"YARN".green}]: Minifying js and css"
-    system "yarn minify"
+    fork { system "yarn minify" }
+    Process.waitall
   end
 
   # Shell out to yarn to render math, via MathJaX and XyJaX
   # Very expensive if you have a lot of math on your site.
   def self.render_math(htmlfiles)
-    system "yarn jax #{htmlfiles}"
+    fork { system "yarn jax #{htmlfiles}" }
+    Process.waitall
   end
 end
 

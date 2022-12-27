@@ -14,6 +14,7 @@ class Init < Minitest::Test
     Dir.mktmpdir do |dir|
       Dir.chdir dir do
         Clayoven::Init.init
+        assert_path_exists ".clayoven/tz", ".clayoven/tz was not generated"
         assert_paths %w[index 404 scratch]
       end
     end
@@ -23,6 +24,8 @@ class Init < Minitest::Test
     Dir.mktmpdir do |dir|
       Clayoven::Init.init dir
       Dir.chdir dir do
+        assert_path_exists ".clayoven/sitename",
+                           ".clayoven/sitename was not generated"
         assert_paths %w[index 404 scratch]
       end
     end

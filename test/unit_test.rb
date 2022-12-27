@@ -18,7 +18,7 @@ class Unit < Minitest::Test
       Dir.chdir dir do
         Clayoven::Init.init
         out, = capture_subprocess_io { Clayoven::Toplevel.main }
-        # TeX message cannot be captured, because it's another shell-out to clay
+        # TeX cannot be captured, because it's another fork to Yarn
         msg_not_found(%w[GIT CLAY YARN XML], out)
       end
     end
@@ -33,6 +33,17 @@ class Unit < Minitest::Test
                      false,
                      "clayoven did not abort with non-zero exit status"
       end
+    end
+  end
+
+  def test_existing_config
+    Dir.mktmpdir do |dir|
+      Dir.mkdir("#{dir}/.clayoven")
+      File.open("#{dir}/.clayoven/sitename", "w") { |io| io.write "foo.io" }
+      out, _ = capture_io { Clayoven::Init.init dir }
+      assert_match "Populating directory with clayoven starter project",
+                   out,
+                   "stdout did not contain expected message: #{out}"
     end
   end
 
