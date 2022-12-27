@@ -36,14 +36,17 @@ class Unit < Minitest::Test
     end
   end
 
-  def test_existing_config
+  def test_custom_init
     Dir.mktmpdir do |dir|
-      Dir.mkdir("#{dir}/.clayoven")
-      File.open("#{dir}/.clayoven/sitename", "w") { |io| io.write "foo.io" }
-      out, _ = capture_io { Clayoven::Init.init dir }
-      assert_match "Populating directory with clayoven starter project",
-                   out,
-                   "stdout did not contain expected message: #{out}"
+      Dir.chdir dir do
+        Dir.mkdir(".clayoven")
+        File.open(".clayoven/sitename", "w") { |io| io.write "foo.io" }
+        File.open("index.clay", "w") { |io| io.write "foo\n" }
+        fork { system "git init" }
+        Process.waitall
+        out, _ = capture_subprocess_io { Clayoven::Toplevel.main }
+        msg_not_found(%w[GIT CLAY YARN XML], out)
+      end
     end
   end
 
@@ -51,7 +54,7 @@ class Unit < Minitest::Test
     Dir.mktmpdir do |dir|
       Clayoven::Init.init dir
       Dir.chdir dir do
-        File.open("no_body.index.clay", "w") { |io| io.write 'heading\n' }
+        File.open("no_body.index.clay", "w") { |io| io.write "heading\n" }
         Clayoven::Toplevel.main
         assert_path_exists "no_body.html", "no_body.html was not generated"
       end
@@ -62,7 +65,7 @@ class Unit < Minitest::Test
     Dir.mktmpdir do |dir|
       Clayoven::Init.init dir
       Dir.chdir dir do
-        File.open("foo.clay", "w") { |io| io.write 'bar\n' }
+        File.open("foo.clay", "w") { |io| io.write "bar\n" }
         _, err = capture_io { Clayoven::Toplevel.main }
         assert_match "foo.clay is a stray file or directory; ignored",
                      err,
