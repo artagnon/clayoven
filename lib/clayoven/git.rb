@@ -64,7 +64,8 @@ class Clayoven::Git
         "\n"
       )
         .map { |d| Time.parse d }
-    locs = dates.map { |d| d.strftime("%z") }.map { |tz| @tzmap[tz] }.uniq
+    locs =
+      dates.map { |d| d.strftime("%z") }.map { |tz| @tzmap[tz] }.flatten.uniq
     return Time.now, Time.now, locs unless dates.first
 
     lastmod = added_or_modified?(file) ? Time.now : dates.first

@@ -12,7 +12,7 @@ class Clayoven::Config
   # not to be displayed when generating the corresponding Clayoven::Toplevel::IndexPage
   attr_accessor :hidden
 
-  # A timezone mapper of the form {'+0000' => 'London'}
+  # A timezone mapper of the form {'+0100' => ['Paris', 'London']}
   # Exposed as Clayoven::Toplevel::Page#locations
   attr_accessor :tzmap
 
@@ -75,6 +75,7 @@ class Clayoven::Config
     @tzmap =
       (create_template ".clayoven/tz", TZ_DEFAULT)
         .map { |l| l.split(" ", 2) }
+        .map { |k, v| [k, v.split(" ")] }
         .to_h
     @stmap =
       (create_template ".clayoven/subtopic", SUBTOPIC_DEFAULT)
