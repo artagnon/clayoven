@@ -56,8 +56,7 @@ module Clayoven::Claytext::Transforms::Util
     "hs" => Rouge::Lexers::Haskell,
     "rs" => Rouge::Lexers::Rust,
     "coq" => Rouge::Lexers::Coq,
-    "cpp" => Rouge::Lexers::Cpp,
-    "asm" => Rouge::Lexers::Nasm
+    "cpp" => Rouge::Lexers::Cpp
   }.freeze
 
   # Do a roman to arabic conversion
