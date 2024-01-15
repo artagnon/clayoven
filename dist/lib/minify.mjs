@@ -1,6 +1,6 @@
 import minify from "@node-minify/core";
 import terser from "@node-minify/terser";
-import sass from "sass";
+import * as sass from "sass";
 import { writeFileSync } from "fs";
 
 minify({
@@ -12,4 +12,4 @@ minify({
   },
 });
 
-writeFileSync("dist/style.min.css", sass.renderSync({ file: "design/style.sass" }).css.toString());
+writeFileSync("dist/style.min.css", sass.compile("design/style.sass", {style: "compressed"}).css);

@@ -1,18 +1,15 @@
 {
   "triggerTaskOnSave.tasks": {
-    "clayoven": ["**/*.clay", "design/*", ".clayoven/*"]
+    "clayoven": [
+      "**/*.clay",
+      "design/style.sass",
+      "design/template.slim",
+      ".clayoven/*"
+    ]
   },
   "triggerTaskOnSave.restart": true,
-  "spellright.language": [
-    "fr",
-    "en"
-  ],
-  "spellright.documentTypes": [
-    "markdown",
-    "latex",
-    "plaintext",
-    "claytext"
-  ],
+  "spellright.language": ["en"],
+  "spellright.documentTypes": ["markdown", "latex", "plaintext", "claytext"],
   "spellright.parserByClass": {
     "claytext": {
       "parser": "plain"

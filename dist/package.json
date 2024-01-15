@@ -24,21 +24,19 @@
   "author": "Ramkumar Ramachandra",
   "license": "CC-BY-4.0",
   "scripts": {
-    "compile": "node -r esm lib/lib.js",
-    "minify": "node -r esm lib/minify.js",
-    "jax": "node -r esm lib/mathjax.js"
+    "minify": "node lib/minify.mjs",
+    "jax": "node lib/mathjax.mjs"
   },
   "devDependencies": {
-    "@node-minify/core": "^7.1.0",
-    "@node-minify/terser": "^7.1.0",
+    "@node-minify/core": "^8.0.6",
+    "@node-minify/terser": "^8.0.6",
     "colors": "^1.4.0",
-    "esm": "^3.2.25",
-    "glob": "^8.0.3",
+    "glob": "^10.3.10",
     "mathjax-full": "^3.2.2",
     "progress": "^2.0.3",
-    "sass": "^1.57.1",
+    "sass": "^1.69.5",
     "svgo": "^3.0.2",
-    "yargs": "^17.6.2"
+    "yargs": "^17.7.2"
   },
   "packageManager": "yarn@4.0.2"
 }

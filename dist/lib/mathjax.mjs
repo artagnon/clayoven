@@ -1,9 +1,11 @@
 import { readFileSync, writeFileSync } from "fs";
-import { argv } from "yargs";
+import yargs from "yargs";
+import { hideBin } from "yargs/helpers";
 import "colors";
-const ProgressBar = require("progress");
+import ProgressBar from "progress";
+import * as mathjax from "mathjax-full/es5/node-main.js";
 
-import * as mathjax from "mathjax-full";
+const argv = yargs(hideBin(process.argv)).argv;
 
 mathjax
   .init({
@@ -12,7 +14,7 @@ mathjax
     },
     loader: {
       paths: { mathjax: "mathjax-full/es5", custom: "." },
-      require: require,
+      require: (url) => import(url),
       load: ["input/tex-full", "output/chtml", "[custom]/xypic"],
     },
     tex: {
@@ -26,7 +28,7 @@ mathjax
   })
   .then((MathJax) => {
     let progress = new ProgressBar(
-      `[${"TeX".green} ]: |:bar| :current/:total`,
+      `[${"TeX".green} ]: |:bar|`,
       {
         total: argv._.length,
         incomplete: " ",
@@ -51,7 +53,7 @@ mathjax
       writeFileSync(
         r,
         adaptor.doctype(html.document) +
-          adaptor.outerHTML(adaptor.root(html.document))
+        adaptor.outerHTML(adaptor.root(html.document))
       );
       progress.tick();
     });
