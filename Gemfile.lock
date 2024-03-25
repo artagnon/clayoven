@@ -12,7 +12,7 @@ GEM
     psych (5.1.2)
       stringio
     rake (13.1.0)
-    rdoc (6.6.2)
+    rdoc (6.6.3.1)
       psych (>= 4.0.0)
     rouge (3.30.0)
     ruby-lsp (0.3.8)
