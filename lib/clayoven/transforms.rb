@@ -88,7 +88,6 @@ module Clayoven::Claytext::Transforms
         formatter = Rouge::Formatters::HTML.new()
         lexer = (Util::ROUGE_LEXERS[fc.captures[0]]).new()
         p.replace (formatter.format(lexer.lex p))
-        p.prop = Rouge::Themes::Base16::Solarized.mode(:light).render()
       end
     end,
     # Images and notebooks of images: << [dims] ... >>
