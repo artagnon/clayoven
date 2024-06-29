@@ -50,9 +50,10 @@ class Clayoven::Git
       modified?(".clayoven/tz") || modified?(".clayoven/subtopics")
   end
 
-  # Indicates if `design/style.sass` or `design/script.js` was changed
+  # Indicates if `design/style.sass`, `design/rouge.sass`, or `design/script.js` was changed
   def design_changed?
-    modified?("design/style.sass") || modified?("design/script.js")
+    modified?("design/style.sass") || modified?("design/rouge.sass") ||
+      modified?("design/script.js")
   end
 
   # Returns a `[#{Last modified timestamp} # {Creation timestamp} #{Location strings}]`
