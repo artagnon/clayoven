@@ -1,6 +1,6 @@
-# \Clayoven Configuration
+# Clayoven Configuration
 #
-# \Clayoven can be configured using files `.clayoven/{sitename, hidden, tz, subtopics}`
+# Clayoven can be configured using files `.clayoven/{sitename, hidden, tz, subtopics}`
 # at the toplevel directory.
 #
 # If a certain configuration file doesn't exist, we automatically create a default one.
@@ -9,15 +9,15 @@ class Clayoven::Config
   attr_accessor :sitename
 
   # A list of Clayoven::Toplevel::ContentPage#permalink entries,
-  # not to be displayed when generating the corresponding Clayoven::Toplevel::IndexPage
+  # not to be displayed when generating the corresponding Clayoven::Toplevel::IndexPage.
   attr_accessor :hidden
 
   # A timezone mapper of the form {'+0100' => ['Paris', 'London']}
-  # Exposed as Clayoven::Toplevel::Page#locations
+  # Exposed as Clayoven::Toplevel::Page#locations.
   attr_accessor :tzmap
 
   # A subtopic mapper of the form {'inf' => '∞-categories'}
-  # Exposed as Clayoven::Toplevel::IndexPage#subtopics
+  # Exposed as Clayoven::Toplevel::IndexPage#subtopics.
   attr_accessor :stmap
 
   # A .slim file read out from disk; hard-coded to the contents of `design/template.slim`
@@ -68,7 +68,7 @@ class Clayoven::Config
     end
   end
 
-  # Initialize our config strings and hashtables based on some sane defaults
+  # Initialize our config strings and hashtables based on some sane defaults.
   def initialize
     @sitename = create_template(".clayoven/sitename", "clayoven.io").first
     @hidden = create_template ".clayoven/hidden", %w[404 scratch].join("\n")

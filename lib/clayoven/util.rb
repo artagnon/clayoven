@@ -1,18 +1,21 @@
 require "rouge"
 
+# Miscellanous Utilities
+module Clayoven::Util
+  # Fetch all files matching a glob recursively
+  def self.ls_files(glob)
+    Dir.glob("**/*.clay").reject { |entry| File.directory? entry }
+  end
+end
+
 # Miscellanous utilities
 module Clayoven::Toplevel::Util
-  # Sorts a list of filenames lexicographically, but for 'index.clay'
+  # Sorts a list of filenames lexicographically, but for 'index.clay'.
   def self.lex_sort(files)
     (files.reject { |f| f == "index.clay" }).sort
   end
 
-  # Fetch all .clay files, ∞ directories deep
-  def self.ls_files
-    Dir.glob("**/*.clay").reject { |entry| File.directory? entry }
-  end
-
-  # Minify css and js files, by shelling out to yarn
+  # Minify css and js files, by shelling out to yarn.
   def self.minify_design
     puts "[#{"YARN".green}]: Minifying js and css"
     fork { system "yarn minify" }
@@ -31,7 +34,7 @@ end
 module Clayoven::Claytext::Util
   # Slice a paragraph along index and length, strip out the first line of the first paragraph,
   # the last line of the last paragraph, and finally return the join of the slices with two
-  # newlines, the "fenced paragraph"
+  # newlines, the "fenced paragraph".
   def self.slice_strip_fences!(paragraphs, index, length)
     slices = paragraphs[index, length]
     slices[0] = slices[0].split("\n")[1..].join("\n")

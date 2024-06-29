@@ -2,16 +2,16 @@ require "colorize"
 require "webrick"
 require "uri"
 
-# The entry point for `clayoven httpd`
+# The entry point for `clayoven httpd`.
 #
-# Run a simple webrick http server to test on localhost:8000
+# Run a simple webrick http server to test on localhost:8000.
 module Clayoven::Httpd
-  # Start the server, and shut it down on `:INT`
+  # Start the server, and shut it down on `:INT`.
   def self.start
     port = 8000
     callback =
       proc do |req, res|
-        # A couple of URL rewriting rules; simple stuff
+        # A couple of URL rewriting rules: strip .html.
         if %r{^/$} =~ req.path_info
           res.set_redirect WEBrick::HTTPStatus::Found, "index.html"
         elsif /^(?<uri>[^.]+)$/ =~ req.path_info

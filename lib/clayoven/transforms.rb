@@ -11,7 +11,7 @@ module Clayoven::Claytext::Transforms
   LINE = {
     # If all the lines in a paragraph begin with "\d+\. ",
     # those characters are stripped from the content,
-    # and the paragraph is marked as an :olitems,
+    # and the paragraph is marked as an :olitems.
     /^([0-9]+)\. / => ->(p, match) do
       p.type = :olitems
       p.olstart = match[1]
@@ -60,13 +60,13 @@ module Clayoven::Claytext::Transforms
     /^(†|‡|§|¶) / => ->(p, _) { p.type = :footer }
   }.freeze
 
-  # Start marker for commutative diagrams, rendered using XyJaX
+  # Start marker for commutative diagrams, rendered using XyJa.X
   XYMATRIX_START = <<-'EOF'.freeze
   \begin{xy}
   \xymatrix{
   EOF
 
-  # End marker for commutative diagrams, rendered using XyJaX
+  # End marker for commutative diagrams, rendered using XyJaX.
   XYMATRIX_END = <<-'EOF'.freeze
   }
   \end{xy}

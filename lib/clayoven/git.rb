@@ -1,7 +1,7 @@
-# \Git \metadata information for the clayoven repository
+# Git metadata information for the clayoven repository
 #
-# Information from the git index via new is cheap, but metadata is expensive due to the `git log --follow`
-# invocation.
+# Information from the git index via new is cheap, but metadata is expensive due to the
+# `git log --follow` invocation.
 class Clayoven::Git
   # Look at the git index immediately; accepts a Clayoven::Config#tzmap hashtable
   def initialize(tzmap)
@@ -19,42 +19,45 @@ class Clayoven::Git
     end
   end
 
-  # Return the toplevel directory in the git tree, or an empty string
+  # Return the toplevel directory in the git tree, or an empty string.
   def self.toplevel
     `git rev-parse --show-toplevel 2>/dev/null`.strip
   end
 
-  # Indicates if a file was modified, from git index
+  # Checks if a file was modified, from the git index.
   def modified?(file)
     @modified.any?(file) || @untracked.any?(file)
   end
 
-  # Indicates if a file was added, from git index
+  # Checks if a file was added, from the git index.
   def added?(file)
     @added.any?(file) || @untracked.any?(file)
   end
 
-  # Indicates if any of the files in the list of files were added, from git index
-  def any_added?(files)
-    files.any? { |file| added? file }
-  end
-
-  # Indicates if any of the files in the list of files were added or modified, from git index
+  # Checks if a file was adddd or modified, from git index.
   def added_or_modified?(file)
     added?(file) || modified?(file)
   end
 
-  # Indicates if the config or the template was changed, in a way that requires a full rebuild
-  def template_changed?
-    modified?("design/template.slim") || modified?(".clayoven/sitename") ||
-      modified?(".clayoven/hidden") || modified?(".clayoven/tz") ||
-      modified?(".clayoven/subtopic")
+  # Checks if any of the files in the list of files were added, from git index.
+  def any_added?(files)
+    files.any? { |file| added? file }
   end
 
-  # Indicates if `design/style.sass`, `design/rouge.sass`, or `design/script.js` was changed
+  # Indicates if the site was changed in a way that requires a full rebuild.
+  def requires_aggressive?
+    (
+      ["design/template.slim"] + Clayoven::Util.ls_files(".clayoven/*") +
+        Clayoven::Util.ls_files("lib/*")
+    ).any? { |file| modified? file }
+  end
+
+  # Checks if the stylesheets or js files were changed.
   def design_changed?
-    modified?("design/style.sass") || modified?("design/rouge.sass") ||
-      modified?("design/script.js")
+    (
+      Clayoven::Util.ls_files("design/*.sass") +
+        Clayoven::Util.ls_files("design/*.js")
+    ).any? { |file| modified? file }
   end
 
   # Returns a `[#{Last modified timestamp} # {Creation timestamp} #{Location strings}]`

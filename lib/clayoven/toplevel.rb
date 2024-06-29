@@ -72,9 +72,10 @@ module Clayoven
 
     # An "index page"
     #
-    # Should be an `index.clay` in the toplevel directory, or `#{topic}.index.clay` files in the toplevel directory,
-    # or some subdirectory. The ContentPage entries corresponding to this \IndexPage will have to be `.clay` files
-    # under the `#{topic}/[#{subtopic}/]` directory of `#{topic}.index.clay`
+    # Should be an `index.clay` in the toplevel directory, or `#{topic}.index.clay` files in the
+    # toplevel directory, or some subdirectory. The ContentPage entries corresponding to this
+    # \IndexPage will have to be `.clay` files under the `#{topic}/[#{subtopic}/]` directory of
+    # `#{topic}.index.clay`
     class IndexPage < Page
       # Initialize permalink and target, with special handling for 'index.clay';
       # every other filename is a '*.index.clay'
@@ -112,8 +113,8 @@ module Clayoven
 
     # A "content page"
     #
-    # For .clay files nested within subdirectories, with a corresponding `#{subdirectory}.index.clay`
-    # in the ancestor directory.
+    # For .clay files nested within subdirectories, with a corresponding
+    # `#{subdirectory}.index.clay` in the ancestor directory.
     class ContentPage < Page
       # The specific "topic" under which this ContentPage sits
       attr_accessor :topic
@@ -199,10 +200,10 @@ module Clayoven
         end
     end
 
-    # Find the dirty IndexPage and ContentPage entries from some modification that occured in the git index,
-    # based on index_files, and content_files.
+    # Find the dirty IndexPage and ContentPage entries from some modification that occured in the
+    # git index, based on index_files, and content_files.
     #
-    # Returns an `Array` of IndexPage
+    # Returns an `Array` of IndexPage.
     def self.dirty_pages_from_mod(index_files, content_files)
       # Create a progressbar based on information from the git index
       modified_index_files, modified_content_files =
@@ -230,10 +231,11 @@ module Clayoven
       ]
     end
 
-    # Return `Array` of IndexPage and ContentPage entries to render
+    # Return `Array` of IndexPage and ContentPage entries to render.
     def self.dirty_pages(index_files, content_files, is_aggressive)
       # Adding a new index file is equivalent to re-rendering the entire site
-      if @git.any_added?(index_files) || @git.template_changed? || is_aggressive
+      if @git.any_added?(index_files) || @git.requires_aggressive? ||
+           is_aggressive
         dirty_pages_from_add(index_files, content_files)
       else
         dirty_pages_from_mod(index_files, content_files)
@@ -247,8 +249,9 @@ module Clayoven
       end
     end
 
-    # Return IndexPage and ContentPage entries to render; we work with index_files and content_files, because
-    # converting them to Page objects prematurely will result in unnecessary `log --follow` invocations
+    # Return IndexPage and ContentPage entries to render; we work with index_files and
+    # content_files, because converting them to Page objects prematurely will result in unnecessary
+    # `log --follow` invocations.
     def self.pages_to_render(index_files, content_files, is_aggressive)
       dirty_index_pages, dirty_content_pages =
         dirty_pages index_files, content_files, is_aggressive
@@ -277,16 +280,16 @@ module Clayoven
       [all_topics, topics]
     end
 
-    # Separate out `index_files` and `content_files` from `all_files` based on filename
+    # Separate out `index_files` and `content_files` from `all_files` based on filename.
     def self.separate_index_content_files(all_files)
-      # index_files are files ending in '.index.clay' and 'index.clay'
-      # content_files are all other files; topics is the list of topics: we need it for the sidebar
+      # index_files are files ending in '.index.clay' and 'index.clay'.
+      # content_files are all other files; topics is the list of topics: we need it for the sidebar.
       index_files =
         ["index.clay"] + all_files.select { |file| /\.index\.clay$/ =~ file }
       [index_files, all_files - index_files]
     end
 
-    # From all_files, find out the list of `index_files`, `content_files`, and `topics`, and return them.
+    # From all_files, find out the list of `index_files`, `content_files`, and `topics`.
     #
     # Returns an `Array` of three different `Array` of `String`.
     def self.index_content_files(all_files)
@@ -307,7 +310,7 @@ module Clayoven
     end
 
     # Produce HTML files, first using Page#render, and then operating on the files produced
-    # in-place with MathJaX
+    # in-place with MathJaX.
     def self.generate_html(genpages, topics)
       progress =
         ProgressBar.create(title: "[#{"CLAY".green}]", total: genpages.length)
@@ -346,6 +349,7 @@ module Clayoven
     def self.generate_site(genpages, topics, is_aggressive)
       generate_html genpages, topics if genpages.any?
       Util.minify_design if @git.design_changed? || is_aggressive
+      # genpages will only have the information for all the pages if is_aggressive
       generate_sitemap genpages if is_aggressive
     end
 
@@ -365,13 +369,13 @@ module Clayoven
         @git = Clayoven::Git.new @config.tzmap
 
         # Collect the list of files from a directory listing
-        all_files = Util.ls_files
+        all_files = Clayoven::Util.ls_files("**/*.clay")
 
         # From all_files, get the list of index_files, content_files, and topics
         index_files, content_files, topics = index_content_files all_files
 
         # If the template changes, we're definitely in aggressive mode
-        is_aggressive ||= @git.template_changed?
+        is_aggressive ||= @git.requires_aggressive?
 
         # Get a list of pages to render, genpages
         genpages = pages_to_render index_files, content_files, is_aggressive

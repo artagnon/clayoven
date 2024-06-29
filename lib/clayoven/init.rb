@@ -2,7 +2,7 @@
 module Clayoven
   require_relative "toplevel"
 
-  # Entry point for `clayoven init`
+  # Entry point for `clayoven init`.
   #
   # It copies the `dist` directory from the source tree to the new project, invokes `git init`
   # and `npm i`. Having node.js installed is a prerequisite.
@@ -12,7 +12,8 @@ module Clayoven
       File.join(__dir__, *%w[.. .. dist])
     end
 
-    # The entry point for 'clayoven \init'. Does a 'cp -rv #{distdir} #{destdir}", 'git \init', and 'yarn install'.
+    # The entry point for 'clayoven init'. Does a 'cp -rv #{distdir} #{destdir}", 'git \init', and
+    # 'yarn install'.
     def self.init(destdir = ".")
       puts "[#{"INIT".yellow}]: Populating directory with clayoven starter project"
       FileUtils.mkdir_p "#{destdir}/.clayoven"
