@@ -46,8 +46,9 @@ class Clayoven::Git
 
   # Indicates if the config or the template was changed, in a way that requires a full rebuild
   def template_changed?
-    modified?("design/template.slim") || modified?(".clayoven/hidden") ||
-      modified?(".clayoven/tz") || modified?(".clayoven/subtopics")
+    modified?("design/template.slim") || modified?(".clayoven/sitename") ||
+      modified?(".clayoven/hidden") || modified?(".clayoven/tz") ||
+      modified?(".clayoven/subtopic")
   end
 
   # Indicates if `design/style.sass`, `design/rouge.sass`, or `design/script.js` was changed

@@ -12,4 +12,5 @@ minify({
   },
 });
 
-writeFileSync("dist/style.min.css", sass.compile("design/style.sass", {style: "compressed"}).css);
+writeFileSync("dist/style.min.css", sass.compile("design/style.sass", { style: "compressed" }).css);
+writeFileSync("dist/rouge.min.css", sass.compile("design/rouge.sass", { style: "compressed" }).css);

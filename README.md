@@ -36,9 +36,9 @@ All site content is split up into "topics", to put in the sidebar, each of which
 
 So, if you have these files,
 
-    .vscode/...             # provided by `init`
+    .vscode/                # provided by `init`
     .htaccess               # provided by `init`
-    lib/...                 # provided by `init`
+    lib/                    # provided by `init`
     design/                 # provided by `init`
     index.clay              # provided by `init`
     scratch.index.clay      # provided by `init`
