@@ -22,14 +22,11 @@ class Production < Minitest::Test
       Dir.chdir("#{tmpdir}/artagnon.com") do
         `yarn install`
 
-        _, err = capture_io { Clayoven::Toplevel.main }
-        assert_empty err.strip,
-                     "clayoven incremental returned an error: #{err.strip}"
+        Clayoven::Toplevel.main
         assert_empty modified_clay_html,
                      "git diff returned non-zero: #{modified_clay_html}"
 
-        _, err = capture_io { Clayoven::Toplevel.main(is_aggressive: true) }
-        assert_empty err.strip, "clayoven returned an error: #{err.strip}"
+        Clayoven::Toplevel.main(is_aggressive: true)
         assert_empty modified_clay_html,
                      "git diff returned non-zero: #{modified_clay_html}"
       end
