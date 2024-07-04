@@ -4,7 +4,7 @@ require "rouge"
 module Clayoven::Util
   # Fetch all files matching a glob recursively
   def self.ls_files(glob)
-    Dir.glob("**/*.clay").reject { |entry| File.directory? entry }
+    Dir.glob(glob).reject { |entry| File.directory? entry }
   end
 end
 

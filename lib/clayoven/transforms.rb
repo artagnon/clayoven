@@ -57,7 +57,7 @@ module Clayoven::Claytext::Transforms
       p.prop = :ellipses
     end,
     # Footer, rendered as a ul
-    /^(†|‡|§|¶) / => ->(p, _) { p.type = :footer }
+    /^(†|‡|¶) / => ->(p, _) { p.type = :footer }
   }.freeze
 
   # Start marker for commutative diagrams, rendered using XyJa.X
