@@ -79,19 +79,11 @@ module Clayoven::Claytext
     end
   end
 
-  # We only HTML escape very few things, for simplicity
-  HTMLESCAPE_RULES = { "&" => "&amp;", "<" => "&lt;", ">" => "&gt;" }.freeze
-
-  # Insert <{mark, strong, em, a, br}> into the paragraph after escaping HTML
+  # Perform the transforms in Clayoven::Claytext::Transforms::INLINE on
+  # Paragraph entries in-place
   def self.inline_transforms!(paragraphs)
-    paragraphs.each do |p|
-      p.replace p
-                  .gsub(/[<>&]/, HTMLESCAPE_RULES)
-                  .gsub(/`([^`]+)`/, '<mark>\1</mark>')
-                  .gsub(/!\{([^\}]+)\}/, '<strong>\1</strong>')
-                  .gsub(/!_\{([^\}]+)\}/, '<em>\1</em>')
-                  .gsub(/\[([^\[\]]+)\]\(([^)]+)\)/, '<a href="\2">\1</a>')
-                  .gsub("\u{23CE}", "<br>")
+    Transforms::INLINE.each do |regex, replacement|
+      paragraphs.each { |p| p.gsub! regex, replacement }
     end
   end
 
@@ -110,11 +102,11 @@ module Clayoven::Claytext
     line_transforms! (paragraphs.filter { |p| p.type == :plain })
 
     # Finally, do inline transforms on paragraphs untouched by the fenced transforms
-    inline_transforms! (
-                         paragraphs.reject { |p|
-                           %i[codeblock images mathjax].count(p.type).positive?
-                         }
-                       )
+    filtered_paragraphs =
+      paragraphs.reject do |p|
+        %i[codeblock images mathjax].count(p.type).positive?
+      end
+    inline_transforms! filtered_paragraphs
 
     # Result: paragraphs
     paragraphs

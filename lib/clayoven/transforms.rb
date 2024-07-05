@@ -124,4 +124,19 @@ module Clayoven::Claytext::Transforms
       p.replace ["$$", XYMATRIX_START, p.to_s, XYMATRIX_END, "$$"].join("\n")
     end
   }.freeze
+
+  # Inline transforms
+  #
+  # Regex replacements for HTML escape, <{mark, strong, em, a, br}>.
+  # We only HTML escape very few things, for simplicity
+  INLINE = {
+    "&" => "&amp;",
+    "<" => "&lt;",
+    ">" => "&gt;",
+    /`([^`]+)`/ => '<mark>\1</mark>',
+    /!\{([^\}]+)\}/ => '<strong>\1</strong>',
+    /!_\{([^\}]+)\}/ => '<em>\1</em>',
+    /\[([^\[\]]+)\]\(([^)]+)\)/ => '<a href="\2">\1</a>',
+    "\u{23CE}" => "<br>"
+  }.freeze
 end
