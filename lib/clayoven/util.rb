@@ -60,6 +60,7 @@ module Clayoven::Claytext::Transforms::Util
     "rs" => Rouge::Lexers::Rust,
     "coq" => Rouge::Lexers::Coq,
     "cpp" => Rouge::Lexers::Cpp,
+    "js" => Rouge::Lexers::Javascript,
     "c" => Rouge::Lexers::C,
     "llvm" => Rouge::Lexers::LLVM,
     "diff" => Rouge::Lexers::Diff
