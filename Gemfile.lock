@@ -1,18 +1,22 @@
 GEM
   remote: https://rubygems.org/
   specs:
-    builder (3.2.4)
+    builder (3.3.0)
     colorize (1.1.0)
-    docile (1.4.0)
-    fileutils (1.7.2)
-    language_server-protocol (3.17.0.3)
-    minitest (5.23.1)
+    date (3.4.1)
+    docile (1.4.1)
+    erb (5.0.1)
+    fileutils (1.7.3)
+    language_server-protocol (3.17.0.5)
+    minitest (5.25.5)
     prettier_print (1.2.1)
     progressbar (1.13.0)
-    psych (5.1.2)
+    psych (5.2.6)
+      date
       stringio
-    rake (13.2.1)
-    rdoc (6.7.0)
+    rake (13.3.0)
+    rdoc (6.14.2)
+      erb
       psych (>= 4.0.0)
     rouge (3.30.0)
     ruby-lsp (0.3.8)
@@ -23,23 +27,23 @@ GEM
       docile (~> 1.1)
       simplecov-html (~> 0.11)
       simplecov_json_formatter (~> 0.1)
-    simplecov-html (0.12.3)
+    simplecov-html (0.13.1)
     simplecov_json_formatter (0.1.4)
     sitemap_generator (6.3.0)
       builder (~> 3.0)
     slim (5.2.1)
       temple (~> 0.10.0)
       tilt (>= 2.1.0)
-    sorbet-runtime (0.5.11406)
-    stringio (3.1.0)
+    sorbet-runtime (0.5.12219)
+    stringio (3.1.7)
     syntax_tree (5.3.0)
       prettier_print (>= 1.2.0)
     temple (0.10.3)
-    tilt (2.3.0)
-    tmpdir (0.2.0)
+    tilt (2.6.0)
+    tmpdir (0.3.1)
       fileutils
-    uri (0.13.0)
-    webrick (1.8.1)
+    uri (1.0.3)
+    webrick (1.9.1)
 
 PLATFORMS
   arm64-darwin-23
