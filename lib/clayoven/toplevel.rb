@@ -359,7 +359,7 @@ module Clayoven
             maker.items.new_item do |item|
               item.link = p.permalink
               item.title = p.title
-              item.updated = p.lastmod
+              item.updated = p.crdate
             end
           end
         end
