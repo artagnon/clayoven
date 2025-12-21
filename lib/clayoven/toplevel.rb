@@ -3,6 +3,7 @@ require "colorize"
 require "fileutils"
 require "progressbar"
 require "sitemap_generator"
+require "rss"
 
 # :nodoc:
 module Clayoven
@@ -249,13 +250,12 @@ module Clayoven
       end
     end
 
-    # Return IndexPage and ContentPage entries to render; we work with index_files and
-    # content_files, because converting them to Page objects prematurely will result in unnecessary
-    # `log --follow` invocations.
-    def self.pages_to_render(index_files, content_files, is_aggressive)
-      dirty_index_pages, dirty_content_pages =
-        dirty_pages index_files, content_files, is_aggressive
-
+    # Return IndexPage and ContentPage entries to render
+    def self.pages_to_render(
+      dirty_index_pages,
+      dirty_content_pages,
+      content_files
+    )
       # Reject hidden content_files
       dirty_index_pages.each do |dip|
         content_pages =
@@ -345,6 +345,27 @@ module Clayoven
       end
     end
 
+    # Generate `feed.xml` from content_pages.
+    def self.generate_rss(content_pages, lastmod)
+      puts "[#{"XML".green} ]: Generating RSS feed"
+      rss =
+        RSS::Maker.make("atom") do |maker|
+          maker.channel.author = "Ramkumar Ramachandra"
+          maker.channel.updated = lastmod
+          maker.channel.about = "https://artagnon.com/feed.xml"
+          maker.channel.title = "RSS Feed for artagnon.com"
+
+          content_pages.each do |p|
+            maker.items.new_item do |item|
+              item.link = p.permalink
+              item.title = p.title
+              item.updated = p.lastmod
+            end
+          end
+        end
+      File.open("feed.xml", _ = "w") { |targetio| targetio.write rss }
+    end
+
     # Generate HTML, minify the design, and generate the sitemap.
     def self.generate_site(genpages, topics, is_aggressive)
       generate_html genpages, topics if genpages.any?
@@ -377,11 +398,20 @@ module Clayoven
         # If the template changes, we're definitely in aggressive mode
         is_aggressive ||= @git.requires_aggressive?
 
-        # Get a list of pages to render, genpages
-        genpages = pages_to_render index_files, content_files, is_aggressive
+        # Get a list of pages to render
+        dirty_index_pages, dirty_content_pages =
+          dirty_pages index_files, content_files, is_aggressive
+        genpages =
+          pages_to_render dirty_index_pages, dirty_content_pages, content_files
 
         # Generate the genpages
         generate_site genpages, topics, is_aggressive
+
+        # Generate the RSS feed from content pages
+        if is_aggressive
+          generate_rss dirty_content_pages,
+                       Clayoven::Toplevel.sitewide_lastmod(genpages)
+        end
       end
     end
   end
