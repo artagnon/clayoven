@@ -8,6 +8,7 @@ gem "uri"
 gem "progressbar"
 gem "rake"
 gem "fileutils"
+gem "rss"
 gem "tmpdir", require: false
 gem "minitest", require: false, group: :test
 gem "simplecov", require: false, group: :test

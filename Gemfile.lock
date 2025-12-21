@@ -3,22 +3,28 @@ GEM
   specs:
     builder (3.3.0)
     colorize (1.1.0)
-    date (3.4.1)
+    date (3.5.1)
     docile (1.4.1)
-    erb (5.0.1)
-    fileutils (1.7.3)
+    erb (6.0.1)
+    fileutils (1.8.0)
     language_server-protocol (3.17.0.5)
-    minitest (5.25.5)
+    minitest (6.0.0)
+      prism (~> 1.5)
     prettier_print (1.2.1)
+    prism (1.7.0)
     progressbar (1.13.0)
-    psych (5.2.6)
+    psych (5.3.1)
       date
       stringio
-    rake (13.3.0)
-    rdoc (6.14.2)
+    rake (13.3.1)
+    rdoc (7.0.1)
       erb
       psych (>= 4.0.0)
+      tsort
+    rexml (3.4.4)
     rouge (3.30.0)
+    rss (0.3.2)
+      rexml
     ruby-lsp (0.3.8)
       language_server-protocol (~> 3.17.0)
       sorbet-runtime
@@ -27,23 +33,24 @@ GEM
       docile (~> 1.1)
       simplecov-html (~> 0.11)
       simplecov_json_formatter (~> 0.1)
-    simplecov-html (0.13.1)
+    simplecov-html (0.13.2)
     simplecov_json_formatter (0.1.4)
     sitemap_generator (6.3.0)
       builder (~> 3.0)
     slim (5.2.1)
       temple (~> 0.10.0)
       tilt (>= 2.1.0)
-    sorbet-runtime (0.5.12219)
-    stringio (3.1.7)
+    sorbet-runtime (0.6.12865)
+    stringio (3.2.0)
     syntax_tree (5.3.0)
       prettier_print (>= 1.2.0)
-    temple (0.10.3)
-    tilt (2.6.0)
+    temple (0.10.4)
+    tilt (2.6.1)
     tmpdir (0.3.1)
       fileutils
-    uri (1.0.3)
-    webrick (1.9.1)
+    tsort (0.2.0)
+    uri (1.1.1)
+    webrick (1.9.2)
 
 PLATFORMS
   arm64-darwin-23
@@ -57,6 +64,7 @@ DEPENDENCIES
   rake
   rdoc
   rouge (~> 3.28)
+  rss
   ruby-lsp (~> 0.3.6)
   simplecov
   sitemap_generator
