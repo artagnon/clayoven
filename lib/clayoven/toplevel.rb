@@ -369,6 +369,8 @@ module Clayoven
                   .map { |p|
                     if p.type == :codeblock
                       "<pre>" + p + "</pre>"
+                    elsif p.type == :subheading
+                      "<h2>" + p + "</h2>"
                     else
                       "<p>" + p + "</p>"
                     end
