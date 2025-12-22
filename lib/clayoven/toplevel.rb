@@ -360,7 +360,16 @@ module Clayoven
               item.link = p.permalink
               item.title = p.title
               item.updated = p.crdate
-              item.description = p.paragraphs[0]
+              item.description =
+                p.paragraphs.reject { |p|
+                  %i[
+                    codeblock
+                    mathjax
+                    images
+                    exercise
+                    horizrule
+                  ].include? p.type
+                }.join "\n"
             end
           end
         end
