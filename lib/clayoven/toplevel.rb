@@ -364,15 +364,15 @@ module Clayoven
                 p
                   .paragraphs
                   .reject { |p|
-                    %i[
-                      codeblock
-                      mathjax
-                      images
-                      exercise
-                      horizrule
-                    ].include? p.type
+                    %i[mathjax images exercise horizrule].include? p.type
                   }
-                  .map { |p| "<p>" + p + "</p>" }.join "\n"
+                  .map { |p|
+                    if p.type == :codeblock
+                      "<pre>" + p + "</pre>"
+                    else
+                      "<p>" + p + "</p>"
+                    end
+                  }.join "\n"
             end
           end
         end
