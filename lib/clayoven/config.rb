@@ -8,6 +8,9 @@ class Clayoven::Config
   # The public URL of the website excluding the 'https://' prefix
   attr_accessor :sitename
 
+  # The author of the website
+  attr_accessor :author
+
   # A list of Clayoven::Toplevel::ContentPage#permalink entries,
   # not to be displayed when generating the corresponding Clayoven::Toplevel::IndexPage.
   attr_accessor :hidden
@@ -71,6 +74,7 @@ class Clayoven::Config
   # Initialize our config strings and hashtables based on some sane defaults.
   def initialize
     @sitename = create_template(".clayoven/sitename", "clayoven.io").first
+    @author = create_template(".clayoven/author", "Clayoven User").first
     @hidden = create_template ".clayoven/hidden", %w[404 scratch].join("\n")
     @tzmap =
       (create_template ".clayoven/tz", TZ_DEFAULT)

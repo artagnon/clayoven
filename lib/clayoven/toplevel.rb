@@ -350,10 +350,10 @@ module Clayoven
       puts "[#{"XML".green} ]: Generating RSS feed"
       rss =
         RSS::Maker.make("atom") do |maker|
-          maker.channel.author = "Ramkumar Ramachandra"
+          maker.channel.author = "#{@config.author}"
           maker.channel.updated = lastmod
-          maker.channel.about = "https://artagnon.com/feed.xml"
-          maker.channel.title = "RSS Feed for artagnon.com"
+          maker.channel.about = "https://#{@config.sitename}/feed.xml"
+          maker.channel.title = "#{@config.sitename}"
 
           content_pages.each do |p|
             maker.items.new_item do |item|
