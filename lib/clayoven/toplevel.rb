@@ -361,15 +361,18 @@ module Clayoven
               item.title = p.title
               item.updated = p.crdate
               item.description =
-                p.paragraphs.reject { |p|
-                  %i[
-                    codeblock
-                    mathjax
-                    images
-                    exercise
-                    horizrule
-                  ].include? p.type
-                }.join "\n"
+                p
+                  .paragraphs
+                  .reject { |p|
+                    %i[
+                      codeblock
+                      mathjax
+                      images
+                      exercise
+                      horizrule
+                    ].include? p.type
+                  }
+                  .map { |p| "<p>" + p + "</p>" }.join "\n"
             end
           end
         end
