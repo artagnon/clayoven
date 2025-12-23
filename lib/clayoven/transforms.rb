@@ -127,13 +127,13 @@ module Clayoven::Claytext::Transforms
 
   # Inline transforms
   #
-  # Regex replacements for HTML escape, <{mark, strong, em, a, br}>.
+  # Regex replacements for HTML escape, <{code, strong, em, a, br}>.
   # We only HTML escape very few things, for simplicity
   INLINE = {
     "&" => "&amp;",
     "<" => "&lt;",
     ">" => "&gt;",
-    /`([^`]+)`/ => '<mark>\1</mark>',
+    /`([^`]+)`/ => '<code>\1</code>',
     /!\{([^\}]+)\}/ => '<strong>\1</strong>',
     /!_\{([^\}]+)\}/ => '<em>\1</em>',
     /\[([^\[\]]+)\]\(([^)]+)\)/ => '<a href="\2">\1</a>',
