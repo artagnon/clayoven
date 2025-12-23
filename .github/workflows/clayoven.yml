@@ -29,9 +29,3 @@ jobs:
         with:
           ruby-version: "ruby"
           bundler-cache: true
-      - name: Test and publish code coverage
-        uses: paambaati/codeclimate-action@v8
-        env:
-          CC_TEST_REPORTER_ID: 6af7e3fd73fa4e4f354fc5da65ef7f77e908c47b01de069d7d718cdc4af4e6f0
-        with:
-          coverageCommand: bundle exec rake
