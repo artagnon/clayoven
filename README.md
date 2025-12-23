@@ -1,8 +1,5 @@
 # clayoven ![logo](assets/clayoven.png)
 
-[![Maintainability](https://img.shields.io/codeclimate/maintainability/artagnon/clayoven?style=for-the-badge&logo=code-climate&labelColor=000000&label=Maintainability)](https://codeclimate.com/github/artagnon/clayoven/maintainability)
-[![Test Coverage](https://img.shields.io/codeclimate/coverage/artagnon/clayoven?style=for-the-badge&logo=code-climate&labelColor=000000&label=Test%20Coverage)](https://codeclimate.com/github/artagnon/clayoven/test_coverage)
-
 clayoven is a beautiful static site generator with a carefully curated set of features. It has been built at a glacial pace, over a period of [nine years](https://github.com/artagnon/clayoven/commit/d4d40161e9f76dbe74078c669de9af698cf621d6), as [my website](https://artagnon.com) expanded in content. I have a spread of mathematical notes, both typeset and handwritten, software-related posts, and some wider-audience articles; while clayoven is primarily aimed at math-heavy sites, it is good on all three fronts. The source files are written in "claytext", a custom format built for elegance and speed.
 
 rdoc documentation is available [here](http://artagnon.github.io/clayoven/).
