@@ -363,14 +363,14 @@ module Clayoven
               item.description =
                 p
                   .paragraphs
-                  .reject { |p|
-                    %i[mathjax images exercise horizrule].include? p.type
-                  }
+                  .reject { |p| %i[mathjax exercise horizrule].include? p.type }
                   .map { |p|
                     if p.type == :codeblock
                       "<pre>" + p + "</pre>"
                     elsif p.type == :subheading
-                      "<h2>" + p + "</h2>"
+                      "<h3>" + p + "</h3>"
+                    elsif p.type == :images
+                      p.each_line.map { |l| "<img src=\"#{l}\" />" }
                     else
                       "<p>" + p + "</p>"
                     end
