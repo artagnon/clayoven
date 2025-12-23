@@ -1,6 +1,6 @@
 # clayoven ![logo](assets/clayoven.png)
 
-clayoven is a beautiful static site generator with a carefully curated set of features. It has been built at a glacial pace, over a period of [nine years](https://github.com/artagnon/clayoven/commit/d4d40161e9f76dbe74078c669de9af698cf621d6), as [my website](https://artagnon.com) expanded in content. I have a spread of mathematical notes, both typeset and handwritten, software-related posts, and some wider-audience articles; while clayoven is primarily aimed at math-heavy sites, it is good on all three fronts. The source files are written in "claytext", a custom format built for elegance and speed.
+clayoven is a beautiful static site generator with a carefully curated set of features. It has been built at a glacial pace, over a [decade](https://github.com/artagnon/clayoven/commit/d4d40161e9f76dbe74078c669de9af698cf621d6), as [my website](https://artagnon.com) expanded in content. I have a spread of mathematical notes, both typeset and handwritten, software-related posts with code, and some wider-audience articles; it is good on all three fronts. The source files are written in "claytext", a custom format built for elegance and speed.
 
 rdoc documentation is available [here](http://artagnon.github.io/clayoven/).
 
@@ -33,13 +33,17 @@ All site content is split up into "topics", to put in the sidebar, each of which
 
 So, if you have these files,
 
+    .clayoven/              # provided by `init`
     .vscode/                # provided by `init`
-    .htaccess               # provided by `init`
+    .yarn/                  # provided by `init`
     lib/                    # provided by `init`
     design/                 # provided by `init`
+    dist/                   # provided by `init`
     index.clay              # provided by `init`
     scratch.index.clay      # provided by `init`
     404.index.clay          # provided by `init`
+    feed.xml                # provided by `init`
+    sitemap.xml             # provided by `init`
     blog.index.clay
     blog/personal/1.clay
     blog/math/1.clay
@@ -58,6 +62,7 @@ The engine works closely with the git object store, and builds are incremental b
 
 ## Configuration
 
+0. `.clayoven/author` is the author of the site: used in RSS feed.
 1. `.clayoven/sitename` is URL of the site, excluding the `https://` prefix.
 2. `.clayoven/hidden` is a list of `IndexFiles` that should be built, but not displayed in the sidebar. You would want to use it for your 404 page and drafts.
 3. `.clayoven/tz` is a timezone-to-location mapper, with lines of the form `+0000 London`. clayoven digs through the git history for locations, and exposes a `Page#locations`.
@@ -77,8 +82,5 @@ The claytext processor is, at its core, a paragraph-processor; all content must 
 
 ## Planned features, and anti-features
 
-- Have one unified dhall configuration.
-- Allow the user to extend claytext syntax with configuration.
-- Hit 100% test coverage.
 - Get vsclay to report syntax errors.
 - Anti: extend clayoven in ways that would necessitate an ugly implementation.
