@@ -5,13 +5,15 @@ GEM
     colorize (1.1.0)
     date (3.5.1)
     docile (1.4.1)
-    erb (6.0.1)
+    drb (2.2.3)
+    erb (6.0.2)
     fileutils (1.8.0)
     language_server-protocol (3.17.0.5)
     logger (1.7.0)
-    minitest (6.0.0)
+    minitest (6.0.2)
+      drb (~> 2.0)
       prism (~> 1.5)
-    prism (1.7.0)
+    prism (1.9.0)
     progressbar (1.13.0)
     psych (5.3.1)
       date
@@ -21,12 +23,12 @@ GEM
       logger
       prism (>= 1.6.0)
       tsort
-    rdoc (7.0.1)
+    rdoc (7.2.0)
       erb
       psych (>= 4.0.0)
       tsort
     rexml (3.4.4)
-    rouge (3.30.0)
+    rouge (4.7.0)
     rss (0.3.2)
       rexml
     ruby-lsp (0.26.9)
@@ -46,7 +48,7 @@ GEM
       tilt (>= 2.1.0)
     stringio (3.2.0)
     temple (0.10.4)
-    tilt (2.6.1)
+    tilt (2.7.0)
     tmpdir (0.3.1)
       fileutils
     tsort (0.2.0)
@@ -64,9 +66,9 @@ DEPENDENCIES
   progressbar
   rake
   rdoc
-  rouge (~> 3.28)
+  rouge
   rss
-  ruby-lsp (~> 0.26.9)
+  ruby-lsp
   simplecov
   sitemap_generator
   slim

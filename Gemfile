@@ -13,5 +13,5 @@ gem "tmpdir", require: false
 gem "minitest", require: false, group: :test
 gem "simplecov", require: false, group: :test
 gem "rdoc", require: false, group: :doc
-gem "rouge", "~> 3.28"
-gem "ruby-lsp", "~> 0.26.9", :group => :development
+gem "rouge"
+gem "ruby-lsp", :group => :development
