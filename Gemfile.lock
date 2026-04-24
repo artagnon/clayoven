@@ -6,7 +6,7 @@ GEM
     date (3.5.1)
     docile (1.4.1)
     drb (2.2.3)
-    erb (6.0.2)
+    erb (6.0.4)
     fileutils (1.8.0)
     language_server-protocol (3.17.0.5)
     logger (1.7.0)
